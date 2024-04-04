@@ -1,0 +1,17 @@
+{
+    "name": "marco/junk-framework",
+    "description": "Simple PHP Framework",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Junk\\": "src/Junk"
+        }
+    },
+    "authors": [
+        {
+            "name": "MarcoCaamal",
+            "email": "caamalmarco99@gmail.com"
+        }
+    ],
+    "require": {}
+}

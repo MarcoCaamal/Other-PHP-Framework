@@ -1,7 +1,14 @@
 <?php
-require './Router.php';
+use Junk\HttpNotFoundException;
+use Junk\Router;
+
+require __DIR__ . "/../vendor/autoload.php";
 
 $router = new Router();
+
+$router->get("/", function () { 
+    return "Server is listen...";
+});
 
 $router->get('/test', function () { 
     return 'GET OK';
