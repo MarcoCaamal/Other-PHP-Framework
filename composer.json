@@ -7,11 +7,21 @@
             "Junk\\": "src/Junk"
         }
     },
+    "scripts": {
+        "tests": "phpunit --color=always --testdox tests/"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Junk\\Tests\\": "tests"
+        }
+    },
     "authors": [
         {
             "name": "MarcoCaamal",
             "email": "caamalmarco99@gmail.com"
         }
     ],
-    "require": {}
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    }
 }
