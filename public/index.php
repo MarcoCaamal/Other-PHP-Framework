@@ -1,4 +1,5 @@
 <?php
+
 use Junk\HttpNotFoundException;
 use Junk\Router;
 
@@ -10,8 +11,8 @@ $router->get("/", function () {
     return "Server is listen...";
 });
 
-$router->get('/test', function () { 
-    return 'GET OK';
+$router->get('/test/{id}', function () { 
+    return 'GET OK ';
 });
 
 $router->post('/test', function () { 
@@ -19,7 +20,9 @@ $router->post('/test', function () {
 });
 
 try {
-    $action = $router->resolve($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
+    $route = $router->resolve($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
+    $action = $route->action();
+
     print($action());
 } catch (HttpNotFoundException $ex) {
     print($ex);

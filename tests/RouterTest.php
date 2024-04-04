@@ -12,8 +12,10 @@ class RouterTest extends TestCase {
         $action = fn() => 'test';
         $router = new Router();
         $router->get($uri, $action);
+        $route = $router->resolve($uri, HttpMethod::GET->value); 
 
-        $this->assertEquals($action, $router->resolve($uri, HttpMethod::GET->value));
+        $this->assertEquals($action, $route->action());
+        $this->assertEquals($uri, $route->uri());
     }
 
     public function testResolveMultipleBasicRoutesWithCallbackAction() {
@@ -30,7 +32,9 @@ class RouterTest extends TestCase {
         }
 
         foreach($routes as $uri => $action) {
-            $this->assertEquals($action, $router->resolve($uri, HttpMethod::GET->value));
+            $route = $router->resolve($uri, HttpMethod::GET->value);
+            $this->assertEquals($action, $route->action());
+            $this->assertEquals($uri, $route->uri());
         }
     }
 
@@ -56,7 +60,9 @@ class RouterTest extends TestCase {
         }
 
         foreach($routes as [$method, $uri, $action]) { 
-            $this->assertEquals($action, $router->resolve($uri, $method->value));
+            $route = $router->resolve($uri, $method->value);
+            $this->assertEquals($route->action(), $action);
+            $this->assertEquals($route->uri(), $uri);
         }
     }
 }
