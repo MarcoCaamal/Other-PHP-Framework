@@ -3,6 +3,7 @@ namespace Junk;
 
 use Junk\HttpMethod;
 use Junk\HttpNotFoundException;
+use Request;
 
 class Router {
     protected $routes = [];
@@ -16,9 +17,9 @@ class Router {
         $this->routes[$method->value][] = new Route($uri, $action);
     }
 
-    public function resolve(string $uri, string $method): Route {
-        foreach($this->routes[$method] as $route) {
-            if($route->matches($uri)) {
+    public function resolve(Request $request): Route {
+        foreach($this->routes[$request->method()->value] as $route) {
+            if($route->matches($request->uri())) {
                 return $route;
             }
         }

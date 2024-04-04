@@ -2,6 +2,7 @@
 
 use Junk\HttpNotFoundException;
 use Junk\Router;
+use Junk\Server;
 
 require __DIR__ . "/../vendor/autoload.php";
 
@@ -20,9 +21,9 @@ $router->post('/test', function () {
 });
 
 try {
-    $route = $router->resolve($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
+    $route = $router->resolve(new Request(new Server()));
     $action = $route->action();
-
+    
     print($action());
 } catch (HttpNotFoundException $ex) {
     print($ex);
