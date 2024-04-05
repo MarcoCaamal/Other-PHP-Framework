@@ -1,5 +1,7 @@
 <?php
+namespace Junk;
 
+use Junk\PHPNativeServer;
 use Junk\Server;
 use Junk\HttpMethod;
 
@@ -9,7 +11,7 @@ class Request {
     protected array $data = [];
     protected array $query = [];
 
-    public function __construct(Server $server) {
+    public function __construct(ServerContract $server) {
         $this->uri = $server->requestUri();
         $this->method = $server->requestMethod();
         $this->data = $server->postData();

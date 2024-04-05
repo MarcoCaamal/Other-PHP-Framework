@@ -3,7 +3,7 @@ namespace Junk;
 
 use Junk\HttpMethod;
 use Junk\HttpNotFoundException;
-use Request;
+use Junk\Request;
 
 class Router {
     protected $routes = [];

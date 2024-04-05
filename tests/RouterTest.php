@@ -1,10 +1,11 @@
 <?php
 namespace Junk\Tests;
-
-use Junk\HttpMethod;
-use PHPUnit\Framework\TestCase;
-
 use Junk\Router;
+
+use Junk\Request;
+use Junk\HttpMethod;
+use Junk\Tests\MockServer;
+use PHPUnit\Framework\TestCase;
 
 class RouterTest extends TestCase {
     public function testResolveBasicRouteWithCallback() {
@@ -12,7 +13,7 @@ class RouterTest extends TestCase {
         $action = fn() => 'test';
         $router = new Router();
         $router->get($uri, $action);
-        $route = $router->resolve($uri, HttpMethod::GET->value); 
+        $route = $router->resolve(new Request(new MockServer($uri, HttpMethod::GET))); 
 
         $this->assertEquals($action, $route->action());
         $this->assertEquals($uri, $route->uri());
@@ -32,7 +33,7 @@ class RouterTest extends TestCase {
         }
 
         foreach($routes as $uri => $action) {
-            $route = $router->resolve($uri, HttpMethod::GET->value);
+            $route = $router->resolve(new Request(new MockServer($uri, HttpMethod::GET)));
             $this->assertEquals($action, $route->action());
             $this->assertEquals($uri, $route->uri());
         }
@@ -60,7 +61,7 @@ class RouterTest extends TestCase {
         }
 
         foreach($routes as [$method, $uri, $action]) { 
-            $route = $router->resolve($uri, $method->value);
+            $route = $router->resolve(new Request(new MockServer($uri, $method)));
             $this->assertEquals($route->action(), $action);
             $this->assertEquals($route->uri(), $uri);
         }

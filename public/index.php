@@ -1,8 +1,9 @@
 <?php
 
 use Junk\HttpNotFoundException;
+use Junk\PHPNativeServer;
+use Junk\Request;
 use Junk\Router;
-use Junk\Server;
 
 require __DIR__ . "/../vendor/autoload.php";
 
@@ -21,9 +22,9 @@ $router->post('/test', function () {
 });
 
 try {
-    $route = $router->resolve(new Request(new Server()));
+    $route = $router->resolve(new Request(new PHPNativeServer()));
     $action = $route->action();
-    
+
     print($action());
 } catch (HttpNotFoundException $ex) {
     print($ex);
