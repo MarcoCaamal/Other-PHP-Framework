@@ -1,4 +1,5 @@
 <?php
+
 namespace Junk\Tests\Routing;
 
 use PHPUnit\Framework\TestCase;
@@ -8,8 +9,10 @@ use Junk\Http\HttpMethod;
 use Junk\Http\Request;
 use Junk\Routing\Router;
 
-class RouterTest extends TestCase {
-    private function createMockRequest(string $uri, HttpMethod $httpMethod): Request {
+class RouterTest extends TestCase
+{
+    private function createMockRequest(string $uri, HttpMethod $httpMethod): Request
+    {
         $mockServer = $this->createConfiguredMock(
             ServerContract::class,
             [
@@ -21,26 +24,28 @@ class RouterTest extends TestCase {
         return new Request($mockServer);
     }
 
-    public function testResolveBasicRouteWithCallback() {
+    public function testResolveBasicRouteWithCallback()
+    {
         $uri = '/test';
-        $action = fn() => 'test';
+        $action = fn () => 'test';
         $router = new Router();
         $router->get($uri, $action);
-        $route = $router->resolve($this->createMockRequest($uri, HttpMethod::GET)); 
+        $route = $router->resolve($this->createMockRequest($uri, HttpMethod::GET));
 
         $this->assertEquals($action, $route->action());
         $this->assertEquals($uri, $route->uri());
     }
 
-    public function testResolveMultipleBasicRoutesWithCallbackAction() {
+    public function testResolveMultipleBasicRoutesWithCallbackAction()
+    {
         $routes = [
-            '/test' => fn() => 'test',
-            '/something' => fn() => 'something',
-            'fizz' => fn() => 'fizz'
+            '/test' => fn () => 'test',
+            '/something' => fn () => 'something',
+            'fizz' => fn () => 'fizz'
         ];
 
         $router = new Router();
-        
+
         foreach ($routes as $uri => $action) {
             $router->get($uri, $action);
         }
@@ -52,7 +57,8 @@ class RouterTest extends TestCase {
         }
     }
 
-    public function testResolveMultipleBasicRoutesWithCallbackActionForDifferentHttpMethods() {
+    public function testResolveMultipleBasicRoutesWithCallbackActionForDifferentHttpMethods()
+    {
         $routes = [
             [HttpMethod::GET, "/test", fn () => "get"],
             [HttpMethod::POST, "/test", fn () => "post"],
@@ -73,7 +79,7 @@ class RouterTest extends TestCase {
             $router->{strtolower($method->value)}($uri, $action);
         }
 
-        foreach($routes as [$method, $uri, $action]) { 
+        foreach($routes as [$method, $uri, $action]) {
             $route = $router->resolve($this->createMockRequest($uri, $method));
             $this->assertEquals($route->action(), $action);
             $this->assertEquals($route->uri(), $uri);

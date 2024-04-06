@@ -1,4 +1,5 @@
 <?php
+
 namespace Junk\Tests\Routing;
 
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -6,8 +7,10 @@ use PHPUnit\Framework\TestCase;
 
 use Junk\Routing\Route;
 
-class RouteTest extends TestCase {
-    public static function routesWithoutParametersProvider() {
+class RouteTest extends TestCase
+{
+    public static function routesWithoutParametersProvider()
+    {
         return [
             ['/'],
             ['/test'],
@@ -20,8 +23,9 @@ class RouteTest extends TestCase {
     }
 
     #[DataProvider('routesWithoutParametersProvider')]
-    public function testRegexWithoutParameters(string $uri) {
-        $route = new Route($uri, fn() => 'test');
+    public function testRegexWithoutParameters(string $uri)
+    {
+        $route = new Route($uri, fn () => 'test');
 
         $this->assertTrue($route->matches($uri));
         $this->assertFalse($route->matches('/extra/route'));
@@ -30,8 +34,9 @@ class RouteTest extends TestCase {
     }
 
     #[DataProvider("routesWithoutParametersProvider")]
-    public function testRegexOnUriThatEndsWithSlash(string $uri) { 
-        $route = new Route($uri, fn() => "test");
+    public function testRegexOnUriThatEndsWithSlash(string $uri)
+    {
+        $route = new Route($uri, fn () => "test");
         $this->assertTrue($route->matches("$uri/"));
     }
 }

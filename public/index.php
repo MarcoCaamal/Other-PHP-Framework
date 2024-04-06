@@ -1,4 +1,5 @@
 <?php
+
 use Junk\Http\Response;
 use Junk\Server\PHPNativeServer;
 
@@ -10,15 +11,15 @@ require __DIR__ . "/../vendor/autoload.php";
 
 $router = new Router();
 
-$router->get("/", function (Request $request) { 
+$router->get("/", function (Request $request) {
     return Response::text("GET OK");
 });
 
-$router->get('/test/{id}', function () { 
+$router->get('/test/{id}', function () {
     return Response::json(['message' => 'TEST OK']);
 });
 
-$router->post('/test', function () { 
+$router->post('/test', function () {
     return 'POST OK';
 });
 

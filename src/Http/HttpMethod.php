@@ -1,11 +1,13 @@
 <?php
+
 namespace Junk\Http;
 
 /**
  * HTTP Verbs.
- * 
+ *
  */
-enum HttpMethod: string {
+enum HttpMethod: string
+{
     case GET = "GET";
     case POST = "POST";
     case PUT = "PUT";
