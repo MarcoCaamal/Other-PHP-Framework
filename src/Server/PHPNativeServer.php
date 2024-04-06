@@ -4,43 +4,13 @@ namespace Junk\Server;
 
 use Junk\Server\ServerContract;
 use Junk\Http\HttpMethod;
+use Junk\Http\Request;
 
 /**
  * PHP native server that uses `$_SERVER` global.
  */
 class PHPNativeServer implements ServerContract
 {
-    /**
-     * @inheritDoc
-     */
-    public function postData(): array
-    {
-        return $_POST;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function queryParams(): array
-    {
-        return $_GET;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function requestMethod(): HttpMethod
-    {
-        return HttpMethod::from($_SERVER['REQUEST_METHOD']);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function requestUri(): string
-    {
-        return parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    }
     /**
      * @inheritDoc
      */
@@ -54,9 +24,20 @@ class PHPNativeServer implements ServerContract
 
         $response->prepare();
         http_response_code($response->getStatus());
-        foreach($response->getHeaders() as $header => $value) {
+        foreach ($response->getHeaders() as $header => $value) {
             header("$header: $value");
         }
         print($response->getContent());
+    }
+    /**
+     * @inheritDoc
+     */
+    public function getRequest(): Request
+    {
+        return (new Request())
+            ->setUri(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH))
+            ->setMethod(HttpMethod::from($_SERVER['REQUEST_METHOD']))
+            ->setPostData($_POST)
+            ->setQueryParameters($_GET);
     }
 }

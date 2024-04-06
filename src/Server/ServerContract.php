@@ -2,7 +2,7 @@
 
 namespace Junk\Server;
 
-use Junk\Http\HttpMethod;
+use Junk\Http\Request;
 use Junk\Http\Response;
 
 /**
@@ -12,29 +12,11 @@ use Junk\Http\Response;
 interface ServerContract
 {
     /**
-     * Get request URI.
+     * Get request sent by the client
      *
-     * @return string
+     * @return Request
      */
-    public function requestUri(): string;
-    /**
-     * Get request HTTP method.
-     *
-     * @return HttpMethod
-     */
-    public function requestMethod(): HttpMethod;
-    /**
-     * Get request POST data.
-     *
-     * @return array
-     */
-    public function postData(): array;
-    /**
-     * Get request query parameters.
-     *
-     * @return array
-     */
-    public function queryParams(): array;
+    public function getRequest(): Request;
     /**
      * Send the response to the client
      *

@@ -15,14 +15,11 @@ class RequestTest extends TestCase
         $queryParams = ['a' => 'Query Param Test A', 'b' => 'Query Param Test B', 'c' => 'Query Param Test C', 'foo' => 1];
         $postData = ['data' => 'test', 'randomData' => 2];
 
-        $server = $this->createConfiguredMock(ServerContract::class, [
-            'requestUri' => $uri,
-            'requestMethod' => HttpMethod::POST,
-            'queryParams' => $queryParams,
-            'postData' => $postData
-        ]);
-
-        $request = new Request($server);
+        $request = (new Request())
+            ->setUri($uri)
+            ->setMethod(HttpMethod::POST)
+            ->setQueryParameters($queryParams)
+            ->setPostData($postData);
 
         $this->assertEquals($uri, $request->uri());
         $this->assertEquals($queryParams, $request->query());
