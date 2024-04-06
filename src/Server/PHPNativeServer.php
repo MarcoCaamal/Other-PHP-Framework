@@ -4,40 +4,45 @@ namespace Junk\Server;
 use Junk\Server\ServerContract;
 use Junk\Http\HttpMethod;
 
+/**
+ * PHP native server that uses `$_SERVER` global.
+ */
 class PHPNativeServer implements ServerContract {
     
     /**
-     * @return array
+     * @inheritDoc
      */
     public function postData(): array {
         return $_POST;
     }
     
     /**
-     * @return array
+     * @inheritDoc
      */
     public function queryParams(): array {
         return $_GET;
     }
     
     /**
-     * @return HttpMethod
+     * @inheritDoc
      */
     public function requestMethod(): HttpMethod {
         return HttpMethod::from($_SERVER['REQUEST_METHOD']);
     }
     
     /**
-     * @return string
+     * @inheritDoc
      */
     public function requestUri(): string {
         return parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     }
     /**
-     *
-     * @param \Junk\Http\Response $response
+     * @inheritDoc
      */
     public function sendResponse(\Junk\Http\Response $response) {
+        // PHP sends Content-Type header by default, but it has to be removed if
+        // the response has not content. Content-Type header can't be removed
+        // unless it is set to some value before.
         header('Content-Type: None');
         header_remove('Content-Type');
 
