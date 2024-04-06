@@ -1,6 +1,8 @@
 <?php
-namespace Junk;
-use Junk\ServerContract;
+namespace Junk\Server;
+
+use Junk\Server\ServerContract;
+use Junk\Http\HttpMethod;
 
 class PHPNativeServer implements ServerContract {
     

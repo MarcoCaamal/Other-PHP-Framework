@@ -1,9 +1,10 @@
 <?php
 namespace Junk\Tests;
 
-use Junk\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+
+use Junk\Routing\Route;
 
 class RouteTest extends TestCase {
     public static function routesWithoutParametersProvider() {

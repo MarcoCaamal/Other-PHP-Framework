@@ -1,5 +1,5 @@
 <?php
-namespace Junk;
+namespace Junk\Routing;
 
 class Route {
     protected string $uri;

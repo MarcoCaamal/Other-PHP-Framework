@@ -1,5 +1,5 @@
 <?php
-namespace Junk;
+namespace Junk\Http;
 
 use Exception;
 

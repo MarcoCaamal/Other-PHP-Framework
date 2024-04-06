@@ -1,9 +1,9 @@
 <?php
+use Junk\Server\PHPNativeServer;
 
-use Junk\HttpNotFoundException;
-use Junk\PHPNativeServer;
-use Junk\Request;
-use Junk\Router;
+use Junk\Http\Request;
+use Junk\Http\HttpNotFoundException;
+use Junk\Routing\Router;
 
 require __DIR__ . "/../vendor/autoload.php";
 

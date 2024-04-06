@@ -1,5 +1,7 @@
 <?php
-namespace Junk;
+namespace Junk\Server;
+
+use Junk\Http\HttpMethod;
 
 interface ServerContract {
     public function requestUri(): string;

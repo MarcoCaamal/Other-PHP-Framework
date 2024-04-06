@@ -1,12 +1,12 @@
 <?php
 namespace Junk\Tests;
-use Junk\Router;
 
-use Junk\Request;
-use Junk\HttpMethod;
-use Junk\ServerContract;
-use Junk\Tests\MockServer;
 use PHPUnit\Framework\TestCase;
+
+use Junk\Server\ServerContract;
+use Junk\Http\HttpMethod;
+use Junk\Http\Request;
+use Junk\Routing\Router;
 
 class RouterTest extends TestCase {
     private function createMockRequest(string $uri, HttpMethod $httpMethod): Request {

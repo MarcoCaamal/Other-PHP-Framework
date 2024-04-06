@@ -1,9 +1,8 @@
 <?php
-namespace Junk;
+namespace Junk\Http;
 
-use Junk\PHPNativeServer;
-use Junk\Server;
-use Junk\HttpMethod;
+use Junk\Server\ServerContract;
+use Junk\Http\HttpMethod;
 
 class Request {
     protected string $uri;

@@ -1,9 +1,9 @@
 <?php
-namespace Junk;
+namespace Junk\Routing;
 
-use Junk\HttpMethod;
-use Junk\HttpNotFoundException;
-use Junk\Request;
+use Junk\Http\HttpMethod;
+use Junk\Http\Request;
+use Junk\Http\HttpNotFoundException;
 
 class Router {
     protected $routes = [];
