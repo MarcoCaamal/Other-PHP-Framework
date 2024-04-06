@@ -63,7 +63,7 @@ class Request
     }
     /**
      * Get POST data
-     * 
+     *
      * @return array
      */
     public function data(): array
@@ -72,7 +72,7 @@ class Request
     }
     /**
      * Get Query parameters
-     * 
+     *
      * @return array
      */
     public function query(): array

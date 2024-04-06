@@ -135,7 +135,7 @@ class Response
     }
     /**
      * Create a new JSON response.
-     * 
+     *
      * @param array $data
      * @return \Junk\Http\Response
      */
@@ -147,7 +147,7 @@ class Response
     }
     /**
      * Create a new plain text response.
-     * 
+     *
      * @param string $text
      * @return \Junk\Http\Response
      */
@@ -159,7 +159,7 @@ class Response
     }
     /**
      * Create a new redirect response.
-     * 
+     *
      * @param string $uri
      * @return \Junk\Http\Response
      */
