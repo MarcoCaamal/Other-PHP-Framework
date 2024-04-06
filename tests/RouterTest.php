@@ -4,16 +4,29 @@ use Junk\Router;
 
 use Junk\Request;
 use Junk\HttpMethod;
+use Junk\ServerContract;
 use Junk\Tests\MockServer;
 use PHPUnit\Framework\TestCase;
 
 class RouterTest extends TestCase {
+    private function createMockRequest(string $uri, HttpMethod $httpMethod): Request {
+        $mockServer = $this->createConfiguredMock(
+            ServerContract::class,
+            [
+                'requestUri' => $uri,
+                'requestMethod' => $httpMethod
+            ]
+        );
+
+        return new Request($mockServer);
+    }
+
     public function testResolveBasicRouteWithCallback() {
         $uri = '/test';
         $action = fn() => 'test';
         $router = new Router();
         $router->get($uri, $action);
-        $route = $router->resolve(new Request(new MockServer($uri, HttpMethod::GET))); 
+        $route = $router->resolve($this->createMockRequest($uri, HttpMethod::GET)); 
 
         $this->assertEquals($action, $route->action());
         $this->assertEquals($uri, $route->uri());
@@ -33,7 +46,7 @@ class RouterTest extends TestCase {
         }
 
         foreach($routes as $uri => $action) {
-            $route = $router->resolve(new Request(new MockServer($uri, HttpMethod::GET)));
+            $route = $router->resolve($this->createMockRequest($uri, HttpMethod::GET));
             $this->assertEquals($action, $route->action());
             $this->assertEquals($uri, $route->uri());
         }
@@ -61,7 +74,7 @@ class RouterTest extends TestCase {
         }
 
         foreach($routes as [$method, $uri, $action]) { 
-            $route = $router->resolve(new Request(new MockServer($uri, $method)));
+            $route = $router->resolve($this->createMockRequest($uri, $method));
             $this->assertEquals($route->action(), $action);
             $this->assertEquals($route->uri(), $uri);
         }
