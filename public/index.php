@@ -1,4 +1,5 @@
 <?php
+use Junk\Http\Response;
 use Junk\Server\PHPNativeServer;
 
 use Junk\Http\Request;
@@ -9,8 +10,13 @@ require __DIR__ . "/../vendor/autoload.php";
 
 $router = new Router();
 
-$router->get("/", function () { 
-    return "Server is listen...";
+$router->get("/", function (Request $request) { 
+    $response = new Response();
+    $response->setHeaders([
+        'Content-Type' => 'application/json',
+    ]);
+    $response->setContent(json_encode(['message' => 'GET OK']));
+    return $response;
 });
 
 $router->get('/test/{id}', function () { 
@@ -21,11 +27,13 @@ $router->post('/test', function () {
     return 'POST OK';
 });
 
+$server = new PHPNativeServer();
 try {
-    $route = $router->resolve(new Request(new PHPNativeServer()));
+    $request = new Request($server);
+    $route = $router->resolve($request);
     $action = $route->action();
-
-    print($action());
+    $response = $action($request);
+    $server->sendResponse($response);
 } catch (HttpNotFoundException $ex) {
     print($ex);
     http_response_code(404);

@@ -33,4 +33,19 @@ class PHPNativeServer implements ServerContract {
     public function requestUri(): string {
         return parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     }
+    /**
+     *
+     * @param \Junk\Http\Response $response
+     */
+    public function sendResponse(\Junk\Http\Response $response) {
+        header('Content-Type: None');
+        header_remove('Content-Type');
+
+        $response->prepare();
+        http_response_code($response->getStatus());
+        foreach($response->getHeaders() as $header => $value) {
+            header("$header: $value");
+        }
+        print($response->getContent());
+    }
 }
