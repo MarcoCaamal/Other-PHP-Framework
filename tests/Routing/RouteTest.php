@@ -1,5 +1,5 @@
 <?php
-namespace Junk\Tests;
+namespace Junk\Tests\Routing;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
