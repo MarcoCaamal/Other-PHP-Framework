@@ -11,16 +11,11 @@ require __DIR__ . "/../vendor/autoload.php";
 $router = new Router();
 
 $router->get("/", function (Request $request) { 
-    $response = new Response();
-    $response->setHeaders([
-        'Content-Type' => 'application/json',
-    ]);
-    $response->setContent(json_encode(['message' => 'GET OK']));
-    return $response;
+    return Response::text("GET OK");
 });
 
 $router->get('/test/{id}', function () { 
-    return 'GET OK ';
+    return Response::json(['message' => 'TEST OK']);
 });
 
 $router->post('/test', function () { 
