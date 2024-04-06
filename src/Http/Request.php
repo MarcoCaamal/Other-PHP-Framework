@@ -35,7 +35,6 @@ class Request
      * @var array
      */
     protected array $query = [];
-
     /**
      * Create a new **Request** from the given `$server`.
      */
@@ -46,7 +45,6 @@ class Request
         $this->data = $server->postData();
         $this->query = $server->queryParams();
     }
-
     /**
      * Get the request URI.
      *
@@ -55,7 +53,6 @@ class Request
     {
         return $this->uri;
     }
-
     /**
      * Get the request HTTP method.
      *
@@ -63,5 +60,23 @@ class Request
     public function method(): HttpMethod
     {
         return $this->method;
+    }
+    /**
+     * Get POST data
+     * 
+     * @return array
+     */
+    public function data(): array
+    {
+        return $this->data;
+    }
+    /**
+     * Get Query parameters
+     * 
+     * @return array
+     */
+    public function query(): array
+    {
+        return $this->query;
     }
 }
