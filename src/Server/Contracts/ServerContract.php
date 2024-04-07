@@ -1,6 +1,6 @@
 <?php
 
-namespace Junk\Server;
+namespace Junk\Server\Contracts;
 
 use Junk\Http\Request;
 use Junk\Http\Response;

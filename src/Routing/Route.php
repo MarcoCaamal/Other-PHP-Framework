@@ -2,6 +2,9 @@
 
 namespace Junk\Routing;
 
+use Junk\App;
+use Junk\Container\Container;
+
 /**
  * This class represents one route that stores URI regex and action.
  *
@@ -31,7 +34,12 @@ class Route
      * @var array<string>
      */
     protected array $parameters = [];
-
+    /**
+     * HTTP Middlewares
+     *
+     * @var array<\Junk\Http\Contracts\MiddlewareContract>
+     */
+    protected array $middlewares = [];
     /**
      * Create a new route with the given URI and action
      *
@@ -65,6 +73,23 @@ class Route
         return $this->action;
     }
     /**
+     * Get HTTP Middlewares for this route
+     * @return array<\Junk\Http\Contracts\MiddlewareContract>
+     */
+    public function middlewares(): array
+    {
+        return $this->middlewares;
+    }
+    public function setMiddlewares(array $middlewares): self
+    {
+        $this->middlewares = array_map(fn ($middleware) => new $middleware(), $middlewares);
+        return $this;
+    }
+    public function hasMiddlewares(): bool
+    {
+        return count($this->middlewares) > 0;
+    }
+    /**
      * Check if the given `$uri` matches the regex of this route.
      *
      * @param string $uri
@@ -92,5 +117,10 @@ class Route
         preg_match("#^$this->regex$#", $uri, $arguments);
 
         return array_combine($this->parameters, array_slice($arguments, 1));
+    }
+
+    public static function get(string $uri, \Closure $action): self
+    {
+        return Container::resolve(App::class)->router->get($uri, $action);
     }
 }

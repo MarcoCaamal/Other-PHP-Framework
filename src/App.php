@@ -7,8 +7,8 @@ use Junk\Http\HttpNotFoundException;
 use Junk\Http\Request;
 use Junk\Http\Response;
 use Junk\Routing\Router;
+use Junk\Server\Contracts\ServerContract;
 use Junk\Server\PHPNativeServer;
-use Junk\Server\ServerContract;
 
 class App
 {

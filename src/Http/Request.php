@@ -43,6 +43,12 @@ class Request
      */
     protected array $query = [];
     /**
+     * HTTP Headers
+     *
+     * @var array
+     */
+    protected array $headers = [];
+    /**
      * Create a new **Request** from the given `$server`.
      */
     public function __construct()
@@ -91,6 +97,39 @@ class Request
         }
 
         return $this->query[$key] ?? null;
+    }
+    /**
+     * Get request headers as key-value or only specific value providing a `$key`
+     *
+     * @return array|string|null Null if the key dosen't exists,
+     * the value of the key if it present or all data if no key was provided.
+     */
+    public function headers(?string $key = null): array|string|null
+    {
+        if (is_null($key)) {
+            return $this->headers;
+        }
+
+        return $this->headers[strtolower($key)] ?? null;
+    }
+    /**
+     * Set request headers fpr this request
+     *
+     * @param array $headers
+     * @return self
+     */
+    public function setHeaders(array $headers): self
+    {
+        foreach ($headers as $header => $value) {
+            $this->headers[strtolower($header)] = $value;
+        }
+
+        return $this;
+    }
+    public function setHeader(string $key, string $value): self
+    {
+        $this->headers[strtolower($key)] = $value;
+        return $this;
     }
     /**
      * URI requested by the client.

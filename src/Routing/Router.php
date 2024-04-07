@@ -5,6 +5,8 @@ namespace Junk\Routing;
 use Junk\Http\HttpMethod;
 use Junk\Http\Request;
 use Junk\Http\HttpNotFoundException;
+use Junk\Http\Response;
+use Junk\Routing\Route;
 
 /**
  * HTTP Router
@@ -31,11 +33,14 @@ class Router
      * @param \Junk\Http\HttpMethod $method
      * @param string $uri
      * @param \Closure $action
-     * @return void
+     * @return Route
      */
-    protected function registerRoute(HttpMethod $method, string $uri, \Closure $action)
+    protected function registerRoute(HttpMethod $method, string $uri, \Closure $action): Route
     {
-        $this->routes[$method->value][] = new Route($uri, $action);
+        $route = new Route($uri, $action);
+        $this->routes[$method->value][] = $route;
+
+        return $route;
     }
     /**
      * Resolve the route of the `$request`
@@ -44,7 +49,7 @@ class Router
      * @throws \Junk\Http\HttpNotFoundException
      * @return \Junk\Routing\Route
      */
-    public function resolve(Request $request): Route
+    public function resolveRoute(Request $request): Route
     {
         foreach ($this->routes[$request->method()->value] as $route) {
             if ($route->matches($request->uri())) {
@@ -53,17 +58,28 @@ class Router
         }
         throw new HttpNotFoundException();
     }
+    public function resolve(Request $request): Response
+    {
+        $route = $this->resolveRoute($request);
+        $request->setRoute($route);
+        $action = $route->action();
 
+        if ($route->hasMiddlewares()) {
+            //Run Middlewares
+        }
+
+        return $action($request);
+    }
     /**
      * Register a GET route with the give `$uri` and `$action`
      *
      * @param string $uri
      * @param \Closure $action
-     * @return void
+     * @return Route
      */
-    public function get(string $uri, \Closure $action)
+    public function get(string $uri, \Closure $action): Route
     {
-        $this->registerRoute(HttpMethod::GET, $uri, $action);
+        return $this->registerRoute(HttpMethod::GET, $uri, $action);
     }
 
     /**
@@ -71,11 +87,11 @@ class Router
      *
      * @param string $uri
      * @param \Closure $action
-     * @return void
+     * @return Route
      */
-    public function post(string $uri, \Closure $action)
+    public function post(string $uri, \Closure $action): Route
     {
-        $this->registerRoute(HttpMethod::POST, $uri, $action);
+        return $this->registerRoute(HttpMethod::POST, $uri, $action);
     }
 
     /**
@@ -83,11 +99,11 @@ class Router
      *
      * @param string $uri
      * @param \Closure $action
-     * @return void
+     * @return Route
      */
-    public function put(string $uri, \Closure $action)
+    public function put(string $uri, \Closure $action): Route
     {
-        $this->registerRoute(HttpMethod::PUT, $uri, $action);
+        return $this->registerRoute(HttpMethod::PUT, $uri, $action);
     }
 
     /**
@@ -95,11 +111,11 @@ class Router
      *
      * @param string $uri
      * @param \Closure $action
-     * @return void
+     * @return Route
      */
-    public function delete(string $uri, \Closure $action)
+    public function delete(string $uri, \Closure $action): Route
     {
-        $this->registerRoute(HttpMethod::DELETE, $uri, $action);
+        return $this->registerRoute(HttpMethod::DELETE, $uri, $action);
     }
 
     /**
@@ -107,10 +123,10 @@ class Router
      *
      * @param string $uri
      * @param \Closure $action
-     * @return void
+     * @return Route
      */
-    public function patch(string $uri, \Closure $action)
+    public function patch(string $uri, \Closure $action): Route
     {
-        $this->registerRoute(HttpMethod::PATCH, $uri, $action);
+        return $this->registerRoute(HttpMethod::PATCH, $uri, $action);
     }
 }

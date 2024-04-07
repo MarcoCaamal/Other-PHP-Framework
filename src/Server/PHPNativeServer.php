@@ -2,9 +2,9 @@
 
 namespace Junk\Server;
 
-use Junk\Server\ServerContract;
 use Junk\Http\HttpMethod;
 use Junk\Http\Request;
+use Junk\Server\Contracts\ServerContract;
 
 /**
  * PHP native server that uses `$_SERVER` global.
@@ -37,6 +37,7 @@ class PHPNativeServer implements ServerContract
         return (new Request())
             ->setUri(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH))
             ->setMethod(HttpMethod::from($_SERVER['REQUEST_METHOD']))
+            ->setHeaders(getallheaders())
             ->setPostData($_POST)
             ->setQueryParameters($_GET);
     }
