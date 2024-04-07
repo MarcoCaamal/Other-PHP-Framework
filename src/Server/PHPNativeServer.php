@@ -24,7 +24,7 @@ class PHPNativeServer implements ServerContract
 
         $response->prepare();
         http_response_code($response->getStatus());
-        foreach ($response->getHeaders() as $header => $value) {
+        foreach ($response->headers() as $header => $value) {
             header("$header: $value");
         }
         print($response->getContent());

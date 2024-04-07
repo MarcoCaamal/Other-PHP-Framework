@@ -29,4 +29,6 @@ $app = App::bootstrap();
 
 Route::get('/', fn () => Response::json(['message' => 'GET OK']))->setMiddlewares([AuthMiddleware::class]);
 
+Route::get('/html', fn (Request $request) => Response::view('home'));
+
 $app->run();

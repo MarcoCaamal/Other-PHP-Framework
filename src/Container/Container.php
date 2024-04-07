@@ -21,6 +21,12 @@ class Container
         return self::$instances[$class];
     }
 
+    /**
+     * @template T
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
     public static function resolve(string $class)
     {
         return self::$instances[$class] ?? null;

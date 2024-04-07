@@ -9,12 +9,15 @@ use Junk\Http\Response;
 use Junk\Routing\Router;
 use Junk\Server\Contracts\ServerContract;
 use Junk\Server\PHPNativeServer;
+use Junk\View\Contracts\ViewContract;
+use Junk\View\ViewEngine;
 
 class App
 {
     public Router $router;
     public Request $request;
     public ServerContract $server;
+    public ViewContract $view;
 
     public static function bootstrap(): App
     {
@@ -22,6 +25,7 @@ class App
         $app->router = new Router();
         $app->server = new PHPNativeServer();
         $app->request = $app->server->getRequest();
+        $app->view = new ViewEngine(__DIR__ . "/../views");
 
         return $app;
     }
