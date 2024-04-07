@@ -2,6 +2,8 @@
 
 namespace Junk\Tests\Routing;
 
+use Junk\Http\Contracts\MiddlewareContract;
+use Junk\Http\Response;
 use PHPUnit\Framework\TestCase;
 
 use Junk\Server\ServerContract;
@@ -78,5 +80,49 @@ class RouterTest extends TestCase
             $this->assertEquals($route->action(), $action);
             $this->assertEquals($route->uri(), $uri);
         }
+    }
+    public function testRunMiddlewares()
+    {
+        $middleware1 = new class () implements MiddlewareContract {
+            /**
+             *
+             * @param Request $request
+             * @param \Closure $next
+             */
+            public function handle(Request $request, \Closure $next)
+            {
+                $response = $next($request);
+                $response->setHeader('x-test-one', 'test one');
+
+                return $response;
+            }
+        };
+
+        $middleware2 = new class () implements MiddlewareContract {
+            /**
+             *
+             * @param Request $request
+             * @param \Closure $next
+             */
+            public function handle(Request $request, \Closure $next)
+            {
+                $response = $next($request);
+                $response->setHeader('x-test-two', 'test two');
+
+                return $response;
+            }
+        };
+
+        $router = new Router();
+        $uri = '/test';
+        $expectedResponse = Response::text('test');
+        $router->get($uri, fn ($request) => $expectedResponse)
+            ->setMiddlewares([$middleware1, $middleware2]);
+
+        $response = $router->resolve($this->createMockRequest($uri, HttpMethod::GET));
+
+        $this->assertEquals($expectedResponse, $response);
+        $this->assertEquals($response->headers('x-test-one'), 'test one');
+        $this->assertEquals($response->headers('x-test-two'), 'test two');
     }
 }

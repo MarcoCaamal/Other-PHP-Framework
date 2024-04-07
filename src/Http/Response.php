@@ -48,11 +48,15 @@ class Response
     /**
      * Get Response HTTP headers.
      *
-     * @return array
+     * @return array|string|null
      */
-    public function getHeaders(): array
+    public function headers(?string $key = null): array|string|null
     {
-        return $this->headers;
+        if (is_null($key)) {
+            return $this->headers;
+        }
+
+        return $this->headers[strtolower($key)] ?? null;
     }
     /**
      * Set HTTP headers by array for this response.

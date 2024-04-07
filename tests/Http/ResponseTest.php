@@ -15,7 +15,7 @@ class ResponseTest extends TestCase
 
         $this->assertEquals(200, $response->getStatus());
         $this->assertEquals(json_encode($content), $response->getContent());
-        $this->assertEquals(['content-type' => 'application/json'], $response->getHeaders());
+        $this->assertEquals(['content-type' => 'application/json'], $response->headers());
     }
     public function testTextResponseIsContructedCorrectly()
     {
@@ -24,7 +24,7 @@ class ResponseTest extends TestCase
 
         $this->assertEquals(200, $response->getStatus());
         $this->assertEquals($content, $response->getContent());
-        $this->assertEquals(['content-type' => 'text/plain'], $response->getHeaders());
+        $this->assertEquals(['content-type' => 'text/plain'], $response->headers());
     }
     public function testRedirectResponseIsContructedCorrectly()
     {
@@ -33,7 +33,7 @@ class ResponseTest extends TestCase
 
         $this->assertEquals(302, $response->getStatus());
         $this->assertNull($response->getContent());
-        $this->assertEquals(['location' => $uri], $response->getHeaders());
+        $this->assertEquals(['location' => $uri], $response->headers());
     }
     public function testPrepareMethodRemovesContentHeadersIfThereIsNoContent()
     {
@@ -42,7 +42,7 @@ class ResponseTest extends TestCase
         $response->setHeader('Content-Length', 10);
         $response->prepare();
 
-        $this->assertEmpty($response->getHeaders());
+        $this->assertEmpty($response->headers());
     }
     public function testPrepareMethodAddsContentLengthHeaderIfThereIsContent()
     {
@@ -50,6 +50,6 @@ class ResponseTest extends TestCase
         $response = Response::text($content);
         $response->prepare();
 
-        $this->assertEquals(strlen($content), $response->getHeaders()['content-length']);
+        $this->assertEquals(strlen($content), $response->headers()['content-length']);
     }
 }
