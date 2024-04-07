@@ -1,23 +1,32 @@
 <?php
 
 use Junk\App;
+use Junk\Http\Contracts\MiddlewareContract;
 use Junk\Http\Request;
 use Junk\Http\Response;
+use Junk\Routing\Route;
 
 require __DIR__ . "/../vendor/autoload.php";
 
+class AuthMiddleware implements MiddlewareContract
+{
+    /**
+     *
+     * @param Request $request
+     * @param Closure $next
+     */
+    public function handle(Request $request, Closure $next)
+    {
+        if ($request->headers('Authorization') === null) {
+            return Response::json(['message' => 'Not Authenticated']);
+        }
+
+        return $next();
+    }
+}
+
 $app = App::bootstrap();
 
-$app->router->get("/", function (Request $request) {
-    return Response::text("Server is listen...");
-});
-
-$app->router->get('/test/{id}', function (Request $request) {
-    return Response::json($request->routeParameters());
-});
-
-$app->router->post('/test', function (Request $request) {
-    return Response::json($request->data());
-});
+Route::get('/', fn () => Response::json(['message' => 'GET OK']))->setMiddlewares([AuthMiddleware::class]);
 
 $app->run();

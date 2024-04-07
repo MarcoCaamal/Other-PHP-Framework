@@ -65,10 +65,21 @@ class Router
         $action = $route->action();
 
         if ($route->hasMiddlewares()) {
-            //Run Middlewares
+            return $this->runMiddlewares($request, $route->middlewares(), $action);
         }
 
         return $action($request);
+    }
+    protected function runMiddlewares(Request $request, array $middlewares, \Closure $target): Response
+    {
+        if (count($middlewares) === 0) {
+            return $target($request);
+        }
+
+        return $middlewares[0]->handle(
+            $request,
+            fn ($request) => $this->runMiddlewares($request, array_slice($middlewares, 1), $target)
+        );
     }
     /**
      * Register a GET route with the give `$uri` and `$action`
