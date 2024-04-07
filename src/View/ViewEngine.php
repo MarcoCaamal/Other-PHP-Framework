@@ -6,10 +6,12 @@ use Junk\View\Contracts\ViewContract;
 
 class ViewEngine implements ViewContract
 {
-    protected string $viewDirectory;
-    public function __construct(string $viewDirectory)
+    protected string $viewsDirectory;
+    protected string $defaultLayout = 'main';
+    protected string $contentAnotation = '@content';
+    public function __construct(string $viewsDirectory)
     {
-        $this->viewDirectory = $viewDirectory;
+        $this->viewsDirectory = $viewsDirectory;
     }
 
     /**
@@ -17,9 +19,27 @@ class ViewEngine implements ViewContract
      * @param string $view
      * @return string
      */
-    public function render(string $view): string
+    public function render(string $view, array $params = [], ?string $layout = null): string
     {
-        $phpFile = "{$this->viewDirectory}/{$view}.php";
+        $layoutContent = $this->renderLayout($layout ?? $this->defaultLayout);
+        $viewContent = $this->renderView($view, $params);
+
+        return str_replace($this->contentAnotation, $viewContent, $layoutContent);
+    }
+
+    public function renderView(string $view, array $params = [])
+    {
+        return $this->phpFileOutput("{$this->viewsDirectory}/$view.php", $params);
+    }
+    public function renderLayout(string $layout): string
+    {
+        return $this->phpFileOutput("{$this->viewsDirectory}/layouts/$layout.php");
+    }
+    public function phpFileOutput(string $phpFile, array $params = [])
+    {
+        foreach ($params as $key => $value) {
+            $$key = $value;
+        }
 
         ob_start();
 
