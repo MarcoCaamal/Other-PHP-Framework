@@ -65,22 +65,32 @@ class Request
         return $this->method;
     }
     /**
-     * Get POST data
+     * Get POST data as key-value or get only specific value providing a `$key`
      *
-     * @return array
+     * @return array|string|int|null Null if the key dosen't exists,
+     * the value of the key if it present or all data if no key was provided.
      */
-    public function data(): array
+    public function data(?string $key = null): array|string|int|null
     {
-        return $this->data;
+        if (is_null($key)) {
+            return $this->data;
+        }
+
+        return $this->data[$key] ?? null;
     }
     /**
-     * Get Query parameters
+     * Get Query parameters as key-value or only specific value providing a `$key`
      *
-     * @return array
+     * @return array|string|int|null Null if the key dosen't exists,
+     * the value of the key if it present or all data if no key was provided.
      */
-    public function query(): array
+    public function query(?string $key = null): array|string|int|null
     {
-        return $this->query;
+        if (is_null($key)) {
+            return $this->query;
+        }
+
+        return $this->query[$key] ?? null;
     }
     /**
      * URI requested by the client.
@@ -147,12 +157,19 @@ class Request
         return $this;
     }
     /**
-     * Get all route parameters.
+     * Get all route parameters or only specific value by providing `$key`
      *
-     * @return array
+     * @return array|string|int|null Null if the key dosen't exists,
+     * the value of the key if it present or all data if no key was provided.
      */
-    public function routeParameters(): array
+    public function routeParameters(?string $key): array|string|int|null
     {
-        return $this->route->parseParameters($this->uri);
+        $parameters = $this->route->parseParameters($this->uri);
+
+        if (is_null($key)) {
+            return $parameters;
+        }
+
+        return $parameters[$key] ?? null;
     }
 }

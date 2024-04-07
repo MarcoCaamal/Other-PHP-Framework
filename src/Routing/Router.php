@@ -21,7 +21,7 @@ class Router
      */
     public function __construct()
     {
-        foreach(HttpMethod::cases() as $method) {
+        foreach (HttpMethod::cases() as $method) {
             $this->routes[$method->value] = [];
         }
     }
@@ -46,8 +46,8 @@ class Router
      */
     public function resolve(Request $request): Route
     {
-        foreach($this->routes[$request->method()->value] as $route) {
-            if($route->matches($request->uri())) {
+        foreach ($this->routes[$request->method()->value] as $route) {
+            if ($route->matches($request->uri())) {
                 return $route;
             }
         }
@@ -55,12 +55,12 @@ class Router
     }
 
     /**
-     * Register a GET route with the given `$uri` and `$action`
+     * Register a GET route with the give `$uri` and `$action`
      *
      * @param string $uri
      * @param \Closure $action
      * @return void
-    */
+     */
     public function get(string $uri, \Closure $action)
     {
         $this->registerRoute(HttpMethod::GET, $uri, $action);
