@@ -162,7 +162,7 @@ class Request
      * @return array|string|int|null Null if the key dosen't exists,
      * the value of the key if it present or all data if no key was provided.
      */
-    public function routeParameters(?string $key): array|string|int|null
+    public function routeParameters(?string $key = null): array|string|int|null
     {
         $parameters = $this->route->parseParameters($this->uri);
 
