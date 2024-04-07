@@ -125,4 +125,39 @@ class RouterTest extends TestCase
         $this->assertEquals($response->headers('x-test-one'), 'test one');
         $this->assertEquals($response->headers('x-test-two'), 'test two');
     }
+    public function testMiddlewareStackCanBeStopped()
+    {
+        $stopMiddleware = new class () implements MiddlewareContract {
+            public function handle(Request $request, \Closure $next)
+            {
+                return Response::text('STOP!');
+            }
+        };
+
+        $middleware2 = new class () implements MiddlewareContract {
+            /**
+             *
+             * @param Request $request
+             * @param \Closure $next
+             */
+            public function handle(Request $request, \Closure $next)
+            {
+                $response = $next($request);
+                $response->setHeader('x-test-two', 'test two');
+
+                return $response;
+            }
+        };
+
+        $router = new Router();
+        $uri = '/test';
+        $unreachableResponse = Response::text('Unreacheable');
+        $router->get($uri, fn ($request) => $unreachableResponse)
+            ->setMiddlewares([$stopMiddleware, $middleware2]);
+
+        $response = $router->resolve($this->createMockRequest($uri, HttpMethod::GET));
+
+        $this->assertEquals('STOP!', $response->getContent());
+        $this->assertNull($response->headers('x-test-two'));
+    }
 }
