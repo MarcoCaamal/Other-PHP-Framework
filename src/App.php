@@ -21,7 +21,7 @@ class App
 
     public static function bootstrap(): App
     {
-        $app = Container::singleton(self::class);
+        $app = singleton(self::class);
         $app->router = new Router();
         $app->server = new PHPNativeServer();
         $app->request = $app->server->getRequest();

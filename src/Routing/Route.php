@@ -2,9 +2,6 @@
 
 namespace Junk\Routing;
 
-use Junk\App;
-use Junk\Container\Container;
-
 /**
  * This class represents one route that stores URI regex and action.
  *
@@ -121,6 +118,6 @@ class Route
 
     public static function get(string $uri, \Closure $action): self
     {
-        return Container::resolve(App::class)->router->get($uri, $action);
+        return app()->router->get($uri, $action);
     }
 }

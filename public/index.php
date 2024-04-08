@@ -18,7 +18,7 @@ class AuthMiddleware implements MiddlewareContract
     public function handle(Request $request, Closure $next)
     {
         if ($request->headers('Authorization') === null) {
-            return Response::json(['message' => 'Not Authenticated']);
+            return json(['message' => 'Not Authenticated']);
         }
 
         return $next();
@@ -27,9 +27,9 @@ class AuthMiddleware implements MiddlewareContract
 
 $app = App::bootstrap();
 
-Route::get('/', fn () => Response::json(['message' => 'GET OK']))->setMiddlewares([AuthMiddleware::class]);
+Route::get('/', fn () => json(['GET OK']))->setMiddlewares([AuthMiddleware::class]);
 
-Route::get('/html', fn (Request $request) => Response::view('home', [
+Route::get('/html', fn (Request $request) => view('home', [
     'user' => 'Guest'
 ]));
 
