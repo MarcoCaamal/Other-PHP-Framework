@@ -12,7 +12,7 @@
         ]
     },
     "scripts": {
-        "tests": "phpunit --color=always --testdox tests/",
+        "tests": "phpunit --display-deprecations --display-errors --stop-on-defect --color=always --testdox tests/",
         "php-cs-fixer": "php-cs-fixer fix . --diff"
     },
     "autoload-dev": {
