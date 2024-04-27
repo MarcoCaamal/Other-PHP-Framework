@@ -24,8 +24,8 @@ class ValidationRulesTest extends TestCase
             ["antonio@.", false],
             ["antonio", false],
             ["@", false],
-            ["", true],
-            [null, true],
+            ["", false],
+            [null, false],
             [4, false],
         ];
     }

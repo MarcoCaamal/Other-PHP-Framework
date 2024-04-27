@@ -17,6 +17,9 @@ class Email implements ValidationRuleContract
         if(!array_key_exists($field, $data)) {
             return false;
         }
+        if(empty($data[$field])) {
+            return false;
+        }
         $email = strtolower(trim($data[$field]));
 
         $split = explode('@', $email);
