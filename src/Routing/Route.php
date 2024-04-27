@@ -120,4 +120,9 @@ class Route
     {
         return app()->router->get($uri, $action);
     }
+
+    public static function post(string $uri, \Closure $action): self
+    {
+        return app()->router->post($uri, $action);
+    }
 }

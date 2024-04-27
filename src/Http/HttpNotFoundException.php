@@ -2,12 +2,12 @@
 
 namespace Junk\Http;
 
-use Exception;
+use Junk\Exceptions\JunkException;
 
 /**
  * HTTP 404 Not Found.
  *
  */
-class HttpNotFoundException extends Exception
+class HttpNotFoundException extends JunkException
 {
 }
