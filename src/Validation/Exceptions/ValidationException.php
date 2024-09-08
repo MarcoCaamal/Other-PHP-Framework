@@ -1,11 +1,12 @@
 <?php
+
 namespace Junk\Validation\Exceptions;
 
 use Junk\Exceptions\JunkException;
 
-class ValidationException extends JunkException 
+class ValidationException extends JunkException
 {
-    public function __construct(protected array $errors) 
+    public function __construct(protected array $errors)
     {
         $this->errors = $errors;
     }

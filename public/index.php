@@ -45,4 +45,8 @@ Route::get('/html', fn (Request $request) => view('home', [
     'user' => 'Guest'
 ]));
 
+Route::get('/', function () {
+    return Response::text('Hello World');
+});
+
 $app->run();

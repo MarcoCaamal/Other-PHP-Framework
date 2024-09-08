@@ -10,8 +10,7 @@ class RequiredWhen implements ValidationRuleContract
         private string $otherField,
         private string $operator,
         private string $compareWith
-    )
-    {
+    ) {
         $this->otherField = $otherField;
         $this->operator = $operator;
         $this->compareWith = $compareWith;

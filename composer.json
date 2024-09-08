@@ -8,6 +8,7 @@
         },
         "files": [
             "src/Helpers/app.php",
+            "src/Helpers/string.php",
             "src/Helpers/http.php"
         ]
     },

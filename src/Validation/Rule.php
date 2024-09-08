@@ -28,7 +28,7 @@ class Rule
     {
         return new Number();
     }
-    public static function lessThan(int|float $value) : ValidationRuleContract
+    public static function lessThan(int|float $value): ValidationRuleContract
     {
         return new LessThan($value);
     }
@@ -36,8 +36,11 @@ class Rule
         string $otherField,
         string $operator,
         int|float $value
-    ) : ValidationRuleContract
-    {
+    ): ValidationRuleContract {
         return new RequiredWhen($otherField, $operator, $value);
+    }
+    public static function from(string $str)
+    {
+
     }
 }

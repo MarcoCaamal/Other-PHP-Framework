@@ -102,7 +102,7 @@ class ValidationRulesTest extends TestCase
     public function testNumber($n, $expected)
     {
         $rule = new Number();
-        $data = ["test"=> $n];
+        $data = ["test" => $n];
         $this->assertEquals($expected, $rule->isValid("test", $data));
     }
     public static function requiredWhenDataProvider()

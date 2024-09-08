@@ -11,8 +11,10 @@ use Junk\Validation\Rules\RequiredWith;
 use Junk\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
-class ValidatorTest extends TestCase {
-    public function test_basic_validation_passes() {
+class ValidatorTest extends TestCase
+{
+    public function test_basic_validation_passes()
+    {
         $data = [
             "email" => "test@test.com",
             "other" => 2,
@@ -38,7 +40,8 @@ class ValidatorTest extends TestCase {
         $this->assertEquals($expected, $v->validate($rules));
     }
 
-    public function test_throws_validation_exception_on_invalid_data() {
+    public function test_throws_validation_exception_on_invalid_data()
+    {
         $this->expectException(ValidationException::class);
         $v = new Validator(["test" => "test"]);
         $v->validate(["test" => new Number()]);
@@ -47,7 +50,8 @@ class ValidatorTest extends TestCase {
     /**
      * @depends test_basic_validation_passes
      */
-    public function test_multiple_rules_validation() {
+    public function test_multiple_rules_validation()
+    {
         $data = ["age" => 20, "num" => 3, "foo" => 5];
 
         $rules = [
