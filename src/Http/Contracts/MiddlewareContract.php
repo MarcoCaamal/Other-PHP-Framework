@@ -1,8 +1,8 @@
 <?php
 
-namespace Junk\Http\Contracts;
+namespace OtherPHPFramework\Http\Contracts;
 
-use Junk\Http\Request;
+use OtherPHPFramework\Http\Request;
 
 interface MiddlewareContract
 {

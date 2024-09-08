@@ -1,6 +1,6 @@
 <?php
 
-namespace Junk\Validation\Contracts;
+namespace OtherPHPFramework\Validation\Contracts;
 
 interface ValidationRuleContract
 {

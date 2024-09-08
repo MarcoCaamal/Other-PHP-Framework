@@ -1,8 +1,8 @@
 <?php
 
-namespace Junk\View;
+namespace OtherPHPFramework\View;
 
-use Junk\View\Contracts\ViewContract;
+use OtherPHPFramework\View\Contracts\ViewContract;
 
 class ViewEngine implements ViewContract
 {

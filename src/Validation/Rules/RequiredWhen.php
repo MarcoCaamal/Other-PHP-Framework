@@ -1,8 +1,8 @@
 <?php
 
-namespace Junk\Validation\Rules;
+namespace OtherPHPFramework\Validation\Rules;
 
-use Junk\Validation\Contracts\ValidationRuleContract;
+use OtherPHPFramework\Validation\Contracts\ValidationRuleContract;
 
 class RequiredWhen implements ValidationRuleContract
 {

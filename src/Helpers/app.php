@@ -1,7 +1,7 @@
 <?php
 
-use Junk\App;
-use Junk\Container\Container;
+use OtherPHPFramework\App;
+use OtherPHPFramework\Container\Container;
 
 /**
  *

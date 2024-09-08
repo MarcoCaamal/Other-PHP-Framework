@@ -1,6 +1,6 @@
 <?php
 
-namespace Junk\Tests\Helpers;
+namespace OtherPHPFramework\Tests\Helpers;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

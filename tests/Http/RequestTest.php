@@ -1,11 +1,11 @@
 <?php
 
-namespace Junk\Tests\Http;
+namespace OtherPHPFramework\Tests\Http;
 
-use Junk\Http\HttpMethod;
-use Junk\Http\Request;
-use Junk\Routing\Route;
-use Junk\Server\ServerContract;
+use OtherPHPFramework\Http\HttpMethod;
+use OtherPHPFramework\Http\Request;
+use OtherPHPFramework\Routing\Route;
+use OtherPHPFramework\Server\ServerContract;
 use PHPUnit\Framework\TestCase;
 
 class RequestTest extends TestCase

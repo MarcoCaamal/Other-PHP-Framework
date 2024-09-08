@@ -1,11 +1,11 @@
 <?php
 
-namespace Junk\Tests\Routing;
+namespace OtherPHPFramework\Tests\Routing;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-use Junk\Routing\Route;
+use OtherPHPFramework\Routing\Route;
 
 class RouteTest extends TestCase
 {

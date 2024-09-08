@@ -1,7 +1,7 @@
 <?php
 
-use Junk\Http\Request;
-use Junk\Http\Response;
+use OtherPHPFramework\Http\Request;
+use OtherPHPFramework\Http\Response;
 
 function json(array $data): Response
 {
@@ -17,5 +17,5 @@ function view(string $view, array $data = [], ?string $layout = null): Response
 }
 function request(): Request
 {
-    return app(\Junk\App::class)->request;
+    return app(\OtherPHPFramework\App::class)->request;
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace Junk\Tests\Http;
+namespace OtherPHPFramework\Tests\Http;
 
 use PHPUnit\Framework\TestCase;
 
-use Junk\Http\Response;
+use OtherPHPFramework\Http\Response;
 
 class ResponseTest extends TestCase
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Junk\Server\Contracts;
+namespace OtherPHPFramework\Server\Contracts;
 
-use Junk\Http\Request;
-use Junk\Http\Response;
+use OtherPHPFramework\Http\Request;
+use OtherPHPFramework\Http\Response;
 
 /**
  * Similar to PHP `$_SERVER` but having an interface allows us to mock these

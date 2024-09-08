@@ -1,18 +1,17 @@
 <?php
 
-namespace Junk;
+namespace OtherPHPFramework;
 
 use Exception;
-use Junk\Container\Container;
-use Junk\Http\HttpNotFoundException;
-use Junk\Http\Request;
-use Junk\Http\Response;
-use Junk\Routing\Router;
-use Junk\Server\Contracts\ServerContract;
-use Junk\Server\PHPNativeServer;
-use Junk\Validation\Exceptions\ValidationException;
-use Junk\View\Contracts\ViewContract;
-use Junk\View\ViewEngine;
+use OtherPHPFramework\Http\HttpNotFoundException;
+use OtherPHPFramework\Http\Request;
+use OtherPHPFramework\Http\Response;
+use OtherPHPFramework\Routing\Router;
+use OtherPHPFramework\Server\Contracts\ServerContract;
+use OtherPHPFramework\Server\PHPNativeServer;
+use OtherPHPFramework\Validation\Exceptions\ValidationException;
+use OtherPHPFramework\View\Contracts\ViewContract;
+use OtherPHPFramework\View\ViewEngine;
 
 class App
 {

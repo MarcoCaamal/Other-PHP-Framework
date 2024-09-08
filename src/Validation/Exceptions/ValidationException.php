@@ -1,8 +1,8 @@
 <?php
 
-namespace Junk\Validation\Exceptions;
+namespace OtherPHPFramework\Validation\Exceptions;
 
-use Junk\Exceptions\JunkException;
+use OtherPHPFramework\Exceptions\JunkException;
 
 class ValidationException extends JunkException
 {

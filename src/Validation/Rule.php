@@ -1,14 +1,14 @@
 <?php
 
-namespace Junk\Validation;
+namespace OtherPHPFramework\Validation;
 
-use Junk\Validation\Contracts\ValidationRuleContract;
-use Junk\Validation\Rules\Email;
-use Junk\Validation\Rules\LessThan;
-use Junk\Validation\Rules\Number;
-use Junk\Validation\Rules\Required;
-use Junk\Validation\Rules\RequiredWhen;
-use Junk\Validation\Rules\RequiredWith;
+use OtherPHPFramework\Validation\Contracts\ValidationRuleContract;
+use OtherPHPFramework\Validation\Rules\Email;
+use OtherPHPFramework\Validation\Rules\LessThan;
+use OtherPHPFramework\Validation\Rules\Number;
+use OtherPHPFramework\Validation\Rules\Required;
+use OtherPHPFramework\Validation\Rules\RequiredWhen;
+use OtherPHPFramework\Validation\Rules\RequiredWith;
 
 class Rule
 {

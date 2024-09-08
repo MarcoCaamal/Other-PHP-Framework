@@ -1,8 +1,8 @@
 <?php
 
-namespace Junk\Validation;
+namespace OtherPHPFramework\Validation;
 
-use Junk\Validation\Exceptions\ValidationException;
+use OtherPHPFramework\Validation\Exceptions\ValidationException;
 
 class Validator
 {

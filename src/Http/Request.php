@@ -1,11 +1,11 @@
 <?php
 
-namespace Junk\Http;
+namespace OtherPHPFramework\Http;
 
-use Junk\Server\ServerContract;
-use Junk\Http\HttpMethod;
-use Junk\Routing\Route;
-use Junk\Validation\Validator;
+use OtherPHPFramework\Server\ServerContract;
+use OtherPHPFramework\Http\HttpMethod;
+use OtherPHPFramework\Routing\Route;
+use OtherPHPFramework\Validation\Validator;
 
 /**
  * This class represent a Request HTTP.

@@ -1,14 +1,14 @@
 <?php
 
-namespace Junk\Tests\Validation;
+namespace OtherPHPFramework\Tests\Validation;
 
-use Junk\Validation\Exceptions\ValidationException;
-use Junk\Validation\Rules\Email;
-use Junk\Validation\Rules\LessThan;
-use Junk\Validation\Rules\Number;
-use Junk\Validation\Rules\Required;
-use Junk\Validation\Rules\RequiredWith;
-use Junk\Validation\Validator;
+use OtherPHPFramework\Validation\Exceptions\ValidationException;
+use OtherPHPFramework\Validation\Rules\Email;
+use OtherPHPFramework\Validation\Rules\LessThan;
+use OtherPHPFramework\Validation\Rules\Number;
+use OtherPHPFramework\Validation\Rules\Required;
+use OtherPHPFramework\Validation\Rules\RequiredWith;
+use OtherPHPFramework\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
 class ValidatorTest extends TestCase

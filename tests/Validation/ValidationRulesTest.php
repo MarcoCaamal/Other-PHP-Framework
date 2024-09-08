@@ -1,13 +1,13 @@
 <?php
 
-namespace Junk\Tests\Validation;
+namespace OtherPHPFramework\Tests\Validation;
 
-use Junk\Validation\Rules\Email;
-use Junk\Validation\Rules\LessThan;
-use Junk\Validation\Rules\Number;
-use Junk\Validation\Rules\Required;
-use Junk\Validation\Rules\RequiredWhen;
-use Junk\Validation\Rules\RequiredWith;
+use OtherPHPFramework\Validation\Rules\Email;
+use OtherPHPFramework\Validation\Rules\LessThan;
+use OtherPHPFramework\Validation\Rules\Number;
+use OtherPHPFramework\Validation\Rules\Required;
+use OtherPHPFramework\Validation\Rules\RequiredWhen;
+use OtherPHPFramework\Validation\Rules\RequiredWith;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

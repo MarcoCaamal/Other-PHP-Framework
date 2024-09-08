@@ -1,6 +1,6 @@
 <?php
 
-namespace Junk\Exceptions;
+namespace OtherPHPFramework\Exceptions;
 
 class JunkException extends \Exception
 {

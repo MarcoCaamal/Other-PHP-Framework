@@ -1,10 +1,10 @@
 <?php
 
-namespace Junk\Server;
+namespace OtherPHPFramework\Server;
 
-use Junk\Http\HttpMethod;
-use Junk\Http\Request;
-use Junk\Server\Contracts\ServerContract;
+use OtherPHPFramework\Http\HttpMethod;
+use OtherPHPFramework\Http\Request;
+use OtherPHPFramework\Server\Contracts\ServerContract;
 
 /**
  * PHP native server that uses `$_SERVER` global.
@@ -14,7 +14,7 @@ class PHPNativeServer implements ServerContract
     /**
      * @inheritDoc
      */
-    public function sendResponse(\Junk\Http\Response $response)
+    public function sendResponse(\OtherPHPFramework\Http\Response $response)
     {
         // PHP sends Content-Type header by default, but it has to be removed if
         // the response has not content. Content-Type header can't be removed

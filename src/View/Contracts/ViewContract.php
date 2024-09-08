@@ -1,6 +1,6 @@
 <?php
 
-namespace Junk\View\Contracts;
+namespace OtherPHPFramework\View\Contracts;
 
 interface ViewContract
 {

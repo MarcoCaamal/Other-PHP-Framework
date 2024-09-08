@@ -1,6 +1,6 @@
 <?php
 
-namespace Junk\Routing;
+namespace OtherPHPFramework\Routing;
 
 /**
  * This class represents one route that stores URI regex and action.
@@ -34,7 +34,7 @@ class Route
     /**
      * HTTP Middlewares
      *
-     * @var array<\Junk\Http\Contracts\MiddlewareContract>
+     * @var array<\OtherPHPFramework\Http\Contracts\MiddlewareContract>
      */
     protected array $middlewares = [];
     /**
@@ -71,7 +71,7 @@ class Route
     }
     /**
      * Get HTTP Middlewares for this route
-     * @return array<\Junk\Http\Contracts\MiddlewareContract>
+     * @return array<\OtherPHPFramework\Http\Contracts\MiddlewareContract>
      */
     public function middlewares(): array
     {

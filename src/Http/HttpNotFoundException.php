@@ -1,8 +1,8 @@
 <?php
 
-namespace Junk\Http;
+namespace OtherPHPFramework\Http;
 
-use Junk\Exceptions\JunkException;
+use OtherPHPFramework\Exceptions\JunkException;
 
 /**
  * HTTP 404 Not Found.
