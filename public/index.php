@@ -46,7 +46,7 @@ Route::get('/html', fn (Request $request) => view('home', [
 ]));
 
 Route::get('/', function () {
-    return Response::text('Hello World');
+    return Response::text('HELLO WORLD with Docker');
 });
 
 $app->run();
