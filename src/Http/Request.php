@@ -2,7 +2,6 @@
 
 namespace OtherPHPFramework\Http;
 
-use OtherPHPFramework\Server\ServerContract;
 use OtherPHPFramework\Http\HttpMethod;
 use OtherPHPFramework\Routing\Route;
 use OtherPHPFramework\Validation\Validator;

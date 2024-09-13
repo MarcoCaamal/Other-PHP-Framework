@@ -5,7 +5,6 @@ namespace OtherPHPFramework\Tests\Http;
 use OtherPHPFramework\Http\HttpMethod;
 use OtherPHPFramework\Http\Request;
 use OtherPHPFramework\Routing\Route;
-use OtherPHPFramework\Server\ServerContract;
 use PHPUnit\Framework\TestCase;
 
 class RequestTest extends TestCase

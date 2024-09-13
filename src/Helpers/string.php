@@ -18,6 +18,7 @@ function snakeCase(string $str): string
             if($last !== '_') {
                 $snakeCased[] = '_';
             }
+            $snakeCased[] = strtolower($character);
         } elseif(ctype_lower($character)) {
             $snakeCased[] = $character;
         } elseif(in_array($character, $skip)) {
