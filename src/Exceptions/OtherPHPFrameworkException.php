@@ -2,6 +2,6 @@
 
 namespace OtherPHPFramework\Exceptions;
 
-class JunkException extends \Exception
+class OtherPHPFrameworkException extends \Exception
 {
 }

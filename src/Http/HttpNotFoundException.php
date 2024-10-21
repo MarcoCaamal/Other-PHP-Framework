@@ -2,12 +2,12 @@
 
 namespace OtherPHPFramework\Http;
 
-use OtherPHPFramework\Exceptions\JunkException;
+use OtherPHPFramework\Exceptions\OtherPHPFrameworkException;
 
 /**
  * HTTP 404 Not Found.
  *
  */
-class HttpNotFoundException extends JunkException
+class HttpNotFoundException extends OtherPHPFrameworkException
 {
 }

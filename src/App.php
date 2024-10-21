@@ -10,6 +10,7 @@ use OtherPHPFramework\Routing\Router;
 use OtherPHPFramework\Server\Contracts\ServerContract;
 use OtherPHPFramework\Server\PHPNativeServer;
 use OtherPHPFramework\Validation\Exceptions\ValidationException;
+use OtherPHPFramework\Validation\Rule;
 use OtherPHPFramework\View\Contracts\ViewContract;
 use OtherPHPFramework\View\ViewEngine;
 
@@ -27,6 +28,7 @@ class App
         $app->server = new PHPNativeServer();
         $app->request = $app->server->getRequest();
         $app->view = new ViewEngine(__DIR__ . "/../views");
+        Rule::loadDefaultRules();
 
         return $app;
     }

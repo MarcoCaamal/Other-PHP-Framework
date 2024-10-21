@@ -2,9 +2,9 @@
 
 namespace OtherPHPFramework\Validation\Exceptions;
 
-use OtherPHPFramework\Exceptions\JunkException;
+use OtherPHPFramework\Exceptions\OtherPHPFrameworkException;
 
-class ValidationException extends JunkException
+class ValidationException extends OtherPHPFrameworkException
 {
     public function __construct(protected array $errors)
     {
