@@ -30,8 +30,8 @@ class AuthMiddleware implements MiddlewareContract
 $app = App::bootstrap();
 
 Route::post('/validate', fn (Request $request) => json($request->validate([
-    'test' => Rule::required(),
-    'num' => Rule::number(),
+    'test' => 'required',
+    'num' => 'number',
     'email' => ['required', 'email']
 ], [
     'email' => [

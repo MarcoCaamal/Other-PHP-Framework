@@ -44,10 +44,11 @@ class App
             $this->abort(json($e->errors())->setStatus(422));
         } catch (Exception $e) {
             $response = json([
+                'error' => $e::class,
                 'message' => $e->getMessage(),
                 'trace'   => $e->getTrace(),
             ]);
-            $this->abort($response);
+            $this->abort($response->setStatus(500));
         }
     }
 

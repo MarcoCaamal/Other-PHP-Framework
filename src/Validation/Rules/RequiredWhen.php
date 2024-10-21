@@ -3,6 +3,7 @@
 namespace OtherPHPFramework\Validation\Rules;
 
 use OtherPHPFramework\Validation\Contracts\ValidationRuleContract;
+use OtherPHPFramework\Validation\Exceptions\RuleParseException;
 
 class RequiredWhen implements ValidationRuleContract
 {
@@ -33,6 +34,7 @@ class RequiredWhen implements ValidationRuleContract
             "<"  => $data[$this->otherField] <  floatval($this->compareWith),
             ">=" => $data[$this->otherField] >= floatval($this->compareWith),
             "<=" => $data[$this->otherField] <= floatval($this->compareWith),
+            default => throw new RuleParseException("Unknown required_when operator: $this->operator")
         };
 
         return !$isRequired || isset($data[$field]) && $data[$field] != "";
