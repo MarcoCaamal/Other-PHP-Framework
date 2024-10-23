@@ -12,6 +12,9 @@ class PhpNativeSessionStorage implements SessionContract{
     public function id(): string {
         return session_id();
     }
+    public function save() {
+        session_write_close();
+    }
     public function get(string $key, $default = null) {
         return $_SESSION[$key] ?? $default;
     }

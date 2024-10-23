@@ -49,4 +49,11 @@ Route::get('/', function () {
     return Response::text('HELLO WORLD with Docker');
 });
 
+Route::get('/session', function(Request $request) {
+    session()->remove('test');
+    // session()->flash('test', 'test');
+    return json(["id" => session()->id(), 'test' => session()->get('test', 'por defecto')]);
+    // return json($_SESSION);
+});
+
 $app->run();
