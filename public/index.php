@@ -45,6 +45,11 @@ Route::get('/html', fn (Request $request) => view('home', [
     'user' => 'Guest'
 ]));
 
+Route::get('/form', fn() => view('form'));
+Route::post('/form', function(Request $request) {
+    return json($request->validate(['email' => 'email', 'name' => 'required']));
+});
+
 Route::get('/', function () {
     return Response::text('HELLO WORLD with Docker');
 });

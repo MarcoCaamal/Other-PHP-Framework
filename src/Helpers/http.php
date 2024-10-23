@@ -19,3 +19,6 @@ function request(): Request
 {
     return app(\OtherPHPFramework\App::class)->request;
 }
+function back(): Response {
+    return redirect(session()->get('_previous', '/'));
+}
