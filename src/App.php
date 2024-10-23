@@ -9,6 +9,8 @@ use OtherPHPFramework\Http\Response;
 use OtherPHPFramework\Routing\Router;
 use OtherPHPFramework\Server\Contracts\ServerContract;
 use OtherPHPFramework\Server\PHPNativeServer;
+use OtherPHPFramework\Session\PhpNativeSessionStorage;
+use OtherPHPFramework\Session\Session;
 use OtherPHPFramework\Validation\Exceptions\ValidationException;
 use OtherPHPFramework\Validation\Rule;
 use OtherPHPFramework\View\Contracts\ViewContract;
@@ -20,6 +22,7 @@ class App
     public Request $request;
     public ServerContract $server;
     public ViewContract $view;
+    public Session $session;
 
     public static function bootstrap(): App
     {
@@ -28,8 +31,8 @@ class App
         $app->server = new PHPNativeServer();
         $app->request = $app->server->getRequest();
         $app->view = new ViewEngine(__DIR__ . "/../views");
+        $app->session = new Session(new PhpNativeSessionStorage);
         Rule::loadDefaultRules();
-
         return $app;
     }
 
