@@ -45,8 +45,8 @@ Route::get('/html', fn (Request $request) => view('home', [
     'user' => 'Guest'
 ]));
 
-Route::get('/form', fn() => view('form'));
-Route::post('/form', function(Request $request) {
+Route::get('/form', fn () => view('form'));
+Route::post('/form', function (Request $request) {
     return json($request->validate(['email' => 'email', 'name' => 'required']));
 });
 
@@ -54,7 +54,7 @@ Route::get('/', function () {
     return Response::text('HELLO WORLD with Docker');
 });
 
-Route::get('/session', function(Request $request) {
+Route::get('/session', function (Request $request) {
     session()->remove('test');
     // session()->flash('test', 'test');
     return json(["id" => session()->id(), 'test' => session()->get('test', 'por defecto')]);

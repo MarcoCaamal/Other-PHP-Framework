@@ -23,7 +23,8 @@ function singleton(string $class)
 {
     return Container::singleton($class);
 }
-function debugDie($var) {
+function debugDie($var)
+{
     echo json_encode($var);
     die;
 }

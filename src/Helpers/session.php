@@ -2,11 +2,13 @@
 
 use OtherPHPFramework\Session\Session;
 
-function session(): Session {
+function session(): Session
+{
     return app()->session;
 }
 
-function error($field) {
+function error($field)
+{
     $errors = session()->get('_errors', [])[$field] ?? [];
 
     $keys = array_keys($errors);
@@ -18,6 +20,7 @@ function error($field) {
     return null;
 }
 
-function old(string $field) {
+function old(string $field)
+{
     return session()->get('_old', [])[$field] ?? null;
 }

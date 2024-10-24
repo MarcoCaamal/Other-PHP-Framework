@@ -137,7 +137,8 @@ class Response
         }
         $this->setHeader("Content-Length", strlen($this->content));
     }
-    public function withErrors(array $errors, int $status = 400): self {
+    public function withErrors(array $errors, int $status = 400): self
+    {
         $this->setStatus($status);
         session()->flash('_errors', $errors);
         session()->flash('_old', request()->data());

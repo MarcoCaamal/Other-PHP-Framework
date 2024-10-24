@@ -14,7 +14,8 @@ use PHPUnit\Framework\TestCase;
 
 class ValidatorTest extends TestCase
 {
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         Rule::loadDefaultRules();
     }
     public function test_basic_validation_passes()
@@ -50,7 +51,8 @@ class ValidatorTest extends TestCase
         $v = new Validator(["test" => "test"]);
         $v->validate(["test" => new Number()]);
     }
-    public function testOverridesErrorMessagesCorrectly() {
+    public function testOverridesErrorMessagesCorrectly()
+    {
         $data = ["email" => "test@", "num1" => "not a number"];
         $rules = [
             "email" => "email",
@@ -91,7 +93,8 @@ class ValidatorTest extends TestCase
 
         $this->assertEquals($expected, $v->validate($rules));
     }
-    public function testBasicValidatationPassesWithStrings() {
+    public function testBasicValidatationPassesWithStrings()
+    {
         $data = [
             "email" => "test@test.com",
             "other" => 2,
@@ -112,7 +115,8 @@ class ValidatorTest extends TestCase
         $v = new Validator($data);
         $this->assertEquals($expected, $v->validate($rules));
     }
-    public function testReturnsMessagesForEachRuleThatDoesntPass() {
+    public function testReturnsMessagesForEachRuleThatDoesntPass()
+    {
         $email = new Email();
         $required = new Required();
         $number = new Number();

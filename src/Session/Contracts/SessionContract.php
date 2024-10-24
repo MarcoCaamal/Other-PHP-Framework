@@ -1,7 +1,9 @@
 <?php
+
 namespace OtherPHPFramework\Session\Contracts;
 
-interface SessionContract {
+interface SessionContract
+{
     public function start();
     public function save();
     public function id(): string;

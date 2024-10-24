@@ -1,10 +1,15 @@
 <?php
+
 namespace OtherPHPFramework\Tests\Session;
+
 use OtherPHPFramework\Session\Contracts\SessionContract;
 use OtherPHPFramework\Session\Session;
 use PHPUnit\Framework\TestCase;
-class SessionTest extends TestCase {
-    private function createMockSessionStorage() {
+
+class SessionTest extends TestCase
+{
+    private function createMockSessionStorage()
+    {
         // $mock = $this->getMockBuilder(SessionContract::class)->getMock();
         $mock = $this->createMock(SessionContract::class);
         $mock->method("id")->willReturn("id");
@@ -17,7 +22,8 @@ class SessionTest extends TestCase {
         });
         return $mock;
     }
-    public function testAgeFlashData() {
+    public function testAgeFlashData()
+    {
         $mock = $this->createMockSessionStorage();
         if(!$mock instanceof SessionContract) {
             $this->fail('The object mock isn\'t instace of SessionContract Class');

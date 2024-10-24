@@ -14,26 +14,31 @@ use OtherPHPFramework\Validation\Rules\RequiredWith;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class RuleParseTest extends TestCase {
-    protected function setUp(): void {
+class RuleParseTest extends TestCase
+{
+    protected function setUp(): void
+    {
         Rule::loadDefaultRules();
     }
 
-    public static function basicRules(): array {
+    public static function basicRules(): array
+    {
         return [
             [Email::class, 'email'],
             [Required::class, 'required'],
             [Number::class, 'number']
         ];
     }
-    public static function rulesWithParameters() {
+    public static function rulesWithParameters()
+    {
         return [
             [new LessThan(5), "less_than:5"],
             [new RequiredWith("other"), "required_with:other"],
             [new RequiredWhen("other", "=", "test"), "required_when:other,=,test"],
         ];
     }
-    public static function rulesWithParametersWithError() {
+    public static function rulesWithParametersWithError()
+    {
         return [
             ["less_than"],
             ["less_than:"],
@@ -47,19 +52,23 @@ class RuleParseTest extends TestCase {
         ];
     }
     #[DataProvider("basicRules")]
-    public function testParseBasicRules($class, $name) {
+    public function testParseBasicRules($class, $name)
+    {
         $this->assertInstanceOf($class, Rule::from($name));
     }
     #[DataProvider('rulesWithParameters')]
-    public function testParseRulesWithParameters($expected, $rule) {
+    public function testParseRulesWithParameters($expected, $rule)
+    {
         $this->assertEquals($expected, Rule::from($rule));
     }
-    public function testParsingUnknownRulesThrowsUnkownRuleException() {
+    public function testParsingUnknownRulesThrowsUnkownRuleException()
+    {
         $this->expectException(UnknownRuleException::class);
         Rule::from("unknown");
     }
     #[DataProvider('rulesWithParametersWithError')]
-    public function testParsingRuleWithParametersWithoutPassingCorrectParametersThrowsRuleParseException($rule) {
+    public function testParsingRuleWithParametersWithoutPassingCorrectParametersThrowsRuleParseException($rule)
+    {
         $this->expectException(RuleParseException::class);
         Rule::from($rule);
     }

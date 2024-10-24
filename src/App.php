@@ -3,6 +3,8 @@
 namespace OtherPHPFramework;
 
 use Exception;
+use OtherPHPFramework\Database\DatabaseDriverContract;
+use OtherPHPFramework\Database\PdoDriver;
 use OtherPHPFramework\Http\HttpMethod;
 use OtherPHPFramework\Http\HttpNotFoundException;
 use OtherPHPFramework\Http\Request;
@@ -24,15 +26,19 @@ class App
     public ServerContract $server;
     public ViewContract $view;
     public Session $session;
+    public DatabaseDriverContract $database;
 
-    public function prepareNextRequest() {
+    public function prepareNextRequest()
+    {
         if ($this->request->method() == HttpMethod::GET) {
             $this->session->set('_previous', $this->request->uri());
         }
     }
-    public function terminate(Response $response) {
+    public function terminate(Response $response)
+    {
         $this->prepareNextRequest();
         $this->server->sendResponse($response);
+        $this->database->close();
     }
     public static function bootstrap(): App
     {
@@ -41,7 +47,9 @@ class App
         $app->server = new PHPNativeServer();
         $app->request = $app->server->getRequest();
         $app->view = new ViewEngine(__DIR__ . "/../views");
-        $app->session = new Session(new PhpNativeSessionStorage);
+        $app->session = new Session(new PhpNativeSessionStorage());
+        $app->database = new PdoDriver();
+        $app->database->connect('mysql', 'localhost', 3036, 'exam', 'root', '');
         Rule::loadDefaultRules();
         return $app;
     }
