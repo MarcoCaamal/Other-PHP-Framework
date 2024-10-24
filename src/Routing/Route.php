@@ -1,6 +1,6 @@
 <?php
 
-namespace OtherPHPFramework\Routing;
+namespace SMFramework\Routing;
 
 /**
  * This class represents one route that stores URI regex and action.
@@ -34,7 +34,7 @@ class Route
     /**
      * HTTP Middlewares
      *
-     * @var array<\OtherPHPFramework\Http\Contracts\MiddlewareContract>
+     * @var array<\SMFramework\Http\Contracts\MiddlewareContract>
      */
     protected array $middlewares = [];
     /**
@@ -71,7 +71,7 @@ class Route
     }
     /**
      * Get HTTP Middlewares for this route
-     * @return array<\OtherPHPFramework\Http\Contracts\MiddlewareContract>
+     * @return array<\SMFramework\Http\Contracts\MiddlewareContract>
      */
     public function middlewares(): array
     {

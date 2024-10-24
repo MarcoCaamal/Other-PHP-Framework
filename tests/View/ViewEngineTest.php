@@ -1,8 +1,8 @@
 <?php
 
-namespace OtherPHPFramework\Tests\View;
+namespace SMFramework\Tests\View;
 
-use OtherPHPFramework\View\ViewEngine;
+use SMFramework\View\ViewEngine;
 use PHPUnit\Framework\TestCase;
 
 class ViewEngineTest extends TestCase

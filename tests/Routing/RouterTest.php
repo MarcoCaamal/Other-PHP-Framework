@@ -1,15 +1,15 @@
 <?php
 
-namespace OtherPHPFramework\Tests\Routing;
+namespace SMFramework\Tests\Routing;
 
-use OtherPHPFramework\Http\Contracts\MiddlewareContract;
-use OtherPHPFramework\Http\Response;
+use SMFramework\Http\Contracts\MiddlewareContract;
+use SMFramework\Http\Response;
 use PHPUnit\Framework\TestCase;
 
-use OtherPHPFramework\Server\ServerContract;
-use OtherPHPFramework\Http\HttpMethod;
-use OtherPHPFramework\Http\Request;
-use OtherPHPFramework\Routing\Router;
+use SMFramework\Server\ServerContract;
+use SMFramework\Http\HttpMethod;
+use SMFramework\Http\Request;
+use SMFramework\Routing\Router;
 
 class RouterTest extends TestCase
 {

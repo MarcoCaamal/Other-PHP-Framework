@@ -1,7 +1,7 @@
 <?php
 
-use OtherPHPFramework\App;
-use OtherPHPFramework\Container\Container;
+use SMFramework\App;
+use SMFramework\Container\Container;
 
 /**
  *

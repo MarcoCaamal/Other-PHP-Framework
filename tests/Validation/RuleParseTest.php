@@ -1,16 +1,16 @@
 <?php
 
-namespace OtherPHPFramework\Tests\Validation;
+namespace SMFramework\Tests\Validation;
 
-use OtherPHPFramework\Validation\Exceptions\RuleParseException;
-use OtherPHPFramework\Validation\Exceptions\UnknownRuleException;
-use OtherPHPFramework\Validation\Rule;
-use OtherPHPFramework\Validation\Rules\Email;
-use OtherPHPFramework\Validation\Rules\LessThan;
-use OtherPHPFramework\Validation\Rules\Number;
-use OtherPHPFramework\Validation\Rules\Required;
-use OtherPHPFramework\Validation\Rules\RequiredWhen;
-use OtherPHPFramework\Validation\Rules\RequiredWith;
+use SMFramework\Validation\Exceptions\RuleParseException;
+use SMFramework\Validation\Exceptions\UnknownRuleException;
+use SMFramework\Validation\Rule;
+use SMFramework\Validation\Rules\Email;
+use SMFramework\Validation\Rules\LessThan;
+use SMFramework\Validation\Rules\Number;
+use SMFramework\Validation\Rules\Required;
+use SMFramework\Validation\Rules\RequiredWhen;
+use SMFramework\Validation\Rules\RequiredWith;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace OtherPHPFramework\Validation\Exceptions;
+namespace SMFramework\Validation\Exceptions;
 
-use OtherPHPFramework\Exceptions\OtherPHPFrameworkException;
+use SMFramework\Exceptions\SMFrameworkException;
 
-class ValidationException extends OtherPHPFrameworkException
+class ValidationException extends SMFrameworkException
 {
     public function __construct(protected array $errors)
     {

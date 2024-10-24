@@ -1,8 +1,8 @@
 <?php
 
-namespace OtherPHPFramework\Database\ORM;
+namespace SMFramework\Database\ORM;
 
-use OtherPHPFramework\Database\DatabaseDriverContract;
+use SMFramework\Database\DatabaseDriverContract;
 
 abstract class Model
 {

@@ -1,24 +1,24 @@
 <?php
 
-namespace OtherPHPFramework;
+namespace SMFramework;
 
 use Exception;
-use OtherPHPFramework\Database\DatabaseDriverContract;
-use OtherPHPFramework\Database\ORM\Model;
-use OtherPHPFramework\Database\PdoDriver;
-use OtherPHPFramework\Http\HttpMethod;
-use OtherPHPFramework\Http\HttpNotFoundException;
-use OtherPHPFramework\Http\Request;
-use OtherPHPFramework\Http\Response;
-use OtherPHPFramework\Routing\Router;
-use OtherPHPFramework\Server\Contracts\ServerContract;
-use OtherPHPFramework\Server\PHPNativeServer;
-use OtherPHPFramework\Session\PhpNativeSessionStorage;
-use OtherPHPFramework\Session\Session;
-use OtherPHPFramework\Validation\Exceptions\ValidationException;
-use OtherPHPFramework\Validation\Rule;
-use OtherPHPFramework\View\Contracts\ViewContract;
-use OtherPHPFramework\View\ViewEngine;
+use SMFramework\Database\DatabaseDriverContract;
+use SMFramework\Database\ORM\Model;
+use SMFramework\Database\PdoDriver;
+use SMFramework\Http\HttpMethod;
+use SMFramework\Http\HttpNotFoundException;
+use SMFramework\Http\Request;
+use SMFramework\Http\Response;
+use SMFramework\Routing\Router;
+use SMFramework\Server\Contracts\ServerContract;
+use SMFramework\Server\PHPNativeServer;
+use SMFramework\Session\PhpNativeSessionStorage;
+use SMFramework\Session\Session;
+use SMFramework\Validation\Exceptions\ValidationException;
+use SMFramework\Validation\Rule;
+use SMFramework\View\Contracts\ViewContract;
+use SMFramework\View\ViewEngine;
 
 class App
 {
@@ -50,7 +50,7 @@ class App
         $app->view = new ViewEngine(__DIR__ . "/../views");
         $app->session = new Session(new PhpNativeSessionStorage());
         $app->database = new PdoDriver();
-        $app->database->connect('mysql', 'localhost', 3036, 'exam', 'root', '');
+        $app->database->connect('mysql', 'localhost', 3306, 'exam', 'root', '');
         Rule::loadDefaultRules();
         Model::setDatabaseDriver($app->database);
         return $app;

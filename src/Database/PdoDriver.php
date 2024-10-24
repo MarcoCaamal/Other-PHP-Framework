@@ -1,8 +1,8 @@
 <?php
 
-namespace OtherPHPFramework\Database;
+namespace SMFramework\Database;
 
-use OtherPHPFramework\Database\DatabaseDriverContract;
+use SMFramework\Database\DatabaseDriverContract;
 use PDO;
 
 class PdoDriver implements DatabaseDriverContract

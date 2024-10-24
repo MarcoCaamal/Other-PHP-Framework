@@ -1,9 +1,9 @@
 <?php
 
-namespace OtherPHPFramework\Server\Contracts;
+namespace SMFramework\Server\Contracts;
 
-use OtherPHPFramework\Http\Request;
-use OtherPHPFramework\Http\Response;
+use SMFramework\Http\Request;
+use SMFramework\Http\Response;
 
 /**
  * Similar to PHP `$_SERVER` but having an interface allows us to mock these

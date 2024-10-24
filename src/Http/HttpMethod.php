@@ -1,6 +1,6 @@
 <?php
 
-namespace OtherPHPFramework\Http;
+namespace SMFramework\Http;
 
 /**
  * HTTP Verbs.

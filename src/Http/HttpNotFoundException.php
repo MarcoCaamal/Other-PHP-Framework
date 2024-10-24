@@ -1,13 +1,13 @@
 <?php
 
-namespace OtherPHPFramework\Http;
+namespace SMFramework\Http;
 
-use OtherPHPFramework\Exceptions\OtherPHPFrameworkException;
+use SMFramework\Exceptions\SMFrameworkException;
 
 /**
  * HTTP 404 Not Found.
  *
  */
-class HttpNotFoundException extends OtherPHPFrameworkException
+class HttpNotFoundException extends SMFrameworkException
 {
 }

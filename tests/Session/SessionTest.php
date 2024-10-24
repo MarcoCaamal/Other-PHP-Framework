@@ -1,9 +1,9 @@
 <?php
 
-namespace OtherPHPFramework\Tests\Session;
+namespace SMFramework\Tests\Session;
 
-use OtherPHPFramework\Session\Contracts\SessionContract;
-use OtherPHPFramework\Session\Session;
+use SMFramework\Session\Contracts\SessionContract;
+use SMFramework\Session\Session;
 use PHPUnit\Framework\TestCase;
 
 class SessionTest extends TestCase

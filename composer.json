@@ -4,7 +4,7 @@
     "type": "library",
     "autoload": {
         "psr-4": {
-            "OtherPHPFramework\\": "src"
+            "SMFramework\\": "src"
         },
         "files": [
             "src/Helpers/app.php",
@@ -19,7 +19,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "OtherPHPFramework\\Tests\\": "tests"
+            "SMFramework\\Tests\\": "tests"
         }
     },
     "authors": [

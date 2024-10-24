@@ -1,7 +1,7 @@
 <?php
 
-use OtherPHPFramework\Http\Request;
-use OtherPHPFramework\Http\Response;
+use SMFramework\Http\Request;
+use SMFramework\Http\Response;
 
 function json(array $data): Response
 {
@@ -17,7 +17,7 @@ function view(string $view, array $data = [], ?string $layout = null): Response
 }
 function request(): Request
 {
-    return app(\OtherPHPFramework\App::class)->request;
+    return app(\SMFramework\App::class)->request;
 }
 function back(): Response
 {

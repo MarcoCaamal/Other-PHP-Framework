@@ -1,10 +1,10 @@
 <?php
 
-namespace OtherPHPFramework\Tests\Http;
+namespace SMFramework\Tests\Http;
 
-use OtherPHPFramework\Http\HttpMethod;
-use OtherPHPFramework\Http\Request;
-use OtherPHPFramework\Routing\Route;
+use SMFramework\Http\HttpMethod;
+use SMFramework\Http\Request;
+use SMFramework\Routing\Route;
 use PHPUnit\Framework\TestCase;
 
 class RequestTest extends TestCase

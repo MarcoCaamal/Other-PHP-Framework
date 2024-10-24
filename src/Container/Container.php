@@ -1,6 +1,6 @@
 <?php
 
-namespace OtherPHPFramework\Container;
+namespace SMFramework\Container;
 
 class Container
 {

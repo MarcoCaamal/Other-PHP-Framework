@@ -1,8 +1,8 @@
 <?php
 
-namespace OtherPHPFramework\Session;
+namespace SMFramework\Session;
 
-use OtherPHPFramework\Session\Contracts\SessionContract;
+use SMFramework\Session\Contracts\SessionContract;
 
 class PhpNativeSessionStorage implements SessionContract
 {

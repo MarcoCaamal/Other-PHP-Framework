@@ -1,12 +1,12 @@
 <?php
 
-namespace OtherPHPFramework\Routing;
+namespace SMFramework\Routing;
 
-use OtherPHPFramework\Http\HttpMethod;
-use OtherPHPFramework\Http\Request;
-use OtherPHPFramework\Http\HttpNotFoundException;
-use OtherPHPFramework\Http\Response;
-use OtherPHPFramework\Routing\Route;
+use SMFramework\Http\HttpMethod;
+use SMFramework\Http\Request;
+use SMFramework\Http\HttpNotFoundException;
+use SMFramework\Http\Response;
+use SMFramework\Routing\Route;
 
 /**
  * HTTP Router
@@ -30,7 +30,7 @@ class Router
     /**
      * Register a new route with the given `#method` and `$uri`
      *
-     * @param \OtherPHPFramework\Http\HttpMethod $method
+     * @param \SMFramework\Http\HttpMethod $method
      * @param string $uri
      * @param \Closure $action
      * @return Route
@@ -45,9 +45,9 @@ class Router
     /**
      * Resolve the route of the `$request`
      *
-     * @param \OtherPHPFramework\Http\Request $request
-     * @throws \OtherPHPFramework\Http\HttpNotFoundException
-     * @return \OtherPHPFramework\Routing\Route
+     * @param \SMFramework\Http\Request $request
+     * @throws \SMFramework\Http\HttpNotFoundException
+     * @return \SMFramework\Routing\Route
      */
     public function resolveRoute(Request $request): Route
     {

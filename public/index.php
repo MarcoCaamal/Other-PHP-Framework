@@ -1,12 +1,12 @@
 <?php
 
-use OtherPHPFramework\App;
-use OtherPHPFramework\Http\Contracts\MiddlewareContract;
-use OtherPHPFramework\Http\Request;
-use OtherPHPFramework\Http\Response;
-use OtherPHPFramework\Routing\Route;
-use OtherPHPFramework\Validation\Rule;
-use OtherPHPFramework\Validation\Rules\Required;
+use SMFramework\App;
+use SMFramework\Http\Contracts\MiddlewareContract;
+use SMFramework\Http\Request;
+use SMFramework\Http\Response;
+use SMFramework\Routing\Route;
+use SMFramework\Validation\Rule;
+use SMFramework\Validation\Rules\Required;
 
 require __DIR__ . "/../vendor/autoload.php";
 

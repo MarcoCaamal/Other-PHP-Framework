@@ -1,6 +1,6 @@
 <?php
 
-namespace OtherPHPFramework\Session\Contracts;
+namespace SMFramework\Session\Contracts;
 
 interface SessionContract
 {

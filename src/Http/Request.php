@@ -1,10 +1,10 @@
 <?php
 
-namespace OtherPHPFramework\Http;
+namespace SMFramework\Http;
 
-use OtherPHPFramework\Http\HttpMethod;
-use OtherPHPFramework\Routing\Route;
-use OtherPHPFramework\Validation\Validator;
+use SMFramework\Http\HttpMethod;
+use SMFramework\Routing\Route;
+use SMFramework\Validation\Validator;
 
 /**
  * This class represent a Request HTTP.

@@ -1,6 +1,6 @@
 <?php
 
-use OtherPHPFramework\Session\Session;
+use SMFramework\Session\Session;
 
 function session(): Session
 {

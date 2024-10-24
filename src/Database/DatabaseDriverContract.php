@@ -1,6 +1,6 @@
 <?php
 
-namespace OtherPHPFramework\Database;
+namespace SMFramework\Database;
 
 interface DatabaseDriverContract
 {

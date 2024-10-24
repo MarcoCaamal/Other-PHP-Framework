@@ -1,8 +1,8 @@
 <?php
 
-namespace OtherPHPFramework\Validation;
+namespace SMFramework\Validation;
 
-use OtherPHPFramework\Validation\Exceptions\ValidationException;
+use SMFramework\Validation\Exceptions\ValidationException;
 
 class Validator
 {

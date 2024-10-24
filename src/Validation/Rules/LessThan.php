@@ -1,8 +1,8 @@
 <?php
 
-namespace OtherPHPFramework\Validation\Rules;
+namespace SMFramework\Validation\Rules;
 
-use OtherPHPFramework\Validation\Contracts\ValidationRuleContract;
+use SMFramework\Validation\Contracts\ValidationRuleContract;
 
 class LessThan implements ValidationRuleContract
 {

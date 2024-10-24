@@ -1,9 +1,9 @@
 <?php
 
-namespace OtherPHPFramework\Validation\Rules;
+namespace SMFramework\Validation\Rules;
 
-use OtherPHPFramework\Validation\Contracts\ValidationRuleContract;
-use OtherPHPFramework\Validation\Exceptions\RuleParseException;
+use SMFramework\Validation\Contracts\ValidationRuleContract;
+use SMFramework\Validation\Exceptions\RuleParseException;
 
 class RequiredWhen implements ValidationRuleContract
 {

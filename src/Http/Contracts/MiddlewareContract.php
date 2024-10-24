@@ -1,8 +1,8 @@
 <?php
 
-namespace OtherPHPFramework\Http\Contracts;
+namespace SMFramework\Http\Contracts;
 
-use OtherPHPFramework\Http\Request;
+use SMFramework\Http\Request;
 
 interface MiddlewareContract
 {
