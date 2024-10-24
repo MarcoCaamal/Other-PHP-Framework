@@ -4,6 +4,7 @@ namespace OtherPHPFramework;
 
 use Exception;
 use OtherPHPFramework\Database\DatabaseDriverContract;
+use OtherPHPFramework\Database\ORM\Model;
 use OtherPHPFramework\Database\PdoDriver;
 use OtherPHPFramework\Http\HttpMethod;
 use OtherPHPFramework\Http\HttpNotFoundException;
@@ -51,6 +52,7 @@ class App
         $app->database = new PdoDriver();
         $app->database->connect('mysql', 'localhost', 3036, 'exam', 'root', '');
         Rule::loadDefaultRules();
+        Model::setDatabaseDriver($app->database);
         return $app;
     }
 
