@@ -11,6 +11,7 @@ abstract class Model
     protected array $hidden = [];
     protected array $fillable = [];
     protected array $attributes = [];
+    protected bool $insertTimestamps = true;
     private static ?DatabaseDriverContract $driver = null;
 
     public static function setDatabaseDriver(DatabaseDriverContract $driver)
@@ -33,13 +34,15 @@ abstract class Model
     {
         return $this->attributes[$name] ?? null;
     }
-    protected function setAttributes(array $attributes): static {
+    protected function setAttributes(array $attributes): static
+    {
         foreach ($attributes as $key => $value) {
             $this->__set($key, $value);
         }
         return $this;
     }
-    protected function massAsign(array $attributes): static {
+    protected function massAsign(array $attributes): static
+    {
         if (count($this->fillable) == 0) {
             throw new \Error("Model " . static::class . " does not have fillable attributes");
         }
@@ -50,13 +53,18 @@ abstract class Model
         }
         return $this;
     }
-    public function toArray(): array {
+    public function toArray(): array
+    {
         return array_filter(
             $this->attributes,
             fn ($attr) => !in_array($attr, $this->hidden)
         );
     }
-    public function save(): static {
+    public function save(): static
+    {
+        if ($this->insertTimestamps) {
+            $this->attributes["created_at"] = date("Y-m-d H:m:s");
+        }
         $databaseColumns = implode(",", array_keys($this->attributes));
         $bind = implode(",", array_fill(0, count($this->attributes), "?"));
         self::$driver->statement(
@@ -65,10 +73,12 @@ abstract class Model
         );
         return $this;
     }
-    public static function create(array $attributes): static {
+    public static function create(array $attributes): static
+    {
         return (new static())->massAsign($attributes)->save();
     }
-    public static function first(): ?static {
+    public static function first(): ?static
+    {
         $model = new static();
         $rows = self::$driver->statement("SELECT * FROM $model->table LIMIT 1");
         if (count($rows) == 0) {
@@ -76,7 +86,8 @@ abstract class Model
         }
         return $model->setAttributes($rows[0]);
     }
-    public static function find(int|string $id): ?static {
+    public static function find(int|string $id): ?static
+    {
         $model = new static();
         $rows = self::$driver->statement(
             "SELECT * FROM $model->table WHERE $model->primaryKey = ?",
@@ -87,7 +98,8 @@ abstract class Model
         }
         return $model->setAttributes($rows[0]);
     }
-    public static function all(): array {
+    public static function all(): array
+    {
         $model = new static();
         $rows = self::$driver->statement("SELECT * FROM $model->table");
         if (count($rows) == 0) {
@@ -99,7 +111,8 @@ abstract class Model
         }
         return $models;
     }
-    public static function where(string $column, mixed $value): array {
+    public static function where(string $column, mixed $value): array
+    {
         $model = new static();
         $rows = self::$driver->statement(
             "SELECT * FROM $model->table WHERE $column = ?",
