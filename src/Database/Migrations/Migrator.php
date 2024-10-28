@@ -22,7 +22,7 @@ class Migrator
     }
     private function createMigrationsTableIfNotExists()
     {
-        $this->driver->statement("CREATE TABLE IF NOT EXISTS migrations (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(256))");
+        $this->driver->statement("CREATE TABLE IF NOT EXISTS migrations (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(256))ENGINE=innodb");
     }
     public function migrate()
     {
@@ -41,7 +41,6 @@ class Migrator
             $this->log("Migrated => $name");
         }
     }
-
     public function make(string $migrationName)
     {
         $migrationName = snakeCase($migrationName);

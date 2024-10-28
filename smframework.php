@@ -7,8 +7,7 @@ use SMFramework\Database\Migrations\Migrator;
 use SMFramework\Database\PdoDriver;
 
 $driver = singleton(DatabaseDriverContract::class, PdoDriver::class);
-
-
+$driver->connect('mysql', 'localhost', 3306, 'smframework', 'root', '');
 
 $migrator = new Migrator(
     __DIR__ . '/database/migrations',
