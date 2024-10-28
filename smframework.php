@@ -2,7 +2,7 @@
 
 require_once './vendor/autoload.php';
 
-use SMFramework\Database\DatabaseDriverContract;
+use SMFramework\Database\Contracts\DatabaseDriverContract;
 use SMFramework\Database\Migrations\Migrator;
 use SMFramework\Database\PdoDriver;
 

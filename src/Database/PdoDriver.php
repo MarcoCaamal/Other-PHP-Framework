@@ -2,7 +2,7 @@
 
 namespace SMFramework\Database;
 
-use SMFramework\Database\DatabaseDriverContract;
+use SMFramework\Database\Contracts\DatabaseDriverContract;
 use PDO;
 
 class PdoDriver implements DatabaseDriverContract

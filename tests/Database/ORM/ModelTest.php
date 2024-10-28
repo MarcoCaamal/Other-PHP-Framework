@@ -5,7 +5,7 @@ namespace SMFramework\Tests\Database\ORM;
 use PDOException;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
-use SMFramework\Database\DatabaseDriverContract;
+use SMFramework\Database\Contracts\DatabaseDriverContract;
 use SMFramework\Database\ORM\Model;
 use SMFramework\Database\PdoDriver;
 

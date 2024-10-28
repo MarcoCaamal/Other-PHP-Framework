@@ -2,7 +2,7 @@
 
 namespace SMFramework\Database\ORM;
 
-use SMFramework\Database\DatabaseDriverContract;
+use SMFramework\Database\Contracts\DatabaseDriverContract;
 
 abstract class Model
 {

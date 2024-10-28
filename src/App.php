@@ -3,7 +3,7 @@
 namespace SMFramework;
 
 use Exception;
-use SMFramework\Database\DatabaseDriverContract;
+use SMFramework\Database\Contracts\DatabaseDriverContract;
 use SMFramework\Database\ORM\Model;
 use SMFramework\Database\PdoDriver;
 use SMFramework\Http\HttpMethod;
