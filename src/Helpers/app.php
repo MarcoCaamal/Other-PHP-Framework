@@ -19,9 +19,9 @@ function app(string $class = App::class)
  * @param class-string<T> $class
  * @return T
  */
-function singleton(string $class)
+function singleton(string $class, string|callable|null $build)
 {
-    return Container::singleton($class);
+    return Container::singleton($class, $build);
 }
 function debugDie($var)
 {

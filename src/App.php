@@ -43,13 +43,13 @@ class App
     }
     public static function bootstrap(): App
     {
-        $app = singleton(self::class);
+        $app = singleton(self::class, self::class);
         $app->router = new Router();
         $app->server = new PHPNativeServer();
         $app->request = $app->server->getRequest();
         $app->view = new ViewEngine(__DIR__ . "/../views");
         $app->session = new Session(new PhpNativeSessionStorage());
-        $app->database = new PdoDriver();
+        $app->database = singleton(DatabaseDriverContract::class, PdoDriver::class);
         $app->database->connect('mysql', 'localhost', 3306, 'exam', 'root', '');
         Rule::loadDefaultRules();
         Model::setDatabaseDriver($app->database);
