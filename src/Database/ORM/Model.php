@@ -73,7 +73,8 @@ abstract class Model
         );
         return $this;
     }
-    public function update(): static {
+    public function update(): static
+    {
         if ($this->insertTimestamps) {
             $this->attributes["updated_at"] = date("Y-m-d H:m:s");
         }
@@ -86,7 +87,8 @@ abstract class Model
         );
         return $this;
     }
-    public function delete(): static {
+    public function delete(): static
+    {
         self::$driver->statement(
             "DELETE FROM $this->table WHERE $this->primaryKey = {$this->attributes[$this->primaryKey]}"
         );
@@ -140,13 +142,14 @@ abstract class Model
         if (count($rows) == 0) {
             return [];
         }
-        $models = [$model->setAttributes($rows[0])];
+        $models = [];
         for ($i = 0; $i < count($rows); $i++) {
             $models[] = (new static())->setAttributes($rows[$i]);
         }
         return $models;
     }
-    public static function firstWhere(string $column, mixed $value): ?static {
+    public static function firstWhere(string $column, mixed $value): ?static
+    {
         $model = new static();
         $rows = self::$driver->statement(
             "SELECT * FROM $model->table WHERE $column = ? LIMIT 1",
