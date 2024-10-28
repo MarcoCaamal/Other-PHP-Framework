@@ -9,18 +9,23 @@ class Migrator
     public function __construct(
         private string $migrationsDirectory,
         private string $templatesDirectory,
-        private DatabaseDriverContract $driver
+        private DatabaseDriverContract $driver,
+        private bool $logProgress = true
     ) {
         $this->migrationsDirectory = $migrationsDirectory;
         $this->templatesDirectory = $templatesDirectory;
         $this->driver = $driver;
+        $this->$logProgress = $logProgress;
     }
 
     private function log(string $message)
     {
         print($message . PHP_EOL);
+        if ($this->logProgress) {
+            print($message . PHP_EOL);
+        }
     }
-    private function createMigrationsTableIfNotExists()
+    public function createMigrationsTableIfNotExists()
     {
         $this->driver->statement("CREATE TABLE IF NOT EXISTS migrations (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(256))ENGINE=innodb");
     }
@@ -89,9 +94,9 @@ class Migrator
         $fileName = sprintf("%s_%06d_%s.php", $date, $id, $migrationName);
 
         // Crear la carpeta de destino si no existe
-        if (!file_exists(dirname("$this->migrationsDirectory/$fileName"))) {
-            mkdir(dirname("$this->migrationsDirectory/$fileName"), 0777, true);
-        }
+        // if (!file_exists(dirname("$this->migrationsDirectory/$fileName"))) {
+        //     mkdir(dirname("$this->migrationsDirectory/$fileName"), 0777, true);
+        // }
 
         file_put_contents("$this->migrationsDirectory/$fileName", $template);
         return $fileName;

@@ -3,6 +3,7 @@
 namespace SMFramework\Tests\Database;
 
 use PDOException;
+use SMFramework\Database\Contracts\DatabaseDriverContract;
 use SMFramework\Database\ORM\Model;
 use SMFramework\Database\PdoDriver;
 
@@ -11,7 +12,7 @@ trait RefreshDatabase
     protected function setUp(): void
     {
         if (is_null($this->driver)) {
-            $this->driver = new PdoDriver();
+            $this->driver = singleton(DatabaseDriverContract::class, PdoDriver::class);
             Model::setDatabaseDriver($this->driver);
             try {
                 $this->driver->connect('mysql', 'localhost', 3306, 'smframework_test', 'root', '');

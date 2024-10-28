@@ -28,3 +28,39 @@ function debugDie($var)
     echo json_encode($var);
     die;
 }
+function php_exec($cmd)
+{
+
+    if(function_exists('exec')) {
+        $output = array();
+        $return_var = 0;
+        exec($cmd, $output, $return_var);
+        return implode(" ", array_values($output));
+    } elseif(function_exists('shell_exec')) {
+        return shell_exec($cmd);
+    } elseif(function_exists('system')) {
+        $return_var = 0;
+        return system($cmd, $return_var);
+    } elseif(function_exists('passthru')) {
+        $return_var = 0;
+        ob_start();
+        passthru($cmd, $return_var);
+        $output = ob_get_contents();
+        ob_end_clean(); //Use this instead of ob_flush()
+        return $output;
+    } elseif(function_exists('proc_open')) {
+        $proc = proc_open(
+            $cmd,
+            array(
+                array("pipe","r"),
+                array("pipe","w"),
+                array("pipe","w")
+            ),
+            $pipes
+        );
+        return stream_get_contents($pipes[1]);
+    } else {
+        return "@PHP_COMMAND_NOT_SUPPORT";
+    }
+
+}
