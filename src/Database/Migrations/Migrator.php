@@ -41,7 +41,8 @@ class Migrator
             $this->log("Migrated => $name");
         }
     }
-    public function rollback(?int $steps = null) {
+    public function rollback(?int $steps = null)
+    {
         $this->createMigrationsTableIfNotExists();
         $migrated = $this->driver->statement("SELECT * FROM migrations");
         $pending = count($migrated);
@@ -74,7 +75,7 @@ class Migrator
             $template = str_replace('\$DOWN', "DROP TABLE $table", $template);
         } elseif (preg_match("/.*(from|to)_(.*)_table/", $migrationName)) {
             $table = preg_replace_callback("/.*(from|to)_(.*)_table/", fn ($match) => $match[2], $migrationName);
-            $template = preg_replace('/\\$UP|\\$DOWN/', "ALTER TABLE $table", $template);
+            $template = preg_replace('/\\\\\$(UP|DOWN)/', "ALTER TABLE $table", $template);
         } else {
             $template = preg_replace_callback("/DB::statement.*/", fn ($match) => "// {$match[0]}", $template);
         }

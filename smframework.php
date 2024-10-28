@@ -19,7 +19,7 @@ if ($argv[1] == "make:migration") {
     $migrator->make($argv[2]);
 } elseif ($argv[1] == "migrate") {
     $migrator->migrate();
-} else if ($argv[1] == "rollback") {
+} elseif ($argv[1] == "rollback") {
     $step = null;
     if (count($argv) == 4 && $argv[2] == "--step") {
         $step = $argv[3];

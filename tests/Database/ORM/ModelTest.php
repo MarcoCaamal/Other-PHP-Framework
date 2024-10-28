@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use SMFramework\Database\Contracts\DatabaseDriverContract;
 use SMFramework\Database\ORM\Model;
 use SMFramework\Database\PdoDriver;
+use SMFramework\Tests\Database\RefreshDatabase;
 
 class MockModel extends Model
 {
@@ -20,24 +21,8 @@ class MockModelFillable extends Model
 
 class ModelTest extends TestCase
 {
+    use RefreshDatabase;
     protected ?DatabaseDriverContract $driver = null;
-    protected function setUp(): void
-    {
-        if (is_null($this->driver)) {
-            $this->driver = new PdoDriver();
-            Model::setDatabaseDriver($this->driver);
-            try {
-                $this->driver->connect('mysql', 'localhost', 3306, 'smframework_test', 'root', '');
-            } catch (PDOException $e) {
-                $this->markTestSkipped("Can't connect to test database: {$e->getMessage()}");
-            }
-        }
-    }
-    protected function tearDown(): void
-    {
-        $this->driver->statement("DROP DATABASE IF EXISTS smframework_test");
-        $this->driver->statement("CREATE DATABASE smframework_test");
-    }
     private function createTestTable($name, $columns, $withTimestamps = true)
     {
         $sql = "CREATE TABLE $name (id INT AUTO_INCREMENT PRIMARY KEY, "
