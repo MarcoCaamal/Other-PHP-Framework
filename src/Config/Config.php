@@ -9,7 +9,7 @@ class Config
     public static function load(string $path)
     {
         foreach(glob("$path/*.php") as $config) {
-            $key = explode('.', basename($config));
+            $key = explode('.', basename($config))[0];
             $values = require_once $config;
             self::$config[$key] = $values;
         }
