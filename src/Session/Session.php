@@ -2,14 +2,14 @@
 
 namespace SMFramework\Session;
 
-use SMFramework\Session\Contracts\SessionContract;
+use SMFramework\Session\Contracts\SessionStorageContract;
 
 class Session
 {
-    protected SessionContract $storage;
+    protected SessionStorageContract $storage;
     public const FLASH_KEY = '_flash';
 
-    public function __construct(SessionContract $storage)
+    public function __construct(SessionStorageContract $storage)
     {
         $this->storage = $storage;
         $this->storage->start();

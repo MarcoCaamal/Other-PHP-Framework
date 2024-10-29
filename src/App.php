@@ -7,20 +7,16 @@ use Exception;
 use SMFramework\Config\Config;
 use SMFramework\Database\Contracts\DatabaseDriverContract;
 use SMFramework\Database\ORM\Model;
-use SMFramework\Database\PdoDriver;
 use SMFramework\Http\HttpMethod;
 use SMFramework\Http\HttpNotFoundException;
 use SMFramework\Http\Request;
 use SMFramework\Http\Response;
 use SMFramework\Routing\Router;
 use SMFramework\Server\Contracts\ServerContract;
-use SMFramework\Server\PHPNativeServer;
-use SMFramework\Session\PhpNativeSessionStorage;
+use SMFramework\Session\Contracts\SessionStorageContract;
 use SMFramework\Session\Session;
 use SMFramework\Validation\Exceptions\ValidationException;
-use SMFramework\Validation\Rule;
 use SMFramework\View\Contracts\ViewContract;
-use SMFramework\View\ViewEngine;
 
 class App
 {
@@ -47,21 +43,50 @@ class App
     public static function bootstrap(string $root): App
     {
         self::$root = $root;
-        Dotenv::createImmutable($root);
-        Config::load("$root/config");
         $app = singleton(self::class, self::class);
-        $app->router = new Router();
-        $app->server = new PHPNativeServer();
-        $app->request = $app->server->getRequest();
-        $app->view = new ViewEngine(config('view.path'));
-        $app->session = new Session(new PhpNativeSessionStorage());
-        $app->database = singleton(DatabaseDriverContract::class, PdoDriver::class);
-        $app->database->connect('mysql', 'localhost', 3306, 'exam', 'root', '');
-        Rule::loadDefaultRules();
-        Model::setDatabaseDriver($app->database);
-        return $app;
+        return $app
+            ->loadConfig()
+            ->runServiceProviders('boot')
+            ->setHttpHandlers()
+            ->setUpDatabaseConnection()
+            ->runServiceProviders('runtime');
     }
-
+    protected function loadConfig(): self
+    {
+        Dotenv::createImmutable(self::$root);
+        Config::load(self::$root . "/config");
+        return $this;
+    }
+    protected function runServiceProviders(string $type): self
+    {
+        foreach (config("providers.$type", []) as $provider) {
+            $provider = new $provider();
+            $provider->registerServices();
+        }
+        return $this;
+    }
+    public function setHttpHandlers(): self
+    {
+        $this->router = singleton(Router::class);
+        $this->server = app(ServerContract::class);
+        $this->request = $this->server->getRequest();
+        $this->session = singleton(Session::class, fn () => new Session(app(SessionStorageContract::class)));
+        return $this;
+    }
+    public function setUpDatabaseConnection(): self
+    {
+        $this->database = app(DatabaseDriverContract::class);
+        $this->database->connect(
+            config("database.connection"),
+            config("database.host"),
+            config("database.port"),
+            config("database.database"),
+            config("database.username"),
+            config("database.password"),
+        );
+        Model::setDatabaseDriver($this->database);
+        return $this;
+    }
     public function run()
     {
         try {

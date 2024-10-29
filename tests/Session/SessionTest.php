@@ -2,7 +2,7 @@
 
 namespace SMFramework\Tests\Session;
 
-use SMFramework\Session\Contracts\SessionContract;
+use SMFramework\Session\Contracts\SessionStorageContract;
 use SMFramework\Session\Session;
 use PHPUnit\Framework\TestCase;
 
@@ -11,7 +11,7 @@ class SessionTest extends TestCase
     private function createMockSessionStorage()
     {
         // $mock = $this->getMockBuilder(SessionContract::class)->getMock();
-        $mock = $this->createMock(SessionContract::class);
+        $mock = $this->createMock(SessionStorageContract::class);
         $mock->method("id")->willReturn("id");
         $mock->storage = [];
         $mock->method("has")->willReturnCallback(fn ($key) => isset($mock->storage[$key]));
@@ -25,7 +25,7 @@ class SessionTest extends TestCase
     public function testAgeFlashData()
     {
         $mock = $this->createMockSessionStorage();
-        if(!$mock instanceof SessionContract) {
+        if(!$mock instanceof SessionStorageContract) {
             $this->fail('The object mock isn\'t instace of SessionContract Class');
         }
         $s1 = new Session($mock);

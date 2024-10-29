@@ -2,9 +2,9 @@
 
 namespace SMFramework\Session;
 
-use SMFramework\Session\Contracts\SessionContract;
+use SMFramework\Session\Contracts\SessionStorageContract;
 
-class PhpNativeSessionStorage implements SessionContract
+class PhpNativeSessionStorage implements SessionStorageContract
 {
     public function start()
     {

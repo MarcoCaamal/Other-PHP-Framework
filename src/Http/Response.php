@@ -2,6 +2,8 @@
 
 namespace SMFramework\Http;
 
+use SMFramework\View\Contracts\ViewContract;
+
 /**
  * This class respresnts a HTTP Response that it will be sending to the client.
  */
@@ -182,7 +184,7 @@ class Response
     }
     public static function view(string $view, array $params = [], ?string $layout = null): self
     {
-        $content = app()->view->render($view, $params, $layout);
+        $content = app(ViewContract::class)->render($view, $params, $layout);
 
         return (new self())
             ->setContentType('text/html')

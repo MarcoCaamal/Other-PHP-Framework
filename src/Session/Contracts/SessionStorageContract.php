@@ -2,7 +2,7 @@
 
 namespace SMFramework\Session\Contracts;
 
-interface SessionContract
+interface SessionStorageContract
 {
     public function start();
     public function save();
