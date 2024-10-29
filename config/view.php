@@ -1,6 +1,6 @@
 <?php
 
 return [
-    'engine' => 'viewengine',
-    'path' => resourcesDirectory() . '/view'
+    'engine' => 'smframework',
+    'path' => resourcesDirectory() . '/views'
 ];
