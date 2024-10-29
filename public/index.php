@@ -27,7 +27,7 @@ class AuthMiddleware implements MiddlewareContract
     }
 }
 
-$app = App::bootstrap();
+$app = App::bootstrap(__DIR__ . '/..');
 
 Route::post('/validate', fn (Request $request) => json($request->validate([
     'test' => 'required',

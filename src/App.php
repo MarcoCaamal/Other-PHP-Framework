@@ -2,6 +2,7 @@
 
 namespace SMFramework;
 
+use Dotenv\Dotenv;
 use Exception;
 use SMFramework\Database\Contracts\DatabaseDriverContract;
 use SMFramework\Database\ORM\Model;
@@ -22,6 +23,7 @@ use SMFramework\View\ViewEngine;
 
 class App
 {
+    public static string $root;
     public Router $router;
     public Request $request;
     public ServerContract $server;
@@ -41,8 +43,10 @@ class App
         $this->server->sendResponse($response);
         $this->database->close();
     }
-    public static function bootstrap(): App
+    public static function bootstrap(string $root): App
     {
+        self::$root = $root;
+        Dotenv::createImmutable($root);
         $app = singleton(self::class, self::class);
         $app->router = new Router();
         $app->server = new PHPNativeServer();
