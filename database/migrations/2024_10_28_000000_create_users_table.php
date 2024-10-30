@@ -10,7 +10,7 @@ return new class () implements MigrationContract {
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
             lastname VARCHAR(255) NOT NULL,
-            passwordHash VARCHAR(255) NOT NULL,
+            password VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL UNIQUE,
             created_at DATETIME,
             updated_at DATETIME NULL

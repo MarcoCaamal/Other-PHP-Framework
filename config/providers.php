@@ -6,6 +6,7 @@ return [
         SMFramework\Providers\DatabaseDriverServiceProvider::class,
         SMFramework\Providers\SessionStorageServiceProvider::class,
         SMFramework\Providers\ViewServiceProvider::class,
+        SMFramework\Providers\AuthenticatorServiceProvider::class
     ],
     'runtime' => [
         App\Providers\RuleServiceProvider::class,
