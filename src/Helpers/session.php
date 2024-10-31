@@ -10,7 +10,6 @@ function session(): Session
 function error($field)
 {
     $errors = session()->get('_errors', [])[$field] ?? [];
-
     $keys = array_keys($errors);
 
     if(count($keys) > 0) {

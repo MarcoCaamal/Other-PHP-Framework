@@ -6,7 +6,7 @@ use SMFramework\Auth\Contracts\Authenticators\AuthenticatorContract;
 
 class Auth
 {
-    public static function user(): ?AuthenticatorContract
+    public static function user(): ?Authenticatable
     {
         return app(AuthenticatorContract::class)->resolve();
     }
