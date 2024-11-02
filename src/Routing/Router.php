@@ -35,7 +35,7 @@ class Router
      * @param \Closure $action
      * @return Route
      */
-    protected function registerRoute(HttpMethod $method, string $uri, \Closure $action): Route
+    protected function registerRoute(HttpMethod $method, string $uri, \Closure|array $action): Route
     {
         $route = new Route($uri, $action);
         $this->routes[$method->value][] = $route;
@@ -64,8 +64,17 @@ class Router
         $request->setRoute($route);
         $action = $route->action();
 
+        if(is_array($action)) {
+            $controller = new $action[0]();
+            $action[0] = $controller;
+        }
+
         if ($route->hasMiddlewares()) {
-            return $this->runMiddlewares($request, $route->middlewares(), $action);
+            return $this->runMiddlewares(
+                $request,
+                $route->middlewares(),
+                fn () => call_user_func($action, $request)
+            );
         }
 
         return $action($request);
@@ -73,7 +82,7 @@ class Router
     protected function runMiddlewares(Request $request, array $middlewares, \Closure $target): Response
     {
         if (count($middlewares) === 0) {
-            return $target($request);
+            return $target();
         }
 
         return $middlewares[0]->handle(
@@ -88,7 +97,7 @@ class Router
      * @param \Closure $action
      * @return Route
      */
-    public function get(string $uri, \Closure $action): Route
+    public function get(string $uri, \Closure|array $action): Route
     {
         return $this->registerRoute(HttpMethod::GET, $uri, $action);
     }
@@ -100,7 +109,7 @@ class Router
      * @param \Closure $action
      * @return Route
      */
-    public function post(string $uri, \Closure $action): Route
+    public function post(string $uri, \Closure|array $action): Route
     {
         return $this->registerRoute(HttpMethod::POST, $uri, $action);
     }
@@ -112,7 +121,7 @@ class Router
      * @param \Closure $action
      * @return Route
      */
-    public function put(string $uri, \Closure $action): Route
+    public function put(string $uri, \Closure|array $action): Route
     {
         return $this->registerRoute(HttpMethod::PUT, $uri, $action);
     }
@@ -124,7 +133,7 @@ class Router
      * @param \Closure $action
      * @return Route
      */
-    public function delete(string $uri, \Closure $action): Route
+    public function delete(string $uri, \Closure|array $action): Route
     {
         return $this->registerRoute(HttpMethod::DELETE, $uri, $action);
     }
@@ -136,7 +145,7 @@ class Router
      * @param \Closure $action
      * @return Route
      */
-    public function patch(string $uri, \Closure $action): Route
+    public function patch(string $uri, \Closure|array $action): Route
     {
         return $this->registerRoute(HttpMethod::PATCH, $uri, $action);
     }

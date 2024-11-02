@@ -1,5 +1,6 @@
 <?php
 
+use App\Controllers\Auth\RegisterController;
 use App\Models\User;
 use SMFramework\Crypto\Contracts\HasherContract;
 use SMFramework\Http\Request;
@@ -12,7 +13,7 @@ Route::get('/', function () {
     }
     return Response::text(auth()->name);
 });
-Route::get('/login', fn (Request $request) => view('login'));
+Route::get('/login', fn (Request $request) => view('auth.login'));
 Route::post('/login', function (Request $request) {
     $data = $request->validate([
         "email" => ["required", "email"],
@@ -34,7 +35,7 @@ Route::get('/logout', function () {
     auth()->logout();
     return redirect('/');
 });
-Route::get('/register', fn () => view('register'));
+Route::get('/register', [RegisterController::class, 'create']);
 Route::post('/register', function (Request $request) {
     $data = $request->validate([
         "email" => ["required", "email"],

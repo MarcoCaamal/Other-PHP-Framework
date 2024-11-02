@@ -19,7 +19,7 @@ class Route
      *
      * @var \Closure
      */
-    protected \Closure $action;
+    protected \Closure|array $action;
     /**
      * Regular expresion used to match incoming requests URIs.
      *
@@ -43,7 +43,7 @@ class Route
      * @param string $uri
      * @param \Closure $action
      */
-    public function __construct(string $uri, \Closure $action)
+    public function __construct(string $uri, \Closure|array $action)
     {
         $this->uri = $uri;
         $this->action = $action;
@@ -65,7 +65,7 @@ class Route
      *
      * @return \Closure
      */
-    public function action(): \Closure
+    public function action(): \Closure|array
     {
         return $this->action;
     }
@@ -121,20 +121,20 @@ class Route
             require_once $routes;
         }
     }
-    public static function get(string $uri, \Closure $action): self
+    public static function get(string $uri, \Closure|array $action): self
     {
         return app()->router->get($uri, $action);
     }
 
-    public static function post(string $uri, \Closure $action): self
+    public static function post(string $uri, \Closure|array $action): self
     {
         return app()->router->post($uri, $action);
     }
-    public static function put(string $uri, \Closure $action): Route
+    public static function put(string $uri, \Closure|array $action): Route
     {
         return app()->router->put($uri, $action);
     }
-    public static function delete(string $uri, \Closure $action): Route
+    public static function delete(string $uri, \Closure|array $action): Route
     {
         return app()->router->delete($uri, $action);
     }

@@ -15,4 +15,5 @@ interface DatabaseDriverContract
     public function close();
     public function statement(string $query, array $bind = []): array;
     public function execute(string $query, array $bind = []): bool;
+    public function lastInsertId();
 }

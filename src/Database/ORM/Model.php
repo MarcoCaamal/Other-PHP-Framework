@@ -78,6 +78,7 @@ abstract class Model
             "INSERT INTO $this->table ($databaseColumns) VALUES ($bind)",
             array_values($this->attributes)
         );
+        $this->{$this->primaryKey} = self::$driver->lastInsertId();
         return $this;
     }
     public function update(): static
