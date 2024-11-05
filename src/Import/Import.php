@@ -1,4 +1,5 @@
 <?php
+
 namespace SMFramework\Import;
 
 use SMFramework\Import\Adapters\Contracts\FileAdapterContract;
@@ -10,8 +11,7 @@ class Import
         private string $fileRoot,
         private FileAdapterContract $fileAdapter,
         private ImporterContract $importer,
-    )
-    {
+    ) {
         $this->fileAdapter = $fileAdapter;
         $this->importer = $importer;
     }

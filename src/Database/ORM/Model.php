@@ -3,9 +3,13 @@
 namespace SMFramework\Database\ORM;
 
 use SMFramework\Database\Contracts\DatabaseDriverContract;
+use SMFramework\Database\QueryBuilder\Contracts\QueryBuilderContract;
+use SMFramework\Database\QueryBuilder\QueryBuilder;
+use SMFramework\Database\QueryBuilder\UseBuilder;
 
 abstract class Model
 {
+    use UseBuilder;
     protected ?string $table = null;
     protected string $primaryKey = 'id';
     protected array $hidden = [];
@@ -13,14 +17,14 @@ abstract class Model
     protected array $attributes = [];
     protected bool $insertTimestamps = true;
     private static ?DatabaseDriverContract $driver = null;
-
     public static function setDatabaseDriver(DatabaseDriverContract $driver)
     {
         self::$driver = $driver;
     }
-
     public function __construct()
     {
+        $this->builder = new QueryBuilder(new self::$builderClassString(), self::$driver);
+        $this->builder->setPrimaryKey($this->primaryKey);
         if(is_null($this->table)) {
             $subclass = new \ReflectionClass(static::class);
             $this->table = snakeCase("{$subclass->getShortName()}s");

@@ -1,4 +1,5 @@
 <?php
+
 namespace SMFramework\Import\Contracts;
 
 interface ImporterContract

@@ -1,4 +1,5 @@
 <?php
+
 namespace SMFramework\Import\Adapters\Contracts;
 
 interface FileAdapterContract

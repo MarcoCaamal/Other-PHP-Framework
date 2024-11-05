@@ -4,9 +4,11 @@ namespace SMFramework;
 
 use Dotenv\Dotenv;
 use Exception;
+use Lib\Database\MysqlQueryBuilder;
 use SMFramework\Config\Config;
 use SMFramework\Database\Contracts\DatabaseDriverContract;
 use SMFramework\Database\ORM\Model;
+use SMFramework\Database\QueryBuilder\Drivers\MysqlQueryBuilderDriver;
 use SMFramework\Http\HttpMethod;
 use SMFramework\Http\HttpNotFoundException;
 use SMFramework\Http\Request;
@@ -84,6 +86,9 @@ class App
             config("database.username"),
             config("database.password"),
         );
+        match(config('database.connection', 'mysql')) {
+            'mysql' => Model::setBuilderClassString(MysqlQueryBuilderDriver::class)
+        };
         Model::setDatabaseDriver($this->database);
         return $this;
     }
@@ -104,9 +109,12 @@ class App
             $this->abort($response->setStatus(500));
         }
     }
-
     public function abort(Response $response)
     {
         $this->terminate($response);
+    }
+    public function make(string $class)
+    {
+
     }
 }
