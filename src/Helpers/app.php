@@ -4,6 +4,8 @@ use LightWeight\App;
 use LightWeight\Config\Config;
 use LightWeight\Container\Container;
 
+use function PHPSTORM_META\type;
+
 /**
  *
  * @template T
@@ -12,7 +14,8 @@ use LightWeight\Container\Container;
  */
 function app(string $class = App::class)
 {
-    return Container::resolve($class);
+    $resolved = Container::getInstance()->get($class);
+    return $resolved;
 }
 /**
  *
@@ -20,9 +23,19 @@ function app(string $class = App::class)
  * @param class-string<T> $class
  * @return T
  */
-function singleton(string $class, string|callable|null $build = null)
+function singleton(string $class, string|callable|object|null $build = null)
 {
-    return Container::singleton($class, $build);
+    $container = Container::getInstance();
+    if($container->has($class)) {
+        return $container->get($class);
+    }
+    match(true) {
+        is_null($build) => $container->set($class, \DI\create($class)),
+        is_string($build) => $container->set($class, \DI\create($build)),
+        is_object($build) && !$build instanceof \Closure => $container->set($class, $build),
+        is_callable($build) => $container->set($class, $build)
+    };
+    return $container->get($class);
 }
 function env(string $variable, $default = null)
 {

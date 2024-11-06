@@ -4,20 +4,29 @@ namespace LightWeight\Container;
 
 use DI\Container as DIContainer;
 use DI\ContainerBuilder;
+use LightWeight\Container\Exceptions\ContainerNotBuildException;
 
 class Container
 {
-    private static ?DIContainer $instance;
-    private function __construct() {}
+    private static ?DIContainer $instance = null;
+    private function __construct()
+    {
+    }
     public static function getInstance()
     {
         if(self::$instance === null) {
-            self::buildContainer();
+            $builder = new ContainerBuilder();
+            $builder->useAutowiring(false);
+            if(env('', 'dev') === 'prod') {
+                $builder->enableCompilation(__DIR__ . '/tmp');
+                $builder->writeProxiesToFile(true, __DIR__ . '/tmp/proxies');
+            }
+            self::$instance = $builder->build();
         }
         return self::$instance;
     }
-    private static function buildContainer()
+    public static function deleteInstance()
     {
-        $builder = new ContainerBuilder();
+        self::$instance = null;
     }
 }

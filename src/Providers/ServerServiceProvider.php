@@ -2,14 +2,17 @@
 
 namespace LightWeight\Providers;
 
+use DI\Container as DIContainer;
 use LightWeight\Providers\Contracts\ServiceProviderContract;
 use LightWeight\Server\Contracts\ServerContract;
 use LightWeight\Server\PHPNativeServer;
 
 class ServerServiceProvider implements ServiceProviderContract
 {
-    public function registerServices()
+    public function registerServices(DIContainer $serviceContainer)
     {
-        singleton(ServerContract::class, PHPNativeServer::class);
+        match(config('server.implementation', 'native')) {
+            'native' => $serviceContainer->set(ServerContract::class, \DI\create(PHPNativeServer::class))
+        };
     }
 }

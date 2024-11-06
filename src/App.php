@@ -4,7 +4,6 @@ namespace LightWeight;
 
 use Dotenv\Dotenv;
 use Exception;
-use Lib\Database\MysqlQueryBuilder;
 use LightWeight\Config\Config;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\ORM\Model;
@@ -45,7 +44,7 @@ class App
     public static function bootstrap(string $root): App
     {
         self::$root = $root;
-        $app = singleton(self::class, self::class);
+        $app = singleton(App::class);
         return $app
             ->loadConfig()
             ->runServiceProviders('boot')
@@ -63,7 +62,7 @@ class App
     {
         foreach (config("providers.$type", []) as $provider) {
             $provider = new $provider();
-            $provider->registerServices();
+            $provider->registerServices(\LightWeight\Container\Container::getInstance());
         }
         return $this;
     }
@@ -71,8 +70,8 @@ class App
     {
         $this->router = singleton(Router::class);
         $this->server = app(ServerContract::class);
-        $this->request = $this->server->getRequest();
-        $this->session = singleton(Session::class, fn () => new Session(app(SessionStorageContract::class)));
+        $this->request = singleton(Request::class, $this->server->getRequest());
+        $this->session = singleton(Session::class, fn (SessionStorageContract $sessionStorage) => new Session($sessionStorage));
         return $this;
     }
     public function setUpDatabaseConnection(): self
@@ -112,9 +111,5 @@ class App
     public function abort(Response $response)
     {
         $this->terminate($response);
-    }
-    public function make(string $class)
-    {
-
     }
 }

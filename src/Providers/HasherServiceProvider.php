@@ -8,10 +8,10 @@ use LightWeight\Providers\Contracts\ServiceProviderContract;
 
 class HasherServiceProvider implements ServiceProviderContract
 {
-    public function registerServices()
+    public function registerServices(\DI\Container $serviceContainer)
     {
-        match (config("hashing.hasher", "bcrypt")) {
-            "bcrypt" => singleton(HasherContract::class, Bcrypt::class),
+        match(config('hashing.hasher', 'bcrypt')) {
+            'bcrypt' => $serviceContainer->set(HasherContract::class, \DI\create(Bcrypt::class)),
         };
     }
 }
