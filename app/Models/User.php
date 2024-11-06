@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use SMFramework\Auth\Authenticatable;
+use LightWeight\Auth\Authenticatable;
 
 class User extends Authenticatable
 {

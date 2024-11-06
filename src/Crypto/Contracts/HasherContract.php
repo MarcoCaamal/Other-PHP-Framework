@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\Crypto\Contracts;
+namespace LightWeight\Crypto\Contracts;
 
 interface HasherContract
 {

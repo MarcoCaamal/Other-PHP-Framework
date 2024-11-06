@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\Providers\Contracts;
+namespace LightWeight\Providers\Contracts;
 
 interface ServiceProviderContract
 {

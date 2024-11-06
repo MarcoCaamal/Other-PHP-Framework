@@ -1,10 +1,10 @@
 <?php
 
-namespace SMFramework\Providers;
+namespace LightWeight\Providers;
 
-use SMFramework\Providers\Contracts\ServiceProviderContract;
-use SMFramework\Server\Contracts\ServerContract;
-use SMFramework\Server\PHPNativeServer;
+use LightWeight\Providers\Contracts\ServiceProviderContract;
+use LightWeight\Server\Contracts\ServerContract;
+use LightWeight\Server\PHPNativeServer;
 
 class ServerServiceProvider implements ServiceProviderContract
 {

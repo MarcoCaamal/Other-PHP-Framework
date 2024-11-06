@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\Database\Migrations\Contracts;
+namespace LightWeight\Database\Migrations\Contracts;
 
 interface MigrationContract
 {

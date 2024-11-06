@@ -1,12 +1,12 @@
 <?php
 
-namespace SMFramework\Routing;
+namespace LightWeight\Routing;
 
-use SMFramework\Http\HttpMethod;
-use SMFramework\Http\Request;
-use SMFramework\Http\HttpNotFoundException;
-use SMFramework\Http\Response;
-use SMFramework\Routing\Route;
+use LightWeight\Http\HttpMethod;
+use LightWeight\Http\Request;
+use LightWeight\Http\HttpNotFoundException;
+use LightWeight\Http\Response;
+use LightWeight\Routing\Route;
 
 /**
  * HTTP Router
@@ -30,7 +30,7 @@ class Router
     /**
      * Register a new route with the given `#method` and `$uri`
      *
-     * @param \SMFramework\Http\HttpMethod $method
+     * @param \LightWeight\Http\HttpMethod $method
      * @param string $uri
      * @param \Closure $action
      * @return Route
@@ -45,9 +45,9 @@ class Router
     /**
      * Resolve the route of the `$request`
      *
-     * @param \SMFramework\Http\Request $request
-     * @throws \SMFramework\Http\HttpNotFoundException
-     * @return \SMFramework\Routing\Route
+     * @param \LightWeight\Http\Request $request
+     * @throws \LightWeight\Http\HttpNotFoundException
+     * @return \LightWeight\Routing\Route
      */
     public function resolveRoute(Request $request): Route
     {

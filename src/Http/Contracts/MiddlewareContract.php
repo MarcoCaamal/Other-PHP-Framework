@@ -1,8 +1,8 @@
 <?php
 
-namespace SMFramework\Http\Contracts;
+namespace LightWeight\Http\Contracts;
 
-use SMFramework\Http\Request;
+use LightWeight\Http\Request;
 
 interface MiddlewareContract
 {

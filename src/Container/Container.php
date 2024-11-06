@@ -1,38 +1,23 @@
 <?php
 
-namespace SMFramework\Container;
+namespace LightWeight\Container;
+
+use DI\Container as DIContainer;
+use DI\ContainerBuilder;
 
 class Container
 {
-    private static array $instances = [];
-
-    /**
-     * @template T
-     * @param class-string<T> $class
-     *
-     * @return T
-     */
-    public static function singleton(string $class, string|callable|null $build = null)
+    private static ?DIContainer $instance;
+    private function __construct() {}
+    public static function getInstance()
     {
-        if (!array_key_exists($class, self::$instances)) {
-            match (true) {
-                is_null($build) => self::$instances[$class] = new $class(),
-                is_string($build) => self::$instances[$class] = new $build(),
-                is_callable($build) => self::$instances[$class] = $build(),
-            };
+        if(self::$instance === null) {
+            self::buildContainer();
         }
-
-        return self::$instances[$class];
+        return self::$instance;
     }
-
-    /**
-     * @template T
-     * @param class-string<T> $class
-     *
-     * @return T
-     */
-    public static function resolve(string $class)
+    private static function buildContainer()
     {
-        return self::$instances[$class] ?? null;
+        $builder = new ContainerBuilder();
     }
 }

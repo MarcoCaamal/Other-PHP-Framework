@@ -3,9 +3,9 @@
 namespace App\Controllers\Auth;
 
 use App\Models\User;
-use SMFramework\Crypto\Contracts\HasherContract;
-use SMFramework\Http\ControllerBase;
-use SMFramework\Http\Request;
+use LightWeight\Crypto\Contracts\HasherContract;
+use LightWeight\Http\ControllerBase;
+use LightWeight\Http\Request;
 
 class RegisterController extends ControllerBase
 {

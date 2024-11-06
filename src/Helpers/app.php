@@ -1,8 +1,8 @@
 <?php
 
-use SMFramework\App;
-use SMFramework\Config\Config;
-use SMFramework\Container\Container;
+use LightWeight\App;
+use LightWeight\Config\Config;
+use LightWeight\Container\Container;
 
 /**
  *

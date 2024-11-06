@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\Session\Contracts;
+namespace LightWeight\Session\Contracts;
 
 interface SessionStorageContract
 {

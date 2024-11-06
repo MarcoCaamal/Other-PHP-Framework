@@ -1,16 +1,16 @@
 <?php
 
-namespace SMFramework\Tests\Validation;
+namespace LightWeight\Tests\Validation;
 
-use SMFramework\Validation\Exceptions\RuleParseException;
-use SMFramework\Validation\Exceptions\UnknownRuleException;
-use SMFramework\Validation\Rule;
-use SMFramework\Validation\Rules\Email;
-use SMFramework\Validation\Rules\LessThan;
-use SMFramework\Validation\Rules\Number;
-use SMFramework\Validation\Rules\Required;
-use SMFramework\Validation\Rules\RequiredWhen;
-use SMFramework\Validation\Rules\RequiredWith;
+use LightWeight\Validation\Exceptions\RuleParseException;
+use LightWeight\Validation\Exceptions\UnknownRuleException;
+use LightWeight\Validation\Rule;
+use LightWeight\Validation\Rules\Email;
+use LightWeight\Validation\Rules\LessThan;
+use LightWeight\Validation\Rules\Number;
+use LightWeight\Validation\Rules\Required;
+use LightWeight\Validation\Rules\RequiredWhen;
+use LightWeight\Validation\Rules\RequiredWith;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

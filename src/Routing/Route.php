@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\Routing;
+namespace LightWeight\Routing;
 
 /**
  * This class represents one route that stores URI regex and action.
@@ -34,7 +34,7 @@ class Route
     /**
      * HTTP Middlewares
      *
-     * @var array<\SMFramework\Http\Contracts\MiddlewareContract>
+     * @var array<\LightWeight\Http\Contracts\MiddlewareContract>
      */
     protected array $middlewares = [];
     /**
@@ -71,7 +71,7 @@ class Route
     }
     /**
      * Get HTTP Middlewares for this route
-     * @return array<\SMFramework\Http\Contracts\MiddlewareContract>
+     * @return array<\LightWeight\Http\Contracts\MiddlewareContract>
      */
     public function middlewares(): array
     {

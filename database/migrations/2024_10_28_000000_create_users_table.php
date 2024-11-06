@@ -1,7 +1,7 @@
 <?php
 
-use SMFramework\Database\Migrations\Contracts\MigrationContract;
-use SMFramework\Database\DB;
+use LightWeight\Database\Migrations\Contracts\MigrationContract;
+use LightWeight\Database\DB;
 
 return new class () implements MigrationContract {
     public function up()

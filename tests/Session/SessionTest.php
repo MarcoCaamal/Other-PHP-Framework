@@ -1,9 +1,9 @@
 <?php
 
-namespace SMFramework\Tests\Session;
+namespace LightWeight\Tests\Session;
 
-use SMFramework\Session\Contracts\SessionStorageContract;
-use SMFramework\Session\Session;
+use LightWeight\Session\Contracts\SessionStorageContract;
+use LightWeight\Session\Session;
 use PHPUnit\Framework\TestCase;
 
 class SessionTest extends TestCase

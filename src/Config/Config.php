@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\Config;
+namespace LightWeight\Config;
 
 class Config
 {

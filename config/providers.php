@@ -2,12 +2,12 @@
 
 return [
     'boot' => [
-        SMFramework\Providers\ServerServiceProvider::class,
-        SMFramework\Providers\DatabaseDriverServiceProvider::class,
-        SMFramework\Providers\SessionStorageServiceProvider::class,
-        SMFramework\Providers\ViewServiceProvider::class,
-        SMFramework\Providers\AuthenticatorServiceProvider::class,
-        SMFramework\Providers\HasherServiceProvider::class
+        LightWeight\Providers\ServerServiceProvider::class,
+        LightWeight\Providers\DatabaseDriverServiceProvider::class,
+        LightWeight\Providers\SessionStorageServiceProvider::class,
+        LightWeight\Providers\ViewServiceProvider::class,
+        LightWeight\Providers\AuthenticatorServiceProvider::class,
+        LightWeight\Providers\HasherServiceProvider::class
     ],
     'runtime' => [
         App\Providers\RuleServiceProvider::class,

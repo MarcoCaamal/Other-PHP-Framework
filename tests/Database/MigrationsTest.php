@@ -1,13 +1,13 @@
 <?php
 
-namespace SMFramework\Tests\Database;
+namespace LightWeight\Tests\Database;
 
 use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
-use SMFramework\Database\Contracts\DatabaseDriverContract;
-use SMFramework\Database\Migrations\Migrator;
+use LightWeight\Database\Contracts\DatabaseDriverContract;
+use LightWeight\Database\Migrations\Migrator;
 
 class MigrationsTest extends TestCase
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace SMFramework\View;
+namespace LightWeight\View;
 
-use SMFramework\View\Contracts\ViewContract;
+use LightWeight\View\Contracts\ViewContract;
 
 class ViewEngine implements ViewContract
 {

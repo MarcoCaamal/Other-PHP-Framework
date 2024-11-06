@@ -2,10 +2,10 @@
 
 use App\Controllers\Auth\RegisterController;
 use App\Models\User;
-use SMFramework\Crypto\Contracts\HasherContract;
-use SMFramework\Http\Request;
-use SMFramework\Http\Response;
-use SMFramework\Routing\Route;
+use LightWeight\Crypto\Contracts\HasherContract;
+use LightWeight\Http\Request;
+use LightWeight\Http\Response;
+use LightWeight\Routing\Route;
 
 Route::get('/', function () {
     if(isGuest()) {

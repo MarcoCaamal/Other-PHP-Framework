@@ -1,8 +1,8 @@
 <?php
 
-namespace SMFramework\Database\QueryBuilder;
+namespace LightWeight\Database\QueryBuilder;
 
-use SMFramework\Database\QueryBuilder\Contracts\QueryBuilderContract;
+use LightWeight\Database\QueryBuilder\Contracts\QueryBuilderContract;
 
 trait UseBuilder
 {

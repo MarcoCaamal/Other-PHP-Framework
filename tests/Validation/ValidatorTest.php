@@ -1,15 +1,15 @@
 <?php
 
-namespace SMFramework\Tests\Validation;
+namespace LightWeight\Tests\Validation;
 
-use SMFramework\Validation\Exceptions\ValidationException;
-use SMFramework\Validation\Rule;
-use SMFramework\Validation\Rules\Email;
-use SMFramework\Validation\Rules\LessThan;
-use SMFramework\Validation\Rules\Number;
-use SMFramework\Validation\Rules\Required;
-use SMFramework\Validation\Rules\RequiredWith;
-use SMFramework\Validation\Validator;
+use LightWeight\Validation\Exceptions\ValidationException;
+use LightWeight\Validation\Rule;
+use LightWeight\Validation\Rules\Email;
+use LightWeight\Validation\Rules\LessThan;
+use LightWeight\Validation\Rules\Number;
+use LightWeight\Validation\Rules\Required;
+use LightWeight\Validation\Rules\RequiredWith;
+use LightWeight\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
 class ValidatorTest extends TestCase

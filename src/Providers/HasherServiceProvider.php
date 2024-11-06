@@ -1,10 +1,10 @@
 <?php
 
-namespace SMFramework\Providers;
+namespace LightWeight\Providers;
 
-use SMFramework\Crypto\Bcrypt;
-use SMFramework\Crypto\Contracts\HasherContract;
-use SMFramework\Providers\Contracts\ServiceProviderContract;
+use LightWeight\Crypto\Bcrypt;
+use LightWeight\Crypto\Contracts\HasherContract;
+use LightWeight\Providers\Contracts\ServiceProviderContract;
 
 class HasherServiceProvider implements ServiceProviderContract
 {

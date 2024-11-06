@@ -1,10 +1,10 @@
 <?php
 
-namespace SMFramework\Tests\Http;
+namespace LightWeight\Tests\Http;
 
 use PHPUnit\Framework\TestCase;
 
-use SMFramework\Http\Response;
+use LightWeight\Http\Response;
 
 class ResponseTest extends TestCase
 {

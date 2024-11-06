@@ -1,9 +1,9 @@
 <?php
 
-namespace SMFramework\Validation\Exceptions;
+namespace LightWeight\Validation\Exceptions;
 
-use SMFramework\Exceptions\SMFrameworkException;
+use LightWeight\Exceptions\LightWeightException;
 
-class RuleParseException extends SMFrameworkException
+class RuleParseException extends LightWeightException
 {
 }

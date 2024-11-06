@@ -1,10 +1,10 @@
 <?php
 
-namespace SMFramework\Http;
+namespace LightWeight\Http;
 
-use SMFramework\Http\HttpMethod;
-use SMFramework\Routing\Route;
-use SMFramework\Validation\Validator;
+use LightWeight\Http\HttpMethod;
+use LightWeight\Routing\Route;
+use LightWeight\Validation\Validator;
 
 /**
  * This class represent a Request HTTP.

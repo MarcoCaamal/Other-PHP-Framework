@@ -1,8 +1,8 @@
 <?php
 
-namespace SMFramework\Database;
+namespace LightWeight\Database;
 
-use SMFramework\Database\Contracts\DatabaseDriverContract;
+use LightWeight\Database\Contracts\DatabaseDriverContract;
 
 class DB
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace SMFramework\Tests\Config;
+namespace LightWeight\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
-use SMFramework\Config\Config;
+use LightWeight\Config\Config;
 
 class ConfigTest extends TestCase
 {

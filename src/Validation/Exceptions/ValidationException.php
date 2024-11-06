@@ -1,10 +1,10 @@
 <?php
 
-namespace SMFramework\Validation\Exceptions;
+namespace LightWeight\Validation\Exceptions;
 
-use SMFramework\Exceptions\SMFrameworkException;
+use LightWeight\Exceptions\LightWeightException;
 
-class ValidationException extends SMFrameworkException
+class ValidationException extends LightWeightException
 {
     public function __construct(protected array $errors)
     {

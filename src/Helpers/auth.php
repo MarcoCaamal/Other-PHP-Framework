@@ -1,7 +1,7 @@
 <?php
 
-use SMFramework\Auth\Auth;
-use SMFramework\Auth\Authenticatable;
+use LightWeight\Auth\Auth;
+use LightWeight\Auth\Authenticatable;
 
 function auth(): ?Authenticatable
 {

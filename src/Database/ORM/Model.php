@@ -1,11 +1,11 @@
 <?php
 
-namespace SMFramework\Database\ORM;
+namespace LightWeight\Database\ORM;
 
-use SMFramework\Database\Contracts\DatabaseDriverContract;
-use SMFramework\Database\QueryBuilder\Contracts\QueryBuilderContract;
-use SMFramework\Database\QueryBuilder\QueryBuilder;
-use SMFramework\Database\QueryBuilder\UseBuilder;
+use LightWeight\Database\Contracts\DatabaseDriverContract;
+use LightWeight\Database\QueryBuilder\Contracts\QueryBuilderContract;
+use LightWeight\Database\QueryBuilder\QueryBuilder;
+use LightWeight\Database\QueryBuilder\UseBuilder;
 
 abstract class Model
 {

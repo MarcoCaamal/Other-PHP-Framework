@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\Validation\Contracts;
+namespace LightWeight\Validation\Contracts;
 
 interface ValidationRuleContract
 {

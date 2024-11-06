@@ -1,11 +1,11 @@
 <?php
 
-namespace SMFramework\Tests\Routing;
+namespace LightWeight\Tests\Routing;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-use SMFramework\Routing\Route;
+use LightWeight\Routing\Route;
 
 class RouteTest extends TestCase
 {

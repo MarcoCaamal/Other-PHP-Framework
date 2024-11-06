@@ -1,10 +1,10 @@
 <?php
 
-namespace SMFramework\Database\QueryBuilder\Contracts;
+namespace LightWeight\Database\QueryBuilder\Contracts;
 
 use Closure;
-use SMFramework\Database\Contracts\DatabaseDriverContract;
-use SMFramework\Database\ORM\Model;
+use LightWeight\Database\Contracts\DatabaseDriverContract;
+use LightWeight\Database\ORM\Model;
 
 interface QueryBuilderContract
 {

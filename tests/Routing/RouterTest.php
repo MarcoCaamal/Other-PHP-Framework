@@ -1,15 +1,15 @@
 <?php
 
-namespace SMFramework\Tests\Routing;
+namespace LightWeight\Tests\Routing;
 
-use SMFramework\Http\Contracts\MiddlewareContract;
-use SMFramework\Http\Response;
+use LightWeight\Http\Contracts\MiddlewareContract;
+use LightWeight\Http\Response;
 use PHPUnit\Framework\TestCase;
 
-use SMFramework\Server\ServerContract;
-use SMFramework\Http\HttpMethod;
-use SMFramework\Http\Request;
-use SMFramework\Routing\Router;
+use LightWeight\Server\ServerContract;
+use LightWeight\Http\HttpMethod;
+use LightWeight\Http\Request;
+use LightWeight\Routing\Router;
 
 class RouterTest extends TestCase
 {

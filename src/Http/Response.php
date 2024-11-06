@@ -1,8 +1,8 @@
 <?php
 
-namespace SMFramework\Http;
+namespace LightWeight\Http;
 
-use SMFramework\View\Contracts\ViewContract;
+use LightWeight\View\Contracts\ViewContract;
 
 /**
  * This class respresnts a HTTP Response that it will be sending to the client.
@@ -150,7 +150,7 @@ class Response
      * Create a new JSON response.
      *
      * @param array $data
-     * @return \SMFramework\Http\Response
+     * @return \LightWeight\Http\Response
      */
     public static function json(array $data): self
     {
@@ -162,7 +162,7 @@ class Response
      * Create a new plain text response.
      *
      * @param string $text
-     * @return \SMFramework\Http\Response
+     * @return \LightWeight\Http\Response
      */
     public static function text(string $text): self
     {
@@ -174,7 +174,7 @@ class Response
      * Create a new redirect response.
      *
      * @param string $uri
-     * @return \SMFramework\Http\Response
+     * @return \LightWeight\Http\Response
      */
     public static function redirect(string $uri): self
     {

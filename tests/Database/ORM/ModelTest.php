@@ -1,14 +1,14 @@
 <?php
 
-namespace SMFramework\Tests\Database\ORM;
+namespace LightWeight\Tests\Database\ORM;
 
 use PDOException;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
-use SMFramework\Database\Contracts\DatabaseDriverContract;
-use SMFramework\Database\ORM\Model;
-use SMFramework\Database\PdoDriver;
-use SMFramework\Tests\Database\RefreshDatabase;
+use LightWeight\Database\Contracts\DatabaseDriverContract;
+use LightWeight\Database\ORM\Model;
+use LightWeight\Database\PdoDriver;
+use LightWeight\Tests\Database\RefreshDatabase;
 
 class MockModel extends Model
 {

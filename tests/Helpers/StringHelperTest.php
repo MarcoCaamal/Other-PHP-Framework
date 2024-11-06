@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\Tests\Helpers;
+namespace LightWeight\Tests\Helpers;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

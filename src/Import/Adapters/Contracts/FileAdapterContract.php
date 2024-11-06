@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\Import\Adapters\Contracts;
+namespace LightWeight\Import\Adapters\Contracts;
 
 interface FileAdapterContract
 {

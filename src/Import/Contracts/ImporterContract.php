@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\Import\Contracts;
+namespace LightWeight\Import\Contracts;
 
 interface ImporterContract
 {

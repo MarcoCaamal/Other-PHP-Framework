@@ -1,8 +1,8 @@
 <?php
 
-namespace SMFramework\Validation\Rules;
+namespace LightWeight\Validation\Rules;
 
-use SMFramework\Validation\Contracts\ValidationRuleContract;
+use LightWeight\Validation\Contracts\ValidationRuleContract;
 
 class RequiredWith implements ValidationRuleContract
 {

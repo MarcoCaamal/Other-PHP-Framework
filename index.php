@@ -1,8 +1,8 @@
 <?php
 
-use SMFramework\Database\PdoDriver;
-use SMFramework\Database\QueryBuilder\Drivers\MysqlQueryBuilderDriver;
-use SMFramework\Database\QueryBuilder\QueryBuilder;
+use LightWeight\Database\PdoDriver;
+use LightWeight\Database\QueryBuilder\Drivers\MysqlQueryBuilderDriver;
+use LightWeight\Database\QueryBuilder\QueryBuilder;
 
 require __DIR__  . '/vendor/autoload.php';
 

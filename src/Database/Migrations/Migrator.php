@@ -1,8 +1,8 @@
 <?php
 
-namespace SMFramework\Database\Migrations;
+namespace LightWeight\Database\Migrations;
 
-use SMFramework\Database\Contracts\DatabaseDriverContract;
+use LightWeight\Database\Contracts\DatabaseDriverContract;
 
 class Migrator
 {

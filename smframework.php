@@ -2,12 +2,12 @@
 
 require_once './vendor/autoload.php';
 
-use SMFramework\Database\Contracts\DatabaseDriverContract;
-use SMFramework\Database\Migrations\Migrator;
-use SMFramework\Database\PdoDriver;
+use LightWeight\Database\Contracts\DatabaseDriverContract;
+use LightWeight\Database\Migrations\Migrator;
+use LightWeight\Database\PdoDriver;
 
 $driver = singleton(DatabaseDriverContract::class, PdoDriver::class);
-$driver->connect('mysql', 'localhost', 3306, 'smframework', 'root', '');
+$driver->connect('mysql', 'localhost', 3306, 'LightWeight', 'root', '');
 
 $migrator = new Migrator(
     __DIR__ . '/database/migrations',

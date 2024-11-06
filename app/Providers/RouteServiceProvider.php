@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use SMFramework\App;
-use SMFramework\Providers\Contracts\ServiceProviderContract;
-use SMFramework\Routing\Route;
+use LightWeight\App;
+use LightWeight\Providers\Contracts\ServiceProviderContract;
+use LightWeight\Routing\Route;
 
 class RouteServiceProvider implements ServiceProviderContract
 {

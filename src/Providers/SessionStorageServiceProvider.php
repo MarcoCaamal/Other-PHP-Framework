@@ -1,10 +1,10 @@
 <?php
 
-namespace SMFramework\Providers;
+namespace LightWeight\Providers;
 
-use SMFramework\Providers\Contracts\ServiceProviderContract;
-use SMFramework\Session\Contracts\SessionStorageContract;
-use SMFramework\Session\PhpNativeSessionStorage;
+use LightWeight\Providers\Contracts\ServiceProviderContract;
+use LightWeight\Session\Contracts\SessionStorageContract;
+use LightWeight\Session\PhpNativeSessionStorage;
 
 class SessionStorageServiceProvider implements ServiceProviderContract
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\View\Contracts;
+namespace LightWeight\View\Contracts;
 
 interface ViewContract
 {

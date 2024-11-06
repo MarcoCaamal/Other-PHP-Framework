@@ -1,8 +1,8 @@
 <?php
 
-namespace SMFramework\Auth\Contracts\Authenticators;
+namespace LightWeight\Auth\Contracts\Authenticators;
 
-use SMFramework\Auth\Authenticatable;
+use LightWeight\Auth\Authenticatable;
 
 interface AuthenticatorContract
 {

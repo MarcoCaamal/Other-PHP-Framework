@@ -1,7 +1,7 @@
 <?php
 
-namespace SMFramework\Exceptions;
+namespace LightWeight\Exceptions;
 
-class SMFrameworkException extends \Exception
+class LightWeightException extends \Exception
 {
 }

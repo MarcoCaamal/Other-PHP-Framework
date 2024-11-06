@@ -1,10 +1,10 @@
 <?php
 
-namespace SMFramework\Providers;
+namespace LightWeight\Providers;
 
-use SMFramework\Auth\Authenticators\SessionAuthenticator;
-use SMFramework\Auth\Contracts\Authenticators\AuthenticatorContract;
-use SMFramework\Providers\Contracts\ServiceProviderContract;
+use LightWeight\Auth\Authenticators\SessionAuthenticator;
+use LightWeight\Auth\Contracts\Authenticators\AuthenticatorContract;
+use LightWeight\Providers\Contracts\ServiceProviderContract;
 
 class AuthenticatorServiceProvider implements ServiceProviderContract
 {

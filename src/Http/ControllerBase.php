@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\Http;
+namespace LightWeight\Http;
 
 class ControllerBase
 {

@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use SMFramework\Providers\Contracts\ServiceProviderContract;
-use SMFramework\Validation\Rule;
+use LightWeight\Providers\Contracts\ServiceProviderContract;
+use LightWeight\Validation\Rule;
 
 class RuleServiceProvider implements ServiceProviderContract
 {

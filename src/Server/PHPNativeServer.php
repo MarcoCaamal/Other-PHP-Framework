@@ -1,10 +1,10 @@
 <?php
 
-namespace SMFramework\Server;
+namespace LightWeight\Server;
 
-use SMFramework\Http\HttpMethod;
-use SMFramework\Http\Request;
-use SMFramework\Server\Contracts\ServerContract;
+use LightWeight\Http\HttpMethod;
+use LightWeight\Http\Request;
+use LightWeight\Server\Contracts\ServerContract;
 
 /**
  * PHP native server that uses `$_SERVER` global.
@@ -14,7 +14,7 @@ class PHPNativeServer implements ServerContract
     /**
      * @inheritDoc
      */
-    public function sendResponse(\SMFramework\Http\Response $response)
+    public function sendResponse(\LightWeight\Http\Response $response)
     {
         // PHP sends Content-Type header by default, but it has to be removed if
         // the response has not content. Content-Type header can't be removed

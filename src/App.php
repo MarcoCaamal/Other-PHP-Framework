@@ -1,24 +1,24 @@
 <?php
 
-namespace SMFramework;
+namespace LightWeight;
 
 use Dotenv\Dotenv;
 use Exception;
 use Lib\Database\MysqlQueryBuilder;
-use SMFramework\Config\Config;
-use SMFramework\Database\Contracts\DatabaseDriverContract;
-use SMFramework\Database\ORM\Model;
-use SMFramework\Database\QueryBuilder\Drivers\MysqlQueryBuilderDriver;
-use SMFramework\Http\HttpMethod;
-use SMFramework\Http\HttpNotFoundException;
-use SMFramework\Http\Request;
-use SMFramework\Http\Response;
-use SMFramework\Routing\Router;
-use SMFramework\Server\Contracts\ServerContract;
-use SMFramework\Session\Contracts\SessionStorageContract;
-use SMFramework\Session\Session;
-use SMFramework\Validation\Exceptions\ValidationException;
-use SMFramework\View\Contracts\ViewContract;
+use LightWeight\Config\Config;
+use LightWeight\Database\Contracts\DatabaseDriverContract;
+use LightWeight\Database\ORM\Model;
+use LightWeight\Database\QueryBuilder\Drivers\MysqlQueryBuilderDriver;
+use LightWeight\Http\HttpMethod;
+use LightWeight\Http\HttpNotFoundException;
+use LightWeight\Http\Request;
+use LightWeight\Http\Response;
+use LightWeight\Routing\Router;
+use LightWeight\Server\Contracts\ServerContract;
+use LightWeight\Session\Contracts\SessionStorageContract;
+use LightWeight\Session\Session;
+use LightWeight\Validation\Exceptions\ValidationException;
+use LightWeight\View\Contracts\ViewContract;
 
 class App
 {

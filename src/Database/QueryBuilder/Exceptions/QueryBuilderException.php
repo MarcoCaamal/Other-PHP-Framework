@@ -1,9 +1,9 @@
 <?php
 
-namespace SMFramework\Database\QueryBuilder\Exceptions;
+namespace LightWeight\Database\QueryBuilder\Exceptions;
 
-use SMFramework\Exceptions\SMFrameworkException;
+use LightWeight\Exceptions\LightWeightException;
 
-class QueryBuilderException extends SMFrameworkException
+class QueryBuilderException extends LightWeightException
 {
 }

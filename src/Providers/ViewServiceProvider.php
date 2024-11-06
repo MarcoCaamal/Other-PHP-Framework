@@ -1,17 +1,17 @@
 <?php
 
-namespace SMFramework\Providers;
+namespace LightWeight\Providers;
 
-use SMFramework\Providers\Contracts\ServiceProviderContract;
-use SMFramework\View\Contracts\ViewContract;
-use SMFramework\View\ViewEngine;
+use LightWeight\Providers\Contracts\ServiceProviderContract;
+use LightWeight\View\Contracts\ViewContract;
+use LightWeight\View\ViewEngine;
 
 class ViewServiceProvider implements ServiceProviderContract
 {
     public function registerServices()
     {
-        match (config("view.engine", "smframework")) {
-            "smframework" => singleton(ViewContract::class, fn () => new ViewEngine(config("view.path"))),
+        match (config("view.engine", "LightWeight")) {
+            "LightWeight" => singleton(ViewContract::class, fn () => new ViewEngine(config("view.path"))),
         };
     }
 }

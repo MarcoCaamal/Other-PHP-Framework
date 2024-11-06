@@ -1,9 +1,9 @@
 <?php
 
-namespace SMFramework\Validation\Rules;
+namespace LightWeight\Validation\Rules;
 
-use SMFramework\Validation\Contracts\ValidationRuleContract;
-use SMFramework\Validation\Exceptions\RuleParseException;
+use LightWeight\Validation\Contracts\ValidationRuleContract;
+use LightWeight\Validation\Exceptions\RuleParseException;
 
 class RequiredWhen implements ValidationRuleContract
 {

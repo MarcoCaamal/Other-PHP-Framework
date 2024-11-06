@@ -1,8 +1,8 @@
 <?php
 
-namespace SMFramework\Auth;
+namespace LightWeight\Auth;
 
-use SMFramework\Auth\Contracts\Authenticators\AuthenticatorContract;
+use LightWeight\Auth\Contracts\Authenticators\AuthenticatorContract;
 
 class Auth
 {

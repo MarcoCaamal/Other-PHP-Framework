@@ -1,13 +1,13 @@
 <?php
 
-namespace SMFramework\Http;
+namespace LightWeight\Http;
 
-use SMFramework\Exceptions\SMFrameworkException;
+use LightWeight\Exceptions\LightWeightException;
 
 /**
  * HTTP 404 Not Found.
  *
  */
-class HttpNotFoundException extends SMFrameworkException
+class HttpNotFoundException extends LightWeightException
 {
 }

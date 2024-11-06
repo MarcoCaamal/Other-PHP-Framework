@@ -1,10 +1,10 @@
 <?php
 
-namespace SMFramework\Tests\Http;
+namespace LightWeight\Tests\Http;
 
-use SMFramework\Http\HttpMethod;
-use SMFramework\Http\Request;
-use SMFramework\Routing\Route;
+use LightWeight\Http\HttpMethod;
+use LightWeight\Http\Request;
+use LightWeight\Routing\Route;
 use PHPUnit\Framework\TestCase;
 
 class RequestTest extends TestCase

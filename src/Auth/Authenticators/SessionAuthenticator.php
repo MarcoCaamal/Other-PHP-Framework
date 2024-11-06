@@ -1,9 +1,9 @@
 <?php
 
-namespace SMFramework\Auth\Authenticators;
+namespace LightWeight\Auth\Authenticators;
 
-use SMFramework\Auth\Contracts\Authenticators\AuthenticatorContract;
-use SMFramework\Auth\Authenticatable;
+use LightWeight\Auth\Contracts\Authenticators\AuthenticatorContract;
+use LightWeight\Auth\Authenticatable;
 
 class SessionAuthenticator implements AuthenticatorContract
 {

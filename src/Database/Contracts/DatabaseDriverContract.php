@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\Database\Contracts;
+namespace LightWeight\Database\Contracts;
 
 interface DatabaseDriverContract
 {

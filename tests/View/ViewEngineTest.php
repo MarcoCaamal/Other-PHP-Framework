@@ -1,8 +1,8 @@
 <?php
 
-namespace SMFramework\Tests\View;
+namespace LightWeight\Tests\View;
 
-use SMFramework\View\ViewEngine;
+use LightWeight\View\ViewEngine;
 use PHPUnit\Framework\TestCase;
 
 class ViewEngineTest extends TestCase

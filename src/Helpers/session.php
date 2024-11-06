@@ -1,6 +1,6 @@
 <?php
 
-use SMFramework\Session\Session;
+use LightWeight\Session\Session;
 
 function session(): Session
 {

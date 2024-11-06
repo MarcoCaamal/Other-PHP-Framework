@@ -1,9 +1,9 @@
 <?php
 
-namespace SMFramework\Import;
+namespace LightWeight\Import;
 
-use SMFramework\Import\Adapters\Contracts\FileAdapterContract;
-use SMFramework\Import\Contracts\ImporterContract;
+use LightWeight\Import\Adapters\Contracts\FileAdapterContract;
+use LightWeight\Import\Contracts\ImporterContract;
 
 class Import
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace SMFramework\Database\QueryBuilder;
+namespace LightWeight\Database\QueryBuilder;
 
 enum TypeWhere: int
 {

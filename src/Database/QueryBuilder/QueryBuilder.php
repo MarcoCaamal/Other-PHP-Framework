@@ -1,9 +1,9 @@
 <?php
 
-namespace SMFramework\Database\QueryBuilder;
+namespace LightWeight\Database\QueryBuilder;
 
-use SMFramework\Database\Contracts\DatabaseDriverContract;
-use SMFramework\Database\QueryBuilder\Contracts\QueryBuilderContract;
+use LightWeight\Database\Contracts\DatabaseDriverContract;
+use LightWeight\Database\QueryBuilder\Contracts\QueryBuilderContract;
 
 class QueryBuilder
 {

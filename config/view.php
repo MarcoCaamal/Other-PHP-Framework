@@ -1,6 +1,6 @@
 <?php
 
 return [
-    'engine' => 'smframework',
+    'engine' => 'LightWeight',
     'path' => resourcesDirectory() . '/views'
 ];

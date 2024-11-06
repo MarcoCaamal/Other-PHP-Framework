@@ -1,8 +1,8 @@
 <?php
 
-namespace SMFramework\Validation;
+namespace LightWeight\Validation;
 
-use SMFramework\Validation\Exceptions\ValidationException;
+use LightWeight\Validation\Exceptions\ValidationException;
 
 class Validator
 {

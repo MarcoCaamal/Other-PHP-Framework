@@ -1,8 +1,8 @@
 <?php
 
-namespace SMFramework\Session;
+namespace LightWeight\Session;
 
-use SMFramework\Session\Contracts\SessionStorageContract;
+use LightWeight\Session\Contracts\SessionStorageContract;
 
 class Session
 {

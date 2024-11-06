@@ -1,9 +1,9 @@
 <?php
 
-namespace SMFramework\Auth;
+namespace LightWeight\Auth;
 
-use SMFramework\Auth\Contracts\Authenticators\AuthenticatorContract;
-use SMFramework\Database\ORM\Model;
+use LightWeight\Auth\Contracts\Authenticators\AuthenticatorContract;
+use LightWeight\Database\ORM\Model;
 
 class Authenticatable extends Model
 {

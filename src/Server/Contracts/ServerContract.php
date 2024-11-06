@@ -1,9 +1,9 @@
 <?php
 
-namespace SMFramework\Server\Contracts;
+namespace LightWeight\Server\Contracts;
 
-use SMFramework\Http\Request;
-use SMFramework\Http\Response;
+use LightWeight\Http\Request;
+use LightWeight\Http\Response;
 
 /**
  * Similar to PHP `$_SERVER` but having an interface allows us to mock these

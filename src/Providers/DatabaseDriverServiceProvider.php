@@ -1,11 +1,11 @@
 <?php
 
-namespace SMFramework\Providers;
+namespace LightWeight\Providers;
 
-use SMFramework\Database\Contracts\DatabaseDriverContract;
-use SMFramework\Database\PdoDriver;
-use SMFramework\Database\QueryBuilder\Drivers\MysqlQueryBuilderDriver;
-use SMFramework\Providers\Contracts\ServiceProviderContract;
+use LightWeight\Database\Contracts\DatabaseDriverContract;
+use LightWeight\Database\PdoDriver;
+use LightWeight\Database\QueryBuilder\Drivers\MysqlQueryBuilderDriver;
+use LightWeight\Providers\Contracts\ServiceProviderContract;
 
 class DatabaseDriverServiceProvider implements ServiceProviderContract
 {

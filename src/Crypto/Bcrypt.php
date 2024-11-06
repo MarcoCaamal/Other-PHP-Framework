@@ -1,8 +1,8 @@
 <?php
 
-namespace SMFramework\Crypto;
+namespace LightWeight\Crypto;
 
-use SMFramework\Crypto\Contracts\HasherContract;
+use LightWeight\Crypto\Contracts\HasherContract;
 
 class Bcrypt implements HasherContract
 {

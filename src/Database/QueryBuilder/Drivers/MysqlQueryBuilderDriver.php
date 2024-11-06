@@ -1,12 +1,12 @@
 <?php
 
-namespace SMFramework\Database\QueryBuilder\Drivers;
+namespace LightWeight\Database\QueryBuilder\Drivers;
 
 use PharIo\Manifest\Type;
-use SMFramework\Database\Contracts\DatabaseDriverContract;
-use SMFramework\Database\QueryBuilder\Contracts\QueryBuilderContract;
-use SMFramework\Database\QueryBuilder\Exceptions\QueryBuilderException;
-use SMFramework\Database\QueryBuilder\TypeWhere;
+use LightWeight\Database\Contracts\DatabaseDriverContract;
+use LightWeight\Database\QueryBuilder\Contracts\QueryBuilderContract;
+use LightWeight\Database\QueryBuilder\Exceptions\QueryBuilderException;
+use LightWeight\Database\QueryBuilder\TypeWhere;
 
 class MysqlQueryBuilderDriver implements QueryBuilderContract
 {
