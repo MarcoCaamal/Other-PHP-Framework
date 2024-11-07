@@ -21,6 +21,7 @@ class ViewEngine implements ViewContract
      */
     public function render(string $view, array $params = [], ?string $layout = null): string
     {
+        $view = str_replace('.', '/', $view);
         $layoutContent = $this->renderLayout($layout ?? $this->defaultLayout);
         $viewContent = $this->renderView($view, $params);
 
