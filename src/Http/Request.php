@@ -4,6 +4,7 @@ namespace LightWeight\Http;
 
 use LightWeight\Http\HttpMethod;
 use LightWeight\Routing\Route;
+use LightWeight\Storage\File;
 use LightWeight\Validation\Validator;
 
 /**
@@ -48,6 +49,12 @@ class Request
      * @var array
      */
     protected array $headers = [];
+    /**
+     * Uploaded files.
+     *
+     * @var array<string, \LightWeight\Storage\File>
+     */
+    protected array $files = [];
     /**
      * Create a new **Request** from the given `$server`.
      */
@@ -129,6 +136,27 @@ class Request
     public function setHeader(string $key, string $value): self
     {
         $this->headers[strtolower($key)] = $value;
+        return $this;
+    }
+    /**
+     * Get file from request.
+     *
+     * @param string $name
+     * @return File|null
+     */
+    public function file(string $name): ?File
+    {
+        return $this->files[$name] ?? null;
+    }
+    /**
+     * Set uploaded files.
+     *
+     * @param array<string, \LightWeight\Storage\File> $files
+     * @return self
+     */
+    public function setFiles(array $files): self
+    {
+        $this->files = $files;
         return $this;
     }
     /**

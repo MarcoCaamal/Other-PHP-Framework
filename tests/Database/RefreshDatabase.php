@@ -20,7 +20,6 @@ trait RefreshDatabase
             Model::setBuilderClassString(MysqlQueryBuilderDriver::class);
             try {
                 $this->driver->connect('mysql', 'localhost', 3306, 'lightweight_test', 'root', '');
-                var_dump($this->driver);
             } catch (PDOException $e) {
                 $this->markTestSkipped("Can't connect to test database: {$e->getMessage()}");
             }

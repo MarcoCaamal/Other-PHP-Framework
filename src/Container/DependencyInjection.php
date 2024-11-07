@@ -18,17 +18,17 @@ class DependencyInjection
         $params = [];
         foreach ($methodOrFunction->getParameters() as $param) {
             $resolved = null;
-            if (is_subclass_of($param->getType()->getName(), Model::class)) {
+            if (is_subclass_of($param->getType()?->getName(), Model::class)) {
                 $modelClass = new ReflectionClass($param->getType()->getName());
                 $routeParamName = snakeCase($modelClass->getShortName());
                 $resolved = $param->getType()->getName()::find($routeParameters[$routeParamName] ?? 0);
                 if (is_null($resolved)) {
                     throw new HttpNotFoundException();
                 }
-            } elseif ($param->getType()->isBuiltin()) {
+            } elseif ($param->getType()?->isBuiltin()) {
                 $resolved = $routeParameters[$param->getName()] ?? null;
-            } else {
-                $resolved = app($param->getType()->getName());
+            } elseif($param->getType()?->getName() !== null) {
+                $resolved = app($param->getType()?->getName());
             }
             $params[] = $resolved;
         }

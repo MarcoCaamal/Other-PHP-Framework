@@ -3,9 +3,11 @@
 namespace LightWeight\Database\Migrations;
 
 use LightWeight\Database\Contracts\DatabaseDriverContract;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class Migrator
 {
+    private ConsoleOutput $output;
     public function __construct(
         private string $migrationsDirectory,
         private string $templatesDirectory,
@@ -16,11 +18,11 @@ class Migrator
         $this->templatesDirectory = $templatesDirectory;
         $this->driver = $driver;
         $this->$logProgress = $logProgress;
+        $this->output = new ConsoleOutput();
     }
 
     private function log(string $message)
     {
-        print($message . PHP_EOL);
         if ($this->logProgress) {
             print($message . PHP_EOL);
         }
@@ -35,7 +37,7 @@ class Migrator
         $migrated = $this->driver->statement("SELECT * FROM migrations");
         $migrations = glob("$this->migrationsDirectory/*.php");
         if (count($migrated) >= count($migrations)) {
-            $this->log("Nothing to migrate");
+            $this->log("<comment>Nothing to migrate</comment>");
             return;
         }
         foreach (array_slice($migrations, count($migrated)) as $file) {
@@ -43,7 +45,7 @@ class Migrator
             $migration->up();
             $name = basename($file);
             $this->driver->statement("INSERT INTO migrations (name) VALUES (?)", [$name]);
-            $this->log("Migrated => $name");
+            $this->log("<comment>Migrated => $name</comment>");
         }
     }
     public function rollback(?int $steps = null)
@@ -93,12 +95,10 @@ class Migrator
         }
         $fileName = sprintf("%s_%06d_%s.php", $date, $id, $migrationName);
 
-        // Crear la carpeta de destino si no existe
-        // if (!file_exists(dirname("$this->migrationsDirectory/$fileName"))) {
-        //     mkdir(dirname("$this->migrationsDirectory/$fileName"), 0777, true);
-        // }
-
         file_put_contents("$this->migrationsDirectory/$fileName", $template);
+
+        $this->log("Created migrations => $fileName");
+
         return $fileName;
     }
 }
