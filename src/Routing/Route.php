@@ -21,6 +21,11 @@ class Route
      */
     protected \Closure|array $action;
     /**
+     * Name of this route
+     * @var
+     */
+    protected ?string $name = null;
+    /**
      * Regular expresion used to match incoming requests URIs.
      *
      * @var string
@@ -68,6 +73,19 @@ class Route
     public function action(): \Closure|array
     {
         return $this->action;
+    }
+    /**
+     * Get the name of the route
+     * @return string|null
+     */
+    public function name(): ?string
+    {
+        return $this->name;
+    }
+    public function setName(string $name)
+    {
+        $this->name = $name;
+        return $this;
     }
     /**
      * Get HTTP Middlewares for this route

@@ -48,7 +48,7 @@ function resourcesDirectory(): string
 }
 function debugDie($var)
 {
-    echo json_encode($var);
+    echo var_dump($var);
     die;
 }
 function php_exec($cmd)

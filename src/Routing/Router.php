@@ -7,6 +7,7 @@ use LightWeight\Http\HttpMethod;
 use LightWeight\Http\Request;
 use LightWeight\Http\HttpNotFoundException;
 use LightWeight\Http\Response;
+use LightWeight\Routing\Exception\RouteDuplicatedNameException;
 use LightWeight\Routing\Route;
 
 /**
@@ -39,8 +40,8 @@ class Router
     protected function registerRoute(HttpMethod $method, string $uri, \Closure|array $action): Route
     {
         $route = new Route($uri, $action);
+        $this->verifyIfExistsRouteWithDuplicatedName($route);
         $this->routes[$method->value][] = $route;
-
         return $route;
     }
     /**
@@ -66,7 +67,7 @@ class Router
         $action = $route->action();
 
         if(is_array($action)) {
-            $controller = singleton($action[0] , \DI\autowire($action[0]));
+            $controller = singleton($action[0], \DI\autowire($action[0]));
             $action[0] = $controller;
         }
 
@@ -91,6 +92,16 @@ class Router
             $request,
             fn ($request) => $this->runMiddlewares($request, array_slice($middlewares, 1), $target)
         );
+    }
+    protected function verifyIfExistsRouteWithDuplicatedName(Route $newRoute)
+    {
+        foreach($this->routes as $method) {
+            foreach($method as $route) {
+                if($route->name() === $newRoute->name() && $newRoute->name() !== null) {
+                    throw new RouteDuplicatedNameException($newRoute->name() ?? '');
+                }
+            }
+        }
     }
     /**
      * Register a GET route with the give `$uri` and `$action`

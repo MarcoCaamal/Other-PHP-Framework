@@ -7,37 +7,39 @@ use LightWeight\Crypto\Contracts\HasherContract;
 use LightWeight\Http\ControllerBase;
 use LightWeight\Http\Request;
 
-class RegisterController extends ControllerBase
+class LoginController extends ControllerBase
 {
     public function __construct(
         private HasherContract $hasherService
     ) {
         $this->hasherService = $hasherService;
     }
-    public function create(Request $request)
+
+    public function create()
     {
-        return view('auth.register');
+        return view('auth.login');
     }
     public function store(Request $request)
     {
         $data = $request->validate([
             "email" => ["required", "email"],
-            "name" => "required",
             "password" => "required",
-            "confirm_password" => "required",
         ]);
 
-        if ($data["password"] !== $data["confirm_password"]) {
+        $user = User::firstWhere('email', $data['email']);
+
+        if (is_null($user) || !app(HasherContract::class)->verify($data["password"], $user->password)) {
             return back()->withErrors([
-                "confirm_password" => ["confirm_password" => "Passwords do not match"]
+                'email' => ['email' => 'Credentials do not match']
             ]);
         }
-
-        $data["password"] = $this->hasherService->hash($data["password"]);
-
-        $user = User::create($data);
         $user->login();
 
+        return redirect('/');
+    }
+    public function destroy()
+    {
+        auth()->logout();
         return redirect('/');
     }
 }
