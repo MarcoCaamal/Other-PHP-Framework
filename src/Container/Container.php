@@ -16,7 +16,6 @@ class Container
     {
         if(self::$instance === null) {
             $builder = new ContainerBuilder();
-            $builder->useAutowiring(false);
             if(env('', 'dev') === 'prod') {
                 $builder->enableCompilation(__DIR__ . '/tmp');
                 $builder->writeProxiesToFile(true, __DIR__ . '/tmp/proxies');

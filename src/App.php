@@ -70,7 +70,7 @@ class App
     {
         $this->router = singleton(Router::class);
         $this->server = app(ServerContract::class);
-        $this->request = singleton(Request::class, $this->server->getRequest());
+        $this->request = singleton(Request::class, fn () => $this->server->getRequest());
         $this->session = singleton(Session::class, fn (SessionStorageContract $sessionStorage) => new Session($sessionStorage));
         return $this;
     }

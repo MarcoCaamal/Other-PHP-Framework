@@ -9,9 +9,14 @@ use LightWeight\Http\Request;
 
 class RegisterController extends ControllerBase
 {
+    public function __construct(
+        private HasherContract $hasherService
+    ) {
+        $this->hasherService = $hasherService;
+    }
     public function create(Request $request)
     {
-        return view('auth/register');
+        return view('auth.register');
     }
     public function store(Request $request)
     {
@@ -28,7 +33,7 @@ class RegisterController extends ControllerBase
             ]);
         }
 
-        $data["password"] = app(HasherContract::class)->hash($data["password"]);
+        $data["password"] = $this->hasherService->hash($data["password"]);
 
         $user = User::create($data);
         $user->login();

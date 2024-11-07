@@ -2,6 +2,7 @@
 
 namespace LightWeight\Routing;
 
+use LightWeight\Container\DependencyInjection;
 use LightWeight\Http\HttpMethod;
 use LightWeight\Http\Request;
 use LightWeight\Http\HttpNotFoundException;
@@ -65,18 +66,30 @@ class Router
         $action = $route->action();
 
         if(is_array($action)) {
-            $controller = new $action[0]();
+            $controller = singleton($action[0], function (\DI\Container $serviceContainer) use ($action) {
+                $class = new \ReflectionClass($action[0]);
+                $paramsResolved = [];
+                foreach($class->getConstructor()->getParameters() as $param) {
+                    if($serviceContainer->has($param->getType()->getName())) {
+                        $paramsResolved[] = $serviceContainer->get($param->getType()->getName());
+                    } else {
+                        throw new HttpNotFoundException();
+                    }
+                }
+                return new $action[0](...$paramsResolved);
+            });
             $action[0] = $controller;
         }
+
+        $params = DependencyInjection::resolveParameters($action, $request->routeParameters());
 
         if ($route->hasMiddlewares()) {
             return $this->runMiddlewares(
                 $request,
                 $route->middlewares(),
-                fn () => call_user_func($action, $request)
+                fn () => call_user_func($action, $params)
             );
         }
-
         return $action($request);
     }
     protected function runMiddlewares(Request $request, array $middlewares, \Closure $target): Response

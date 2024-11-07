@@ -26,9 +26,6 @@ function app(string $class = App::class)
 function singleton(string $class, string|callable|object|null $build = null)
 {
     $container = Container::getInstance();
-    if($container->has($class)) {
-        return $container->get($class);
-    }
     match(true) {
         is_null($build) => $container->set($class, \DI\create($class)),
         is_string($build) => $container->set($class, \DI\create($build)),
