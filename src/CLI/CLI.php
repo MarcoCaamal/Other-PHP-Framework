@@ -4,7 +4,9 @@ namespace LightWeight\CLI;
 
 use Dotenv\Dotenv;
 use LightWeight\App;
+use LightWeight\CLI\Commands\MakeController;
 use LightWeight\CLI\Commands\MakeMigration;
+use LightWeight\CLI\Commands\MakeModel;
 use LightWeight\CLI\Commands\Migrate;
 use LightWeight\CLI\Commands\MigrateRollback;
 use LightWeight\Config\Config;
@@ -47,7 +49,9 @@ class CLI
         $cli->addCommands([
             new MakeMigration(),
             new Migrate(),
-            new MigrateRollback()
+            new MigrateRollback(),
+            new MakeController(),
+            new MakeModel()
         ]);
         $cli->run();
     }
