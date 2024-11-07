@@ -11,7 +11,8 @@ class RegisterController extends ControllerBase
 {
     public function __construct(
         private HasherContract $hasherService
-    ) {
+    )
+    {
         $this->hasherService = $hasherService;
     }
     public function create(Request $request)

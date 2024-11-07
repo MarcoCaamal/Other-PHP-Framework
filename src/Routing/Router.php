@@ -66,18 +66,7 @@ class Router
         $action = $route->action();
 
         if(is_array($action)) {
-            $controller = singleton($action[0], function (\DI\Container $serviceContainer) use ($action) {
-                $class = new \ReflectionClass($action[0]);
-                $paramsResolved = [];
-                foreach($class->getConstructor()->getParameters() as $param) {
-                    if($serviceContainer->has($param->getType()->getName())) {
-                        $paramsResolved[] = $serviceContainer->get($param->getType()->getName());
-                    } else {
-                        throw new HttpNotFoundException();
-                    }
-                }
-                return new $action[0](...$paramsResolved);
-            });
+            $controller = singleton($action[0] , \DI\autowire($action[0]));
             $action[0] = $controller;
         }
 
