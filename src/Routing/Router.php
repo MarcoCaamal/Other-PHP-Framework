@@ -80,7 +80,7 @@ class Router
             return $this->runMiddlewares(
                 $request,
                 $middlewares,
-                fn () => call_user_func($action, $params)
+                fn () => call_user_func($action, ...$params)
             );
         }
         return $action($request);
