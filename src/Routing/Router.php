@@ -83,7 +83,7 @@ class Router
                 fn () => call_user_func($action, $params)
             );
         }
-        return $action($request);
+        return $action(...$params);
     }
     protected function runMiddlewares(Request $request, array $middlewares, \Closure $target): Response
     {
