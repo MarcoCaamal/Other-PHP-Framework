@@ -7,7 +7,7 @@ use LightWeight\Http\HttpMethod;
 use LightWeight\Http\Request;
 use LightWeight\Http\HttpNotFoundException;
 use LightWeight\Http\Response;
-use LightWeight\Routing\Exception\RouteDuplicatedNameException;
+use LightWeight\Routing\Exceptions\RouteDuplicatedNameException;
 use LightWeight\Routing\Route;
 
 /**
