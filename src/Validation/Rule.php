@@ -6,6 +6,7 @@ use LightWeight\Validation\Contracts\ValidationRuleContract;
 use LightWeight\Validation\Exceptions\RuleParseException;
 use LightWeight\Validation\Exceptions\UnknownRuleException;
 use LightWeight\Validation\Rules\Email;
+use LightWeight\Validation\Rules\IsString;
 use LightWeight\Validation\Rules\LessThan;
 use LightWeight\Validation\Rules\Number;
 use LightWeight\Validation\Rules\Required;
@@ -21,7 +22,8 @@ class Rule
         RequiredWhen::class,
         Number::class,
         LessThan::class,
-        Email::class
+        Email::class,
+        IsString::class,
     ];
     public static function loadDefaultRules()
     {
