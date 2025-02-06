@@ -7,7 +7,7 @@ use LightWeight\Http\HttpMethod;
 use LightWeight\Http\Request;
 use LightWeight\Http\HttpNotFoundException;
 use LightWeight\Http\Response;
-use LightWeight\Routing\Exception\RouteDuplicatedNameException;
+use LightWeight\Routing\Exceptions\RouteDuplicatedNameException;
 use LightWeight\Routing\Route;
 
 /**
@@ -76,14 +76,14 @@ class Router
 
         $params = DependencyInjection::resolveParameters($action, $request->routeParameters());
 
-        if ($route->hasMiddlewares()) {
+        if (!empty($middlewares)) {
             return $this->runMiddlewares(
                 $request,
                 $middlewares,
                 fn () => call_user_func($action, ...$params)
             );
         }
-        return $action($request);
+        return $action(...$params);
     }
     protected function runMiddlewares(Request $request, array $middlewares, \Closure $target): Response
     {

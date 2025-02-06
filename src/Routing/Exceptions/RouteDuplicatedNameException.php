@@ -1,6 +1,6 @@
 <?php
 
-namespace LightWeight\Routing\Exception;
+namespace LightWeight\Routing\Exceptions;
 
 use LightWeight\Exceptions\LightWeightException;
 
