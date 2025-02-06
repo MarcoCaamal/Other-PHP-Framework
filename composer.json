@@ -1,5 +1,5 @@
 {
-    "name": "marco/junk-framework",
+    "name": "marco/lightweight",
     "description": "Simple PHP Framework",
     "type": "library",
     "autoload": {
