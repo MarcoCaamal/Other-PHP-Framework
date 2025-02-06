@@ -76,11 +76,11 @@ class Router
 
         $params = DependencyInjection::resolveParameters($action, $request->routeParameters());
 
-        if ($route->hasMiddlewares()) {
+        if (!empty($middlewares)) {
             return $this->runMiddlewares(
                 $request,
                 $middlewares,
-                fn () => call_user_func($action, $params)
+                fn () => call_user_func($action, ...$params)
             );
         }
         return $action(...$params);
