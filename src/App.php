@@ -38,6 +38,7 @@ class App
     public function terminate(Response $response)
     {
         $this->prepareNextRequest();
+        $this->setCors($response);
         $this->server->sendResponse($response);
         $this->database->close();
     }
@@ -72,6 +73,25 @@ class App
         $this->server = app(ServerContract::class);
         $this->request = singleton(Request::class, fn () => $this->server->getRequest());
         $this->session = singleton(Session::class, fn (SessionStorageContract $sessionStorage) => new Session($sessionStorage));
+        return $this;
+    }
+    public function setCors(&$response): self
+    {
+        $allowedOrigins = config('cors.allowed_origins', []);
+        if(in_array('*', $allowedOrigins)) {
+            $response->setHeader('Access-Control-Allow-Origin', '*');
+        } else {
+            $origin = $this->request->headers('Origin');
+            if (in_array($origin, $allowedOrigins)) {
+                $response->setHeader('Access-Control-Allow-Origin', $origin);
+            }
+        }
+        $response
+            ->setHeader('Access-Control-Allow-Methods', implode(',', config('cors.allowed_methods', ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])));
+        $response
+            ->setHeader('Access-Control-Allow-Headers', implode(',', config('cors.allowed_headers', ['Content-Type', 'Authorization'])));
+        $response
+            ->setHeader('Access-Control-Allow-Credentials', config('cors.allow_credentials', 'false'));
         return $this;
     }
     public function setUpDatabaseConnection(): self
