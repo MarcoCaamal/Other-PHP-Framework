@@ -10,11 +10,10 @@ class JWTService implements JWTServiceContract
     public function __construct(
         string $key,
         string $digestAlg,
-        int $KeyBits,
         int $maxAge,
         int $leeway,
     ) {
-        $this->jwt = new \Ahc\Jwt\JWT($key, $digestAlg, $KeyBits, $maxAge, $leeway);
+        $this->jwt = new \Ahc\Jwt\JWT($key, $digestAlg, $maxAge, $leeway);
     }
     /**
      * @inheritDoc

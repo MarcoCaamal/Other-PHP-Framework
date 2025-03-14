@@ -22,7 +22,6 @@ class AuthenticatorServiceProvider implements ServiceProviderContract
                 ->constructor(
                     env('APP_KEY', 'default_key'),
                     config('auth.jwt_options.digest_alg', 'HS256'),
-                    config('auth.jwt_options.private_key_bits', 1024),
                     config('auth.jwt_options.max_age', 3600),
                     config('auth.jwt_options.leeway', 60),
                 )
