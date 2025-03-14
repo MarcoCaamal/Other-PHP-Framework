@@ -118,7 +118,16 @@ class App
         } catch (HttpNotFoundException $e) {
             $this->abort(Response::text("Not Found")->setStatus(404));
         } catch (ValidationException $e) {
-            $this->abort(back()->withErrors($e->errors(), 422));
+            if(str_starts_with($this->request->uri(), '/api')) {
+                $response = Response::json([
+                    'errors' => $e->errors(),
+                    'message' => "Validation Errors",
+                ]);
+                $this->abort($response->setStatus(422));
+
+            } else {
+                $this->abort(back()->withErrors($e->errors(), 422));
+            }
         } catch (Exception $e) {
             $response = json([
                 'error' => $e::class,
