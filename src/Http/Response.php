@@ -152,7 +152,7 @@ class Response
      * @param array $data
      * @return \LightWeight\Http\Response
      */
-    public static function json(array $data): self
+    public static function json(mixed $data): self
     {
         return (new self())
             ->setContentType('application/json')
