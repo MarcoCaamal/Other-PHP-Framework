@@ -12,6 +12,7 @@ use LightWeight\Validation\Rules\Number;
 use LightWeight\Validation\Rules\Required;
 use LightWeight\Validation\Rules\RequiredWhen;
 use LightWeight\Validation\Rules\RequiredWith;
+use LightWeight\Validation\Rules\Unique;
 
 class Rule
 {
@@ -24,6 +25,7 @@ class Rule
         LessThan::class,
         Email::class,
         IsString::class,
+        Unique::class
     ];
     public static function loadDefaultRules()
     {
