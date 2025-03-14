@@ -2,12 +2,12 @@
 
 namespace LightWeight\Database\ORM;
 
+use JsonSerializable;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
-use LightWeight\Database\QueryBuilder\Contracts\QueryBuilderContract;
 use LightWeight\Database\QueryBuilder\QueryBuilder;
 use LightWeight\Database\QueryBuilder\UseBuilder;
 
-abstract class Model
+abstract class Model implements JsonSerializable
 {
     use UseBuilder;
     protected ?string $table = null;
@@ -44,6 +44,14 @@ abstract class Model
             unset($this->attributes[$hide]);
         }
         return array_keys(get_object_vars($this));
+    }
+    public function jsonSerialize(): mixed
+    {
+        $newData = $this->attributes;
+        foreach ($this->hidden as $hide) {
+            unset($newData[$hide]);
+        }
+        return $newData;
     }
     protected function setAttributes(array $attributes): static
     {

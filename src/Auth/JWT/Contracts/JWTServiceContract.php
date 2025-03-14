@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Auth\JWT\Contracts;
+namespace LightWeight\Auth\JWT\Contracts;
 
 interface JWTServiceContract
 {

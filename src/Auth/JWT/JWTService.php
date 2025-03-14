@@ -1,8 +1,8 @@
 <?php
 
-namespace Src\Auth\JWT;
+namespace LightWeight\Auth\JWT;
 
-use Src\Auth\JWT\Contracts\JWTServiceContract;
+use LightWeight\Auth\JWT\Contracts\JWTServiceContract;
 
 class JWTService implements JWTServiceContract
 {

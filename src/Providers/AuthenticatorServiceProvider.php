@@ -5,9 +5,9 @@ namespace LightWeight\Providers;
 use DI\Container as DIContainer;
 use LightWeight\Auth\Authenticators\SessionAuthenticator;
 use LightWeight\Auth\Contracts\Authenticators\AuthenticatorContract;
+use LightWeight\Auth\JWT\Contracts\JWTServiceContract;
+use LightWeight\Auth\JWT\JWTService;
 use LightWeight\Providers\Contracts\ServiceProviderContract;
-use Src\Auth\JWT\Contracts\JWTServiceContract;
-use Src\Auth\JWT\JWTService;
 
 class AuthenticatorServiceProvider implements ServiceProviderContract
 {

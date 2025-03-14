@@ -3,9 +3,9 @@
 use LightWeight\Http\Request;
 use LightWeight\Http\Response;
 
-function json(mixed $data): Response
+function json(mixed $data, int $statusCode = 200): Response
 {
-    return Response::json($data);
+    return Response::json($data)->setStatus($statusCode);
 }
 function redirect(string $uri): Response
 {
