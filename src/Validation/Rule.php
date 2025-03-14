@@ -58,18 +58,28 @@ class Rule
     {
         $class = new \ReflectionClass(self::$rules[$ruleName]);
         $constructorParameters = $class->getConstructor()?->getParameters() ?? [];
+
+        // Filtrar los parámetros requeridos (los que no tienen valor por defecto)
+        $requiredParameters = array_filter(
+            $constructorParameters,
+            fn ($param) => !$param->isOptional()
+        );
+
         $givenParameters = array_filter(explode(",", $params), fn ($p) => !empty($p));
-        if (count($givenParameters) !== count($constructorParameters)) {
+
+        if (count($givenParameters) < count($requiredParameters)) {
             throw new RuleParseException(sprintf(
-                "Rule %s requires %d parameters, but %d where given: %s",
+                "Rule %s requires at least %d parameters, but %d were given: %s",
                 $ruleName,
-                count($constructorParameters),
+                count($requiredParameters),
                 count($givenParameters),
                 $params
             ));
         }
+
         return $class->newInstance(...$givenParameters);
     }
+
     public static function from(string $str)
     {
         if (strlen($str) == 0) {

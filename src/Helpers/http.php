@@ -3,7 +3,7 @@
 use LightWeight\Http\Request;
 use LightWeight\Http\Response;
 
-function json(array $data): Response
+function json(mixed $data): Response
 {
     return Response::json($data);
 }
