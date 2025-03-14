@@ -37,6 +37,7 @@
     "require": {
         "vlucas/phpdotenv": "^5.6",
         "php-di/php-di": "^7.0",
-        "symfony/console": "^6.4"
+        "symfony/console": "^6.4",
+        "adhocore/jwt": "^1.1"
     }
 }
