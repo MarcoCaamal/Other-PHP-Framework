@@ -37,7 +37,7 @@ class CLI
             Migrator::class,
             fn () => new Migrator(
                 "$root/database/migrations",
-                resourcesDirectory() . "/templates",
+                __DIR__ . "/../templates",
                 app(DatabaseDriverContract::class),
             )
         );

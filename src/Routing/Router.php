@@ -39,8 +39,9 @@ class Router
      */
     protected function registerRoute(HttpMethod $method, string $uri, \Closure|array $action): Route
     {
-        $route = new Route($uri, $action);
-        $this->verifyIfExistsRouteWithDuplicatedName($route);
+        $uriWithPrefix = rtrim(Route::$prefix ?? '', '/') . '/' . ltrim($uri, '/');
+        $uriWithPrefix = '/' . trim($uriWithPrefix, '/');
+        $route = new Route($uriWithPrefix, $action);
         $this->routes[$method->value][] = $route;
         return $route;
     }

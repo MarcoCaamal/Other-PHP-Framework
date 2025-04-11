@@ -2,6 +2,7 @@
     "name": "marco/lightweight",
     "description": "Simple PHP Framework",
     "type": "library",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "LightWeight\\": "src",

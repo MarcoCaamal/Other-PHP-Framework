@@ -8,6 +8,7 @@ namespace LightWeight\Routing;
  */
 class Route
 {
+    public static string $prefix = '';
     /**
      * URI defined int the format `"/route/{param}"`.
      *
@@ -138,6 +139,12 @@ class Route
         foreach(glob("$routesDirectory/*.php") as $routes) {
             require_once $routes;
         }
+    }
+    public static function prefix(string $prefix, \Closure $callback)
+    {
+        self::$prefix = $prefix;
+        $callback();
+        self::$prefix = '';
     }
     public static function get(string $uri, \Closure|array $action): self
     {
