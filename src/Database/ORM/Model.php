@@ -4,30 +4,59 @@ namespace LightWeight\Database\ORM;
 
 use JsonSerializable;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
-use LightWeight\Database\QueryBuilder\QueryBuilder;
-use LightWeight\Database\QueryBuilder\UseBuilder;
+use LightWeight\Database\Exceptions\DatabaseException;
+use LightWeight\Database\QueryBuilder\Builder;
+use LightWeight\Database\QueryBuilder\Contracts\QueryBuilderContract;
+use LightWeight\Database\QueryBuilder\Exceptions\QueryBuilderException;
 
+/**
+ * Model Class
+ *
+ * @method static Builder<static> where(string $column, string $operator, mixed $value, string $boolean = 'AND')
+ * @method static Builder<static> select(array $columns = ['*']);
+ */
 abstract class Model implements JsonSerializable
 {
-    use UseBuilder;
+    /**
+     *
+     * @var ?string
+     */
     protected ?string $table = null;
     protected string $primaryKey = 'id';
     protected array $hidden = [];
     protected array $fillable = [];
     protected array $attributes = [];
     protected bool $insertTimestamps = true;
+    /**
+     *
+     * @var \LightWeight\Database\QueryBuilder\Metadata\Column[]|null
+     */
+    protected static ?array $columns = [];
     private static ?DatabaseDriverContract $driver = null;
+    private static ?QueryBuilderContract $builder = null;
     public static function setDatabaseDriver(DatabaseDriverContract $driver)
     {
         self::$driver = $driver;
     }
+    public static function setBuilderDriver(QueryBuilderContract $builder)
+    {
+        self::$builder = $builder;
+    }
     public function __construct()
     {
-        $this->builder = new QueryBuilder(new self::$builderClassString(), self::$driver);
-        $this->builder->setPrimaryKey($this->primaryKey);
         if(is_null($this->table)) {
             $subclass = new \ReflectionClass(static::class);
             $this->table = snakeCase("{$subclass->getShortName()}s");
+        }
+        if(self::$builder === null) {
+            throw new DatabaseException("Builder must be QueryBuilderContract");
+        }
+        if(static::$columns === null) {
+            $query = new Builder(self::$builder, static::class);
+            static::$columns = $query->getMetadataOfTableColumns();
+        }
+        foreach(static::$columns as $column) {
+            $this->attributes[$column->name] = $column->default;
         }
     }
     public function __set($name, $value)
@@ -45,6 +74,30 @@ abstract class Model implements JsonSerializable
         }
         return array_keys(get_object_vars($this));
     }
+    public function __call($method, $args)
+    {
+
+    }
+    public static function __callStatic($method, $args)
+    {
+        if (!method_exists(self::$builder, $method)) {
+            throw new QueryBuilderException("Method $method is not defined.");
+        }
+
+        $instance = new static();
+
+        return (new Builder(static::$builder, static::class))
+            ->table($instance->getTable())
+            ->{$method}(...$args);
+    }
+    public function getTable(): ?string
+    {
+        return $this->table;
+    }
+    public function getPrimaryKeyName(): string
+    {
+        return $this->primaryKey;
+    }
     public function jsonSerialize(): mixed
     {
         $newData = $this->attributes;
@@ -53,14 +106,7 @@ abstract class Model implements JsonSerializable
         }
         return $newData;
     }
-    protected function setAttributes(array $attributes): static
-    {
-        foreach ($attributes as $key => $value) {
-            $this->__set($key, $value);
-        }
-        return $this;
-    }
-    protected function massAsign(array $attributes): static
+    public function fill(array $attributes): static
     {
         if (count($this->fillable) == 0) {
             throw new \Error("Model " . static::class . " does not have fillable attributes");
@@ -116,68 +162,41 @@ abstract class Model implements JsonSerializable
     }
     public static function create(array $attributes): static
     {
-        return (new static())->massAsign($attributes)->save();
+        return (new static())->fill($attributes)->save();
     }
-    public static function first(): ?static
+    /**
+     *
+     * @param string|int $id
+     * @return static|null
+     */
+    public static function find(string|int $id): ?static
     {
-        $model = new static();
-        $rows = self::$driver->statement("SELECT * FROM $model->table LIMIT 1");
-        if (count($rows) == 0) {
-            return null;
-        }
-        return $model->setAttributes($rows[0]);
+        $query = new Builder(self::$builder, static::class);
+        $instance = new static();
+        return $query
+            ->table($instance->getTable())
+            ->where($instance->getPrimaryKeyName(), '=', $id)
+            ->first();
     }
-    public static function find(int|string $id): ?static
-    {
-        $model = new static();
-        $rows = self::$driver->statement(
-            "SELECT * FROM $model->table WHERE $model->primaryKey = ?",
-            [$id]
-        );
-        if (count($rows) == 0) {
-            return null;
-        }
-        return $model->setAttributes($rows[0]);
-    }
+    /**
+     * Return all models
+     * @return static[]
+     */
     public static function all(): array
     {
-        $model = new static();
-        $rows = self::$driver->statement("SELECT * FROM $model->table");
-        if (count($rows) == 0) {
-            return [];
-        }
-        $models = [];
-        for ($i = 0; $i < count($rows); $i++) {
-            $models[] = (new static())->setAttributes($rows[$i]);
-        }
-        return $models;
+        $query = new Builder(self::$builder, static::class);
+        $instance = new static();
+        return $query
+            ->table($instance->getTable())
+            ->get();
     }
-    public static function where(string $column, mixed $value): array
+    public static function query(): Builder
     {
-        $model = new static();
-        $rows = self::$driver->statement(
-            "SELECT * FROM $model->table WHERE $column = ?",
-            [$value]
-        );
-        if (count($rows) == 0) {
-            return [];
+        if(self::$builder === null) {
+            throw new QueryBuilderException("Not provided QueryBuilderContract.");
         }
-        $models = [];
-        for ($i = 0; $i < count($rows); $i++) {
-            $models[] = (new static())->setAttributes($rows[$i]);
-        }
-        return $models;
-    }
-    public static function firstWhere(string $column, mixed $value): ?static
-    {
-        $model = new static();
-        $rows = self::$driver->statement(
-            "SELECT * FROM $model->table WHERE $column = ? LIMIT 1",
-            [$value]
-        );
-        if (count($rows) == 0) {
-            return null;
-        }
-        return $model->setAttributes($rows[0]);
+        $instance = new static();
+        return (new Builder(self::$builder, static::class))
+            ->table($instance->getTable());
     }
 }

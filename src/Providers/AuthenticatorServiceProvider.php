@@ -17,7 +17,7 @@ class AuthenticatorServiceProvider implements ServiceProviderContract
             'session' => $serviceContainer->set(AuthenticatorContract::class, \DI\create(SessionAuthenticator::class))
         };
         $serviceContainer->set(
-            JWTServiceContract::class, 
+            JWTServiceContract::class,
             \DI\create(JWTService::class)
                 ->constructor(
                     env('APP_KEY', 'default_key'),

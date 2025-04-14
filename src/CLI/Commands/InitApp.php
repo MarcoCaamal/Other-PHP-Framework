@@ -12,8 +12,7 @@ class InitApp extends Command
 
     public function __construct(
         private string $templatesDir
-    )
-    {
+    ) {
         $this->$templatesDir = $templatesDir;
     }
     protected function configure()

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace LightWeight\Validation\Rules;
 
@@ -12,8 +12,7 @@ class Unique implements ValidationRuleContract
         private string $column,
         private string $exceptColumn = "",
         private string $exceptValue = ""
-    )
-    {
+    ) {
         $this->table = $table;
         $this->column = $column;
         $this->exceptColumn = $exceptColumn;
@@ -22,7 +21,7 @@ class Unique implements ValidationRuleContract
     /**
      * @inheritDoc
      */
-    public function isValid(string $field, array $data): bool 
+    public function isValid(string $field, array $data): bool
     {
         if(!isset($data[$field]) && $data[$field] == "") {
             return false;
@@ -36,11 +35,11 @@ class Unique implements ValidationRuleContract
         $count = DB::statement($query, $params)[0]['count'] ?? 0;
         return $count == 0;
     }
-    
+
     /**
      * @inheritDoc
      */
-    public function message(): string 
+    public function message(): string
     {
         return "This field must be unique";
     }

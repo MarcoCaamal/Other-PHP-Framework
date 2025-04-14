@@ -37,7 +37,7 @@ class RouterTest extends TestCase
         $routes = [
             '/test' => fn () => 'test',
             '/something' => fn () => 'something',
-            'fizz' => fn () => 'fizz'
+            '/fizz' => fn () => 'fizz'
         ];
 
         $router = new Router();

@@ -18,15 +18,15 @@ class JWTService implements JWTServiceContract
     /**
      * @inheritDoc
      */
-    public function decode(string $token): array 
+    public function decode(string $token): array
     {
         return $this->jwt->decode($token);
     }
-    
+
     /**
      * @inheritDoc
      */
-    public function encode(array $payload): string 
+    public function encode(array $payload): string
     {
         return $this->jwt->encode($payload);
     }

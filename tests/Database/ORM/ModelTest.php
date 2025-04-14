@@ -83,7 +83,8 @@ class ModelTest extends TestCase
             foreach ($columns as $column => $value) {
                 $model->{$column} = $value;
             }
-            $this->assertEquals($model, MockModel::find($columns["id"]));
+            $actual = MockModel::find($columns["id"]);
+            $this->assertEquals($model, $actual);
         }
         $this->assertNull(MockModel::find(5));
     }
@@ -117,18 +118,25 @@ class ModelTest extends TestCase
         }
     }
     #[Depends('testCreateModel')]
-    public function testWhereAndFirstWhere()
+    public function testFirstWhereAndAllWhere()
     {
         $this->createTestTable("mock_models", ["test", "name"]);
         MockModelFillable::create(["test" => "First", "name" => "Name"]);
         MockModelFillable::create(["test" => "Where", "name" => "Foo"]);
         MockModelFillable::create(["test" => "Where", "name" => "Foo"]);
-        $where = MockModelFillable::where("test", "Where");
-        $this->assertEquals(2, count($where));
-        $this->assertEquals("Where", $where[0]->test);
-        $this->assertEquals("Where", $where[1]->test);
-        $firstWhere = MockModelFillable::firstWhere('test', 'First');
-        $this->assertEquals("First", $firstWhere->test);
+        $firstWhere = MockModelFillable::where("test", "=", 'First')
+            ->first();
+        $allWhere = MockModelFillable::where('test', '=', 'Where')->get();
+
+        // Tests of First Where
+        $this->assertInstanceOf(MockModelFillable::class, $firstWhere);
+        $this->assertIsObject($firstWhere);
+        $this->assertEquals($firstWhere->test, 'First');
+
+        //Tests of All Where
+        $this->assertIsArray($allWhere);
+        $this->assertCount(2, $allWhere);
+        $this->assertContainsOnlyInstancesOf(MockModelFillable::class, $allWhere);
     }
     #[Depends('testCreateModel')]
     #[Depends('testFindModel')]
@@ -152,8 +160,6 @@ class ModelTest extends TestCase
     {
         $this->createTestTable("mock_models", ["test", "name"]);
         MockModelFillable::create(["test" => "test", "name" => "name"]);
-        // The create method doesn't return the ID of the model.
-        // Check https://www.php.net/manual/es/pdo.lastinsertid.php to implement that feature.
         $model = MockModelFillable::find(1);
         $model->delete();
         $rows = $this->driver->statement("SELECT test, name FROM mock_models");

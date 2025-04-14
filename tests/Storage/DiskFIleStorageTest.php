@@ -11,7 +11,23 @@ class DiskFIleStorageTest extends TestCase
     protected $storageDirectory = __DIR__ . "/test-storage";
     protected function removeTestStorageDirectory()
     {
-        shell_exec("rd /s /q " . escapeshellarg($this->storageDirectory));
+        if (is_dir($this->storageDirectory)) {
+            $this->deleteDirectoryRecursively($this->storageDirectory);
+        }
+    }
+
+    protected function deleteDirectoryRecursively($dir)
+    {
+        $items = array_diff(scandir($dir), ['.', '..']);
+        foreach ($items as $item) {
+            $path = "$dir/$item";
+            if (is_dir($path)) {
+                $this->deleteDirectoryRecursively($path);
+            } else {
+                unlink($path);
+            }
+        }
+        rmdir($dir);
     }
     protected function setUp(): void
     {

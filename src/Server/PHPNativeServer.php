@@ -31,7 +31,8 @@ class PHPNativeServer implements ServerContract
         }
         return $files;
     }
-    protected function requestData(): array {
+    protected function requestData(): array
+    {
         $headers = getallheaders();
 
         $isJson = isset($headers["Content-Type"])

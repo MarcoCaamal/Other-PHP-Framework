@@ -2,12 +2,11 @@
 
 namespace LightWeight\Tests\Database;
 
-use LightWeight\Container\Container;
-use PDOException;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\ORM\Model;
 use LightWeight\Database\PdoDriver;
-use LightWeight\Database\QueryBuilder\Drivers\MysqlQueryBuilderDriver;
+use LightWeight\Database\QueryBuilder\Drivers\MySQLQueryBuilder;
+use PDOException;
 
 trait RefreshDatabase
 {
@@ -17,7 +16,8 @@ trait RefreshDatabase
             $this->driver = singleton(DatabaseDriverContract::class, PdoDriver::class);
 
             Model::setDatabaseDriver($this->driver);
-            Model::setBuilderClassString(MysqlQueryBuilderDriver::class);
+            Model::setBuilderDriver(new MySQLQueryBuilder($this->driver));
+
             try {
                 $this->driver->connect('mysql', 'localhost', 3306, 'lightweight_test', 'root', '');
             } catch (PDOException $e) {
