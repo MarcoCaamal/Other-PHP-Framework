@@ -13,13 +13,26 @@ trait RefreshDatabase
     protected function setUp(): void
     {
         if (is_null($this->driver)) {
+            // Configure driver as singleton
             $this->driver = singleton(DatabaseDriverContract::class, PdoDriver::class);
-
+            
+            // Also configure QueryBuilder as singleton
+            $queryBuilder = new MySQLQueryBuilder($this->driver);
+            singleton(\LightWeight\Database\QueryBuilder\Contracts\QueryBuilderContract::class, $queryBuilder);
+            
+            // Set model drivers
             Model::setDatabaseDriver($this->driver);
-            Model::setBuilderDriver(new MySQLQueryBuilder($this->driver));
+            Model::setBuilderDriver($queryBuilder);
 
             try {
-                $this->driver->connect('mysql', 'localhost', 3306, 'lightweight_test', 'root', '');
+                $dbConnection = getenv('DB_CONNECTION') ?: 'mysql';
+                $dbHost = getenv('DB_HOST') ?: '127.0.0.1';
+                $dbPort = (int)(getenv('DB_PORT') ?: 3306);
+                $dbName = getenv('DB_DATABASE') ?: 'lightweight_test';
+                $dbUsername = getenv('DB_USERNAME') ?: 'root';
+                $dbPassword = getenv('DB_PASSWORD') ?: '';
+                
+                $this->driver->connect($dbConnection, $dbHost, $dbPort, $dbName, $dbUsername, $dbPassword);
             } catch (PDOException $e) {
                 $this->markTestSkipped("Can't connect to test database: {$e->getMessage()}");
             }
@@ -27,7 +40,8 @@ trait RefreshDatabase
     }
     protected function tearDown(): void
     {
-        $this->driver->statement("DROP DATABASE IF EXISTS lightweight_test");
-        $this->driver->statement("CREATE DATABASE lightweight_test");
+        $dbName = getenv('DB_DATABASE') ?: 'lightweight_test';
+        $this->driver->statement("DROP DATABASE IF EXISTS `{$dbName}`");
+        $this->driver->statement("CREATE DATABASE `{$dbName}`");
     }
 }

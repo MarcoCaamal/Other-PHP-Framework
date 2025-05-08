@@ -2,12 +2,10 @@
 
 namespace LightWeight\Tests\Database\ORM;
 
-use PDOException;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\ORM\Model;
-use LightWeight\Database\PdoDriver;
 use LightWeight\Tests\Database\RefreshDatabase;
 
 class MockModel extends Model
@@ -45,7 +43,7 @@ class ModelTest extends TestCase
             "id" => 1,
             "name" => "Name",
             "test" => "Test",
-            "created_at" => date("Y-m-d H:m:s"),
+            "created_at" => date("Y-m-d H:i:s"),
             "updated_at" => null,
         ];
         $this->assertEquals($expected, $rows[0]);
@@ -61,14 +59,14 @@ class ModelTest extends TestCase
                 "id" => 1,
                 "test" => "Test",
                 "name" => "Name",
-                "created_at" => date("Y-m-d H:m:s"),
+                "created_at" => date("Y-m-d H:i:s"),
                 "updated_at" => null,
             ],
             [
                 "id" => 2,
                 "test" => "Foo",
                 "name" => "Bar",
-                "created_at" => date("Y-m-d H:m:s"),
+                "created_at" => date("Y-m-d H:i:s"),
                 "updated_at" => null,
             ],
         ];

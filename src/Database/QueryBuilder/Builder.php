@@ -34,6 +34,7 @@ use LightWeight\Database\QueryBuilder\Exceptions\QueryBuilderException;
  */
 class Builder
 {
+
     public function __construct(
         private QueryBuilderContract $driver,
         private ?string $modelClass = null
@@ -85,17 +86,18 @@ class Builder
         $models = [];
 
         foreach($entities as $entity) {
+            // Create a new instance of the model
             $model = new $this->modelClass();
-
-            foreach($entity as $column => $value) {
-                $model->{$column} = $value;
-            }
-
+            
+            // Set raw attributes directly, bypassing any fillable check
+            $model->setRawAttributes($entity);
+            
             $models[] = $model;
         }
-
+        
         return $models;
     }
+    
     /**
      * Get first entity
      * @return ?TModel|array
@@ -109,10 +111,26 @@ class Builder
         if($entity === null) {
             return $entity;
         }
+        
         $model = new $this->modelClass();
-        foreach($entity as $column => $value) {
-            $model->{$column} = $value;
-        }
+        $model->setRawAttributes($entity);
+        
         return $model;
     }
+    
+
+
+
+    
+    /**
+     * Get the query builder driver.
+     *
+     * @return \LightWeight\Database\QueryBuilder\Contracts\QueryBuilderContract
+     */
+    public function getDriver()
+    {
+        return $this->driver;
+    }
+
+
 }

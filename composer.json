@@ -13,11 +13,17 @@
             "src/Helpers/string.php",
             "src/Helpers/http.php",
             "src/Helpers/session.php",
-            "src/Helpers/auth.php"
+            "src/Helpers/auth.php",
+            "src/Helpers/class.php"
         ]
     },
     "scripts": {
-        "tests": "phpunit --display-deprecations --display-errors --stop-on-defect --color=always --testdox tests/",
+        "tests": "phpunit",
+        "test:unit": "phpunit --testsuite=Unit",
+        "test:db": "phpunit --testsuite=Database",
+        "test:orm": "phpunit --testsuite=ORM",
+        "test:builder": "phpunit --testsuite=QueryBuilder",
+        "test:validation": "phpunit --testsuite=Validation",
         "php-cs-fixer": "php-cs-fixer fix . --diff"
     },
     "autoload-dev": {

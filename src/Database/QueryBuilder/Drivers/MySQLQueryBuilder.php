@@ -46,16 +46,6 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $this->aggregate = [];
     }
 
-    protected function addBinding(mixed $value, string $type = 'where'): string
-    {
-        $key = ':' . $type . '_binding_' . count(array_filter($this->bindings, function ($k) use ($type) {
-            return strpos($k, ":{$type}_") === 0;
-        }));
-
-        $this->bindings[$key] = $value;
-        return $key;
-    }
-
     protected function compileSelect(): string
     {
         $sql = 'SELECT ';
@@ -118,22 +108,24 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $whereClauses = [];
 
         foreach ($wheres as $where) {
-            $boolean = $isNested ? $where['boolean'] : ($where['boolean'] ?? 'AND');
+            $boolean = $where['boolean'] ?? 'AND';
 
             switch ($where['type']) {
                 case 'basic':
-                    $value = $this->addBinding($where['value']);
-                    $whereClauses[] = "{$boolean} {$where['column']} {$where['operator']} {$value}";
+                    $columnName = $this->quoteIdentifier($where['column']);
+                    $whereClauses[] = "{$boolean} {$columnName} {$where['operator']} ?";
                     break;
                 case 'in':
-                    $placeholders = implode(', ', array_map([$this, 'addBinding'], $where['values']));
+                    $placeholders = implode(', ', array_fill(0, count($where['values']), '?'));
                     $not = $where['not'] ? 'NOT ' : '';
-                    $whereClauses[] = "{$boolean} {$where['column']} {$not}IN ({$placeholders})";
+                    $columnName = $this->quoteIdentifier($where['column']);
+                    $whereClauses[] = "{$boolean} {$columnName} {$not} IN ({$placeholders})";
                     break;
 
                 case 'null':
-                    $not = $where['not'] ? 'NOT ' : '';
-                    $whereClauses[] = "{$boolean} {$where['column']} {$not}IS NULL";
+                    $notClause = $where['not'] ? 'IS NOT NULL' : 'IS NULL';
+                    $columnName = $this->quoteIdentifier($where['column']);
+                    $whereClauses[] = "{$boolean} {$columnName} {$notClause}";
                     break;
 
                 case 'raw':
@@ -141,14 +133,18 @@ class MySQLQueryBuilder implements QueryBuilderContract
                     break;
 
                 case 'group':
-                    $nested = $this->compileWheresRecursive($where['wheres'], true);
-                    $whereClauses[] = "{$boolean} ({$nested})";
+                    // Handle the nested group separately and correctly
+                    $nestedClauses = $this->compileWheresRecursive($where['wheres'], true);
+                    // Remove leading boolean operators from the nested query
+                    $nestedClauses = ltrim($nestedClauses, 'AND ');
+                    $nestedClauses = ltrim($nestedClauses, 'OR ');
+                    
+                    $whereClauses[] = "{$boolean} ({$nestedClauses})";
                     break;
                 case 'between':
-                    $value1 = $this->addBinding($where['value1']);
-                    $value2 = $this->addBinding($where['value2']);
                     $not = $where['not'] ? 'NOT ' : '';
-                    $whereClauses[] = "{$boolean} {$where['column']} {$not}BETWEEN {$value1} AND {$value2}";
+                    $columnName = $this->quoteIdentifier($where['column']);
+                    $whereClauses[] = "{$boolean} {$columnName} {$not} BETWEEN ? AND ?";
                     break;
             }
         }
@@ -169,8 +165,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $havingClauses = [];
 
         foreach ($this->havings as $having) {
-            $value = $this->addBinding($having['value'], 'having');
-            $havingClauses[] = "{$having['boolean']} {$having['column']} {$having['operator']} {$value}";
+            $havingClauses[] = "{$having['boolean']} {$having['column']} {$having['operator']} ?";
         }
 
         // Remove the first boolean (AND/OR)
@@ -198,7 +193,10 @@ class MySQLQueryBuilder implements QueryBuilderContract
             $sql .= ' WHERE ' . $this->compileWheres();
         }
 
-        $result = $this->db->execute($sql, $this->bindings);
+        // Convertir los bindings de array asociativo a array indexado
+        $bindingValues = array_values($this->bindings);
+        
+        $result = $this->db->execute($sql, $bindingValues);
         $this->reset();
 
         return $result;
@@ -220,7 +218,11 @@ class MySQLQueryBuilder implements QueryBuilderContract
     public function get(): array
     {
         $sql = $this->compileSelect();
-        $result = $this->db->statement($sql, $this->bindings);
+        
+        // Convertir los bindings de array asociativo a array indexado
+        $bindingValues = array_values($this->bindings);
+        
+        $result = $this->db->statement($sql, $bindingValues);
         $this->reset();
         return $result;
     }
@@ -231,13 +233,14 @@ class MySQLQueryBuilder implements QueryBuilderContract
     public function insert(array $data): bool
     {
         $this->queryType = 'insert';
-
+        
+        // Usar interrogaciones (?) en lugar de marcadores con nombre
         $columns = implode(', ', array_keys($data));
-        $values = implode(', ', array_map([$this, 'addBinding'], array_values($data)));
+        $placeholders = implode(', ', array_fill(0, count($data), '?'));
 
-        $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$values})";
-
-        $result = $this->db->execute($sql, $this->bindings);
+        $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})";
+        
+        $result = $this->db->execute($sql, array_values($data));
         $this->reset();
 
         return $result;
@@ -352,11 +355,13 @@ class MySQLQueryBuilder implements QueryBuilderContract
     public function update(array $data): bool
     {
         $this->queryType = 'update';
-
+        
         $sets = [];
+        $updateValues = [];
+        
         foreach ($data as $column => $value) {
-            $placeholder = $this->addBinding($value, 'update');
-            $sets[] = "{$column} = {$placeholder}";
+            $sets[] = "{$column} = ?";
+            $updateValues[] = $value;
         }
 
         $sql = "UPDATE {$this->table} SET " . implode(', ', $sets);
@@ -364,8 +369,11 @@ class MySQLQueryBuilder implements QueryBuilderContract
         if (!empty($this->wheres)) {
             $sql .= ' WHERE ' . $this->compileWheres();
         }
-
-        $result = $this->db->execute($sql, $this->bindings);
+        
+        // Combinar los valores del SET con los valores de WHERE
+        $allValues = array_merge($updateValues, array_values($this->bindings));
+        
+        $result = $this->db->execute($sql, $allValues);
         $this->reset();
 
         return $result;
@@ -384,7 +392,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
             'boolean' => $boolean
         ];
 
-        $this->addBinding($value);
+        $this->bindings[] = $value;
         return $this;
     }
 
@@ -402,8 +410,8 @@ class MySQLQueryBuilder implements QueryBuilderContract
             'not' => false
         ];
 
-        $this->addBinding($value1);
-        $this->addBinding($value2);
+        $this->bindings[] = $value1;
+        $this->bindings[] = $value2;
 
         return $this;
     }
@@ -419,17 +427,20 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         // Ejecutar el callback para agregar condiciones al grupo
         $callback($this);
-
+        
+        // Guardar las condiciones del grupo
+        $groupWheres = $this->wheres;
+        
+        // Restaurar las condiciones originales
+        $this->wheres = $currentWheres;
+        
         // Agregar el grupo de condiciones
-        if (!empty($this->wheres)) {
-            $this->wheres = $currentWheres;
+        if (!empty($groupWheres)) {
             $this->wheres[] = [
                 'type' => 'group',
-                'wheres' => $this->wheres,
+                'wheres' => $groupWheres,
                 'boolean' => $boolean
             ];
-        } else {
-            $this->wheres = $currentWheres;
         }
 
         return $this;
@@ -448,7 +459,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
         ];
 
         foreach ($values as $value) {
-            $this->addBinding($value);
+            $this->bindings[] = $value;
         }
 
         return $this;
@@ -468,8 +479,8 @@ class MySQLQueryBuilder implements QueryBuilderContract
             'not' => true
         ];
 
-        $this->addBinding($value1);
-        $this->addBinding($value2);
+        $this->bindings[] = $value1;
+        $this->bindings[] = $value2;
 
         return $this;
     }
@@ -488,7 +499,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
         ];
 
         foreach ($values as $value) {
-            $this->addBinding($value);
+            $this->bindings[] = $value;
         }
 
         return $this;
@@ -530,15 +541,24 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $this->wheres[] = [
             'type' => 'raw',
             'sql' => $sql,
-            'boolean' => $boolean
+            'boolean' => $boolean,
+            'bindings' => $bindings
         ];
-
-        foreach ($bindings as $binding) {
-            $this->addBinding($binding);
+        
+        if (!empty($bindings)) {
+            $this->bindings = array_merge($this->bindings, $bindings);
         }
-
+        
         return $this;
     }
+    /**
+     * @inheritDoc
+     */
+    public function orWhereRaw(string $sql, array $bindings = []): static
+    {
+        return $this->whereRaw($sql, $bindings, 'OR');
+    }
+
     /**
      * @inheritDoc
      */
@@ -550,7 +570,10 @@ class MySQLQueryBuilder implements QueryBuilderContract
             $sql .= ' WHERE ' . $this->compileWheres();
         }
 
-        $result = $this->db->statement($sql, $this->bindings);
+        // Convertir los bindings de array asociativo a array indexado
+        $bindingValues = array_values($this->bindings);
+        
+        $result = $this->db->statement($sql, $bindingValues);
 
         return $result[0]['avg_result'] !== null ? (float)$result[0]['avg_result'] : 0;
     }
@@ -568,8 +591,11 @@ class MySQLQueryBuilder implements QueryBuilderContract
             $sql .= ' WHERE ' . $this->compileWheres();
         }
 
+        // Convertir los bindings de array asociativo a array indexado
+        $bindingValues = array_values($this->bindings);
+        
         // Ejecutamos la consulta
-        $result = $this->db->statement($sql, $this->bindings);
+        $result = $this->db->statement($sql, $bindingValues);
 
         return (int) ($result[0]['count_result'] ?? 0);
     }
@@ -586,19 +612,22 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         $this->queryType = 'update';
 
-        // Usamos parámetros vinculados para seguridad
-        $placeholder = $this->addBinding($value, 'decrement');
-
-        // Construimos la sentencia SQL
-        $sql = "UPDATE {$this->table} SET {$column} = {$column} - {$placeholder}";
+        // Construimos la sentencia SQL con placeholder de interrogación
+        $sql = "UPDATE {$this->table} SET {$column} = {$column} - ?";
+        
+        // Valores para los placeholders
+        $values = [$value];
 
         // Añadimos condiciones WHERE si existen
         if (!empty($this->wheres)) {
             $sql .= ' WHERE ' . $this->compileWheres();
         }
 
+        // Combinar los valores
+        $allValues = array_merge($values, array_values($this->bindings));
+        
         // Ejecutamos la consulta
-        $affectedRows = $this->db->execute($sql, $this->bindings);
+        $affectedRows = $this->db->execute($sql, $allValues);
 
         $this->reset();
 
@@ -659,7 +688,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
             'boolean' => $boolean
         ];
 
-        $this->addBinding($value, 'having');
+        $this->bindings[] = $value;
 
         return $this;
     }
@@ -671,24 +700,27 @@ class MySQLQueryBuilder implements QueryBuilderContract
     {
         // Validación de parámetros
         if ($value <= 0) {
-            throw new \InvalidArgumentException('Decrement value must be positive');
+            throw new \InvalidArgumentException('Increment value must be positive');
         }
 
         $this->queryType = 'update';
 
-        // Usamos parámetros vinculados para seguridad
-        $placeholder = $this->addBinding($value, 'decrement');
-
-        // Construimos la sentencia SQL
-        $sql = "UPDATE {$this->table} SET {$column} = {$column} + {$placeholder}";
+        // Construimos la sentencia SQL con placeholder de interrogación
+        $sql = "UPDATE {$this->table} SET {$column} = {$column} + ?";
+        
+        // Valores para los placeholders
+        $values = [$value];
 
         // Añadimos condiciones WHERE si existen
         if (!empty($this->wheres)) {
             $sql .= ' WHERE ' . $this->compileWheres();
         }
 
+        // Combinar los valores
+        $allValues = array_merge($values, array_values($this->bindings));
+        
         // Ejecutamos la consulta
-        $affectedRows = $this->db->execute($sql, $this->bindings);
+        $affectedRows = $this->db->execute($sql, $allValues);
 
         $this->reset();
 
@@ -718,18 +750,18 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $columnsStr = implode(', ', $columns);
 
         foreach ($data as $row) {
-            $rowValues = [];
+            $rowPlaceholders = array_fill(0, count($row), '?');
+            $placeholders[] = '(' . implode(', ', $rowPlaceholders) . ')';
+            
+            // Agregar valores al array de valores
             foreach ($row as $value) {
-                $placeholder = $this->addBinding($value, 'insert');
-                $rowValues[] = $placeholder;
+                $values[] = $value;
             }
-            $placeholders[] = '(' . implode(', ', $rowValues) . ')';
-            $values = array_merge($values, array_values($row));
         }
 
         $sql = "INSERT INTO {$this->table} ({$columnsStr}) VALUES " . implode(', ', $placeholders);
-
-        $affectedRows = $this->db->execute($sql, $this->bindings);
+        
+        $affectedRows = $this->db->execute($sql, $values);
         $this->reset();
 
         return $affectedRows;
@@ -745,26 +777,32 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $columns = array_keys($data);
         $columnsStr = implode(', ', $columns);
 
-        // Preparar valores para INSERT
-        $insertValues = [];
+        // Valores a pasar a la consulta
+        $values = [];
+        
+        // Preparar valores y placeholders para INSERT
+        $insertPlaceholders = array_fill(0, count($data), '?');
+        $valuesStr = implode(', ', $insertPlaceholders);
+        
+        // Agregar valores de INSERT al array de valores
         foreach ($data as $value) {
-            $insertValues[] = $this->addBinding($value, 'insert');
+            $values[] = $value;
         }
-        $valuesStr = implode(', ', $insertValues);
 
         // Preparar valores para UPDATE
         $updates = [];
         foreach ($data as $column => $value) {
-            $placeholder = $this->addBinding($value, 'update');
-            $updates[] = "{$column} = {$placeholder}";
+            $updates[] = "{$column} = ?";
+            // Agregar valores de UPDATE al array de valores
+            $values[] = $value;
         }
         $updatesStr = implode(', ', $updates);
 
         $sql = "INSERT INTO {$this->table} ({$columnsStr}) 
                 VALUES ({$valuesStr})
                 ON DUPLICATE KEY UPDATE {$updatesStr}";
-
-        $result = $this->db->execute($sql, $this->bindings);
+        
+        $result = $this->db->execute($sql, $values);
         $this->reset();
 
         return $result;
@@ -781,7 +819,10 @@ class MySQLQueryBuilder implements QueryBuilderContract
             $sql .= ' WHERE ' . $this->compileWheres();
         }
 
-        $result = $this->db->statement($sql, $this->bindings);
+        // Convertir los bindings de array asociativo a array indexado
+        $bindingValues = array_values($this->bindings);
+        
+        $result = $this->db->statement($sql, $bindingValues);
 
         return $result[0]['max_result'] !== null ? (float)$result[0]['max_result'] : 0;
     }
@@ -797,7 +838,10 @@ class MySQLQueryBuilder implements QueryBuilderContract
             $sql .= ' WHERE ' . $this->compileWheres();
         }
 
-        $result = $this->db->statement($sql, $this->bindings);
+        // Convertir los bindings de array asociativo a array indexado
+        $bindingValues = array_values($this->bindings);
+        
+        $result = $this->db->statement($sql, $bindingValues);
 
         return $result[0]['min_result'] !== null ? (float)$result[0]['min_result'] : 0;
     }
@@ -864,7 +908,10 @@ class MySQLQueryBuilder implements QueryBuilderContract
             $sql .= ' WHERE ' . $this->compileWheres();
         }
 
-        $result = $this->db->statement($sql, $this->bindings);
+        // Convertir los bindings de array asociativo a array indexado
+        $bindingValues = array_values($this->bindings);
+        
+        $result = $this->db->statement($sql, $bindingValues);
 
         return $result[0]['sum_result'] !== null ? (float)$result[0]['sum_result'] : 0;
     }
@@ -890,5 +937,56 @@ class MySQLQueryBuilder implements QueryBuilderContract
         }
 
         return $columnsMetadata;
+    }
+
+    /**
+     * Quote a column identifier to prevent SQL injection
+     * and handle special characters in column names
+     *
+     * @param string $identifier
+     * @return string
+     */
+    protected function quoteIdentifier(string $identifier): string
+    {
+        // Don't quote if it's already a valid MySQL identifier
+        if (preg_match('/^[a-zA-Z0-9_]+$/', $identifier)) {
+            return $identifier;
+        }
+        
+        // If it contains a dot, we need to quote the parts separately
+        if (strpos($identifier, '.') !== false) {
+            $parts = array_map(function($part) {
+                return '`' . str_replace('`', '``', $part) . '`';
+            }, explode('.', $identifier));
+            return implode('.', $parts);
+        }
+        
+        // Simple case - just quote the identifier
+        return '`' . str_replace('`', '``', $identifier) . '`';
+    }
+
+    /**
+     * Get the current table name.
+     *
+     * @return string
+     */
+    public function getTable(): string
+    {
+        return $this->table;
+    }
+
+    /**
+     * Get the where clause for the current query.
+     * Used to extract constraints in subqueries for relationship queries.
+     *
+     * @return string
+     */
+    public function getWhereClause(): string
+    {
+        if (empty($this->wheres)) {
+            return '';
+        }
+        
+        return $this->compileWheres();
     }
 }

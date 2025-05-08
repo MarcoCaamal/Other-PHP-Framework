@@ -14,6 +14,7 @@ use LightWeight\Database\QueryBuilder\Exceptions\QueryBuilderException;
  *
  * @method static Builder<static> where(string $column, string $operator, mixed $value, string $boolean = 'AND')
  * @method static Builder<static> select(array $columns = ['*']);
+
  */
 abstract class Model implements JsonSerializable
 {
@@ -34,6 +35,9 @@ abstract class Model implements JsonSerializable
     protected static ?array $columns = [];
     private static ?DatabaseDriverContract $driver = null;
     private static ?QueryBuilderContract $builder = null;
+    
+
+    
     public static function setDatabaseDriver(DatabaseDriverContract $driver)
     {
         self::$driver = $driver;
@@ -55,8 +59,12 @@ abstract class Model implements JsonSerializable
             $query = new Builder(self::$builder, static::class);
             static::$columns = $query->getMetadataOfTableColumns();
         }
+        // Initialize attributes with defaults from table schema
         foreach(static::$columns as $column) {
-            $this->attributes[$column->name] = $column->default;
+            // Only set defaults if the attribute doesn't already exist
+            if (!isset($this->attributes[$column->name])) {
+                $this->attributes[$column->name] = $column->default;
+            }
         }
     }
     public function __set($name, $value)
@@ -65,7 +73,12 @@ abstract class Model implements JsonSerializable
     }
     public function __get($name)
     {
-        return $this->attributes[$name] ?? null;
+        // Check if the attribute exists
+        if (isset($this->attributes[$name])) {
+            return $this->attributes[$name];
+        }
+        
+        return null;
     }
     public function __sleep()
     {
@@ -76,7 +89,15 @@ abstract class Model implements JsonSerializable
     }
     public function __call($method, $args)
     {
-
+        // Forward to query builder if needed
+        $query = $this->newQuery();
+        if (method_exists($query, $method)) {
+            return $query->$method(...$args);
+        }
+        
+        throw new \BadMethodCallException(sprintf(
+            'Call to undefined method %s::%s()', static::class, $method
+        ));
     }
     public static function __callStatic($method, $args)
     {
@@ -86,7 +107,7 @@ abstract class Model implements JsonSerializable
 
         $instance = new static();
 
-        return (new Builder(static::$builder, static::class))
+        return (new Builder(self::$builder, static::class))
             ->table($instance->getTable())
             ->{$method}(...$args);
     }
@@ -98,12 +119,24 @@ abstract class Model implements JsonSerializable
     {
         return $this->primaryKey;
     }
+    
+    /**
+     * Get the value of the model's primary key.
+     *
+     * @return mixed
+     */
+    public function getKey()
+    {
+        return $this->attributes[$this->primaryKey] ?? null;
+    }
     public function jsonSerialize(): mixed
     {
+        // Create a copy of attributes and remove the hidden ones
         $newData = $this->attributes;
         foreach ($this->hidden as $hide) {
             unset($newData[$hide]);
         }
+        
         return $newData;
     }
     public function fill(array $attributes): static
@@ -112,7 +145,8 @@ abstract class Model implements JsonSerializable
             throw new \Error("Model " . static::class . " does not have fillable attributes");
         }
         foreach ($attributes as $key => $value) {
-            if (in_array($key, $this->fillable)) {
+            // Check if the key is in the fillable array or is a special field like primary key
+            if (in_array($key, $this->fillable) || $key === $this->primaryKey || $key === 'created_at' || $key === 'updated_at') {
                 $this->__set($key, $value);
             }
         }
@@ -120,44 +154,155 @@ abstract class Model implements JsonSerializable
     }
     public function toArray(): array
     {
-        return array_filter(
+        $array = array_filter(
             $this->attributes,
-            fn ($attr) => !in_array($attr, $this->hidden)
+            fn ($value, $key) => !in_array($key, $this->hidden),
+            ARRAY_FILTER_USE_BOTH
         );
+        
+        return $array;
+    }
+    
+    /**
+     * Set multiple attributes directly (for internal use)
+     * 
+     * @param array $attributes Attributes to set
+     * @return $this
+     */
+    public function setRawAttributes(array $attributes): static
+    {
+        $this->attributes = $attributes;
+        return $this;
+    }
+    
+    /**
+     * Get all attributes of the model (for debugging)
+     * 
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+    
+    /**
+     * Get column metadata (for debugging)
+     * 
+     * @return array
+     */
+    public static function getColumns(): array
+    {
+        return static::$columns ?? [];
     }
     public function save(): static
     {
-        if ($this->insertTimestamps) {
-            $this->attributes["created_at"] = date("Y-m-d H:m:s");
+        // Make a copy of the attributes before we modify them
+        $attributesToSave = $this->attributes;
+        
+        // Process boolean values to ensure they are properly stored in MySQL
+        foreach ($attributesToSave as $key => $value) {
+            // Convert boolean values to integers for MySQL
+            if (is_bool($value)) {
+                $attributesToSave[$key] = $value ? 1 : 0;
+            } elseif ($value === '') {
+                // Check if this column is a boolean field in the schema
+                $isBoolean = false;
+                foreach(static::$columns as $column) {
+                    if ($column->name === $key && ($column->type->name === 'tinyint' || $column->type->name === 'boolean')) {
+                        $isBoolean = true;
+                        break;
+                    }
+                }
+                
+                // If it's a boolean field, convert empty string to 0
+                if ($isBoolean) {
+                    $attributesToSave[$key] = 0;
+                }
+            }
         }
-        $databaseColumns = implode(",", array_keys($this->attributes));
-        $bind = implode(",", array_fill(0, count($this->attributes), "?"));
-        self::$driver->statement(
-            "INSERT INTO $this->table ($databaseColumns) VALUES ($bind)",
-            array_values($this->attributes)
-        );
-        $this->{$this->primaryKey} = self::$driver->lastInsertId();
+        
+        // Only add timestamps if they don't exist already
+        if ($this->insertTimestamps && !isset($attributesToSave["created_at"])) {
+            $attributesToSave["created_at"] = date("Y-m-d H:i:s");
+        }
+        
+        if (self::$builder === null) {
+            throw new QueryBuilderException("QueryBuilder is not initialized");
+        }
+        
+        $builder = new Builder(self::$builder);
+        $builder->table($this->table);
+        
+        // Use the copied attributes for the insert
+        if ($builder->insert($attributesToSave)) {
+            $this->{$this->primaryKey} = $builder->lastInsertId();
+        }
+        
         return $this;
     }
+    
     public function update(): static
     {
         if ($this->insertTimestamps) {
-            $this->attributes["updated_at"] = date("Y-m-d H:m:s");
+            $this->attributes["updated_at"] = date("Y-m-d H:i:s");
         }
-        $databaseColumns = array_keys($this->attributes);
-        $bind = implode(",", array_map(fn ($column) => "$column = ?", $databaseColumns));
-        $id = $this->attributes[$this->primaryKey];
-        self::$driver->statement(
-            "UPDATE $this->table SET $bind WHERE $this->primaryKey = $id",
-            array_values($this->attributes)
-        );
+        
+        $primaryKey = $this->attributes[$this->primaryKey] ?? null;
+        if ($primaryKey === null) {
+            throw new \RuntimeException("Cannot update a model without a primary key value");
+        }
+        
+        // Process boolean values for MySQL
+        $attributesToUpdate = $this->attributes;
+        foreach ($attributesToUpdate as $key => $value) {
+            // Convert boolean values to integers for MySQL
+            if (is_bool($value)) {
+                $attributesToUpdate[$key] = $value ? 1 : 0;
+            } elseif ($value === '') {
+                // Check if this column is a boolean field in the schema
+                $isBoolean = false;
+                foreach(static::$columns as $column) {
+                    if ($column->name === $key && ($column->type->name === 'tinyint' || $column->type->name === 'boolean')) {
+                        $isBoolean = true;
+                        break;
+                    }
+                }
+                
+                // If it's a boolean field, convert empty string to 0
+                if ($isBoolean) {
+                    $attributesToUpdate[$key] = 0;
+                }
+            }
+        }
+        
+        if (self::$builder === null) {
+            throw new QueryBuilderException("QueryBuilder is not initialized");
+        }
+        
+        $builder = new Builder(self::$builder);
+        $builder->table($this->table)
+                ->where($this->primaryKey, '=', $primaryKey)
+                ->update($attributesToUpdate);
+        
         return $this;
     }
+    
     public function delete(): static
     {
-        self::$driver->statement(
-            "DELETE FROM $this->table WHERE $this->primaryKey = {$this->attributes[$this->primaryKey]}"
-        );
+        $primaryKey = $this->attributes[$this->primaryKey] ?? null;
+        if ($primaryKey === null) {
+            throw new \RuntimeException("Cannot delete a model without a primary key value");
+        }
+        
+        if (self::$builder === null) {
+            throw new QueryBuilderException("QueryBuilder is not initialized");
+        }
+        
+        $builder = new Builder(self::$builder);
+        $builder->table($this->table)
+                ->where($this->primaryKey, '=', $primaryKey)
+                ->delete();
+        
         return $this;
     }
     public static function create(array $attributes): static
@@ -190,6 +335,11 @@ abstract class Model implements JsonSerializable
             ->table($instance->getTable())
             ->get();
     }
+    /**
+     * Create a new instance of the Builder for this model
+     * 
+     * @return Builder<static>
+     */
     public static function query(): Builder
     {
         if(self::$builder === null) {
@@ -199,4 +349,6 @@ abstract class Model implements JsonSerializable
         return (new Builder(self::$builder, static::class))
             ->table($instance->getTable());
     }
+    
+
 }

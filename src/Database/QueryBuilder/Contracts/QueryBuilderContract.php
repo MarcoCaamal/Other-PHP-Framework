@@ -20,6 +20,7 @@ interface QueryBuilderContract
     public function whereBetween(string $column, mixed $value1, mixed $value2, string $boolean = 'AND'): static;
     public function whereNotBetween(string $column, mixed $value1, mixed $value2, string $boolean = 'AND'): static;
     public function whereRaw(string $sql, array $bindings = [], string $boolean = 'AND'): static;
+    public function orWhereRaw(string $sql, array $bindings = []): static;
     public function whereGroup(Closure $callback, string $boolean = 'AND'): static;
     public function orWhereGroup(Closure $callback): static;
 
@@ -49,13 +50,22 @@ interface QueryBuilderContract
     public function decrement(string $column, int $value = 1): int;
 
     public function toSql(): string;
-    public function getBindings(): array;
-    public function groupBy(array|string $columns): static;
-    public function having(string $column, string $operator, mixed $value, string $boolean = 'AND'): static;
-    public function orHaving(string $column, string $operator, mixed $value): static;
-    public function distinct(): static;
-    public function insertBatch(array $data): int;
-    public function insertOrUpdate(array $data): bool;
+    
+    /**
+     * Get the current table name.
+     *
+     * @return string
+     */
+    public function getTable(): string;
+    
+    /**
+     * Get the where clause for the current query.
+     * Used to extract constraints in subqueries for relationship queries.
+     *
+     * @return string
+     */
+    public function getWhereClause(): string;
+
     /**
      * Get information columns of table
      * @return Column[]
