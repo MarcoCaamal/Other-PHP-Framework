@@ -5,6 +5,10 @@ namespace LightWeight\Database\ORM;
 use JsonSerializable;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\Exceptions\DatabaseException;
+use LightWeight\Database\ORM\Relations\BelongsTo;
+use LightWeight\Database\ORM\Relations\HasMany;
+use LightWeight\Database\ORM\Relations\HasOne;
+use LightWeight\Database\ORM\Relations\Relation;
 use LightWeight\Database\QueryBuilder\Builder;
 use LightWeight\Database\QueryBuilder\Contracts\QueryBuilderContract;
 use LightWeight\Database\QueryBuilder\Exceptions\QueryBuilderException;
@@ -28,6 +32,11 @@ abstract class Model implements JsonSerializable
     protected array $fillable = [];
     protected array $attributes = [];
     protected bool $insertTimestamps = true;
+    /**
+     * Store loaded relationships
+     * @var array<string, mixed>
+     */
+    protected array $relations = [];
     /**
      *
      * @var \LightWeight\Database\QueryBuilder\Metadata\Column[]|null
@@ -76,6 +85,22 @@ abstract class Model implements JsonSerializable
         // Check if the attribute exists
         if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
+        }
+        
+        // Check if the relation exists and has been loaded
+        if (isset($this->relations[$name])) {
+            return $this->relations[$name];
+        }
+        
+        // Check if the relation method exists
+        if (method_exists($this, $name)) {
+            // Load the relation
+            $relation = $this->$name();
+            
+            if ($relation instanceof Relation) {
+                // Cache the relationship result
+                return $this->relations[$name] = $relation->getResults();
+            }
         }
         
         return null;
@@ -350,5 +375,171 @@ abstract class Model implements JsonSerializable
             ->table($instance->getTable());
     }
     
+    /**
+     * Create a new query for the Model
+     * 
+     * @return Builder<static>
+     */
+    protected function newQuery(): Builder
+    {
+        if(self::$builder === null) {
+            throw new QueryBuilderException("Not provided QueryBuilderContract.");
+        }
+        
+        return (new Builder(self::$builder, static::class))
+            ->table($this->getTable());
+    }
 
+    /**
+     * Define a one-to-one relationship.
+     *
+     * @template TRelatedModel of Model
+     * @param class-string<TRelatedModel> $related Related model class name
+     * @param string|null $foreignKey Foreign key on the related model
+     * @param string|null $localKey Local key on the parent model
+     * @return HasOne<TRelatedModel>
+     */
+    public function hasOne(string $related, ?string $foreignKey = null, ?string $localKey = null): HasOne
+    {
+        // Create a new instance of the related model
+        $instance = new $related;
+        
+        // Determine the foreign key
+        if (is_null($foreignKey)) {
+            // Get the "snake case" version of the calling model's class name + _id
+            $reflectionClass = new \ReflectionClass(static::class);
+            // Remove "Model" suffix if present when creating the foreign key
+            $className = $reflectionClass->getShortName();
+            $className = preg_replace('/Model$/', '', $className);
+            $foreignKey = snakeCase($className) . '_id';
+        }
+        
+        // Determine the local key (default is primary key of this model)
+        if (is_null($localKey)) {
+            $localKey = $this->getPrimaryKeyName();
+        }
+        
+        // Create a query builder for the related model
+        $query = $instance->query();
+        
+        // Return a new HasOne relation
+        return new HasOne($query, $this, $foreignKey, $localKey);
+    }
+
+    /**
+     * Define a one-to-many relationship.
+     *
+     * @template TRelatedModel of Model
+     * @param class-string<TRelatedModel> $related Related model class name
+     * @param string|null $foreignKey Foreign key on the related model
+     * @param string|null $localKey Local key on the parent model
+     * @return HasMany<TRelatedModel>
+     */
+    public function hasMany(string $related, ?string $foreignKey = null, ?string $localKey = null): HasMany
+    {
+        // Create a new instance of the related model
+        $instance = new $related;
+        
+        // Determine the foreign key
+        if (is_null($foreignKey)) {
+            // Get the "snake case" version of the calling model's class name + _id
+            $reflectionClass = new \ReflectionClass(static::class);
+            // Remove "Model" suffix if present when creating the foreign key
+            $className = $reflectionClass->getShortName();
+            $className = preg_replace('/Model$/', '', $className);
+            $foreignKey = snakeCase($className) . '_id';
+        }
+        
+        // Determine the local key (default is primary key of this model)
+        if (is_null($localKey)) {
+            $localKey = $this->getPrimaryKeyName();
+        }
+        
+        // Create a query builder for the related model
+        $query = $instance->query();
+        
+        // Return a new HasMany relation
+        return new HasMany($query, $this, $foreignKey, $localKey);
+    }
+
+    /**
+     * Define an inverse one-to-one or many relationship.
+     *
+     * @template TRelatedModel of Model
+     * @param class-string<TRelatedModel> $related Related model class name
+     * @param string|null $foreignKey Foreign key on this model
+     * @param string|null $ownerKey Primary key on the related model
+     * @return BelongsTo<TRelatedModel>
+     */
+    public function belongsTo(string $related, ?string $foreignKey = null, ?string $ownerKey = null): BelongsTo
+    {
+        // Create a new instance of the related model
+        $instance = new $related;
+        
+        // Determine the foreign key
+        if (is_null($foreignKey)) {
+            // Get the "snake case" version of the related model's class name + _id
+            $reflectionClass = new \ReflectionClass($related);
+            // Remove "Model" suffix if present when creating the foreign key
+            $className = $reflectionClass->getShortName();
+            $className = preg_replace('/Model$/', '', $className);
+            $foreignKey = snakeCase($className) . '_id';
+        }
+        
+        // Determine the owner key (default is primary key of the related model)
+        if (is_null($ownerKey)) {
+            $ownerKey = $instance->getPrimaryKeyName();
+        }
+        
+        // Create a query builder for the related model
+        $query = $instance->query();
+        
+        // Return a new BelongsTo relation
+        return new BelongsTo($query, $this, $foreignKey, $ownerKey);
+    }
+
+    /**
+     * Get relationship method from the dynamic method
+     * 
+     * @param string $method Method name
+     * @return mixed The relationship if it exists, null otherwise
+     */
+    public function getRelationValue(string $method)
+    {
+        // Check if the relation already exists in the relations array
+        if (array_key_exists($method, $this->relations)) {
+            return $this->relations[$method];
+        }
+
+        // Check if a relationship method exists
+        if (method_exists($this, $method)) {
+            $relation = $this->$method();
+            
+            if ($relation instanceof Relation) {
+                // Get and cache the relationship value
+                return $this->relations[$method] = $relation->getResults();
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Load a relationship by name
+     * 
+     * @param string $name Name of the relationship method
+     * @return $this
+     */
+    public function load(string $name): static 
+    {
+        if (method_exists($this, $name)) {
+            $relation = $this->$name();
+            
+            if ($relation instanceof Relation) {
+                $this->relations[$name] = $relation->getResults();
+            }
+        }
+        
+        return $this;
+    }
 }
