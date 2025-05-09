@@ -13,11 +13,13 @@
          stopOnError="true"
          stopOnSkipped="true">
     <testsuites>
-        <testsuite name="Unit">
+        <testsuite name="All">
             <directory>./tests</directory>
         </testsuite>
         <testsuite name="Database">
             <directory>./tests/Database</directory>
+            <exclude>./tests/Database/ORM</exclude>
+            <exclude>./tests/Database/QueryBuilder</exclude>
         </testsuite>
         <testsuite name="ORM">
             <directory>./tests/Database/ORM</directory>

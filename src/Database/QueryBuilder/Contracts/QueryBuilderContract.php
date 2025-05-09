@@ -24,6 +24,15 @@ interface QueryBuilderContract
     public function whereGroup(Closure $callback, string $boolean = 'AND'): static;
     public function orWhereGroup(Closure $callback): static;
 
+    /**
+     * Add a where clause with a callback function
+     * 
+     * @param Closure $callback Function that receives the query builder
+     * @param string $boolean The boolean operator (AND/OR)
+     * @return static
+     */
+    public function whereCallback(Closure $callback, string $boolean = 'AND'): static;
+
     public function orderBy(string $column, string $direction = 'asc'): static;
     public function limit(int $limit): static;
     public function offset(int $offset): static;

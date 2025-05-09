@@ -989,4 +989,45 @@ class MySQLQueryBuilder implements QueryBuilderContract
         
         return $this->compileWheres();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function whereCallback(\Closure $callback, string $boolean = 'AND'): static
+    {
+        // Esta implementación es similar a whereGroup
+        
+        // Guardar el estado actual de los wheres
+        $currentWheres = $this->wheres;
+        $currentBindings = $this->bindings;
+        
+        // Reiniciar wheres para el callback
+        $this->wheres = [];
+        $this->bindings = [];
+        
+        // Ejecutar el callback para agregar condiciones
+        $callback($this);
+        
+        // Guardar las condiciones del grupo
+        $groupWheres = $this->wheres;
+        $groupBindings = $this->bindings;
+        
+        // Restaurar las condiciones originales
+        $this->wheres = $currentWheres;
+        $this->bindings = $currentBindings;
+        
+        // Agregar el grupo de condiciones
+        if (!empty($groupWheres)) {
+            $this->wheres[] = [
+                'type' => 'group',
+                'wheres' => $groupWheres,
+                'boolean' => $boolean
+            ];
+            
+            // Añadir los bindings del grupo
+            $this->bindings = array_merge($this->bindings, $groupBindings);
+        }
+
+        return $this;
+    }
 }

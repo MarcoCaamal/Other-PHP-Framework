@@ -18,8 +18,7 @@
         ]
     },
     "scripts": {
-        "tests": "phpunit",
-        "test:unit": "phpunit --testsuite=Unit",
+        "tests": "phpunit --testsuite=All",
         "test:db": "phpunit --testsuite=Database",
         "test:orm": "phpunit --testsuite=ORM",
         "test:builder": "phpunit --testsuite=QueryBuilder",

@@ -7,7 +7,7 @@ use Exception;
 use LightWeight\Config\Config;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\ORM\Model;
-use LightWeight\Database\QueryBuilder\Drivers\MysqlQueryBuilderDriver;
+use LightWeight\Database\QueryBuilder\Drivers\MySQLQueryBuilder;
 use LightWeight\Http\HttpMethod;
 use LightWeight\Http\HttpNotFoundException;
 use LightWeight\Http\Request;
@@ -106,7 +106,7 @@ class App
             config("database.password"),
         );
         match(config('database.connection', 'mysql')) {
-            'mysql' => Model::setBuilderClassString(MysqlQueryBuilderDriver::class)
+            'mysql' => Model::setBuilderClassString(MySQLQueryBuilder::class)
         };
         Model::setDatabaseDriver($this->database);
         return $this;
