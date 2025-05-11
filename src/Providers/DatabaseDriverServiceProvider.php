@@ -6,7 +6,6 @@ use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\PdoDriver;
 use LightWeight\Database\QueryBuilder\Contracts\QueryBuilderContract;
 use LightWeight\Database\QueryBuilder\Drivers\MySQLQueryBuilder;
-use LightWeight\Database\ORM\Model;
 use LightWeight\Providers\Contracts\ServiceProviderContract;
 
 class DatabaseDriverServiceProvider implements ServiceProviderContract
@@ -25,16 +24,11 @@ class DatabaseDriverServiceProvider implements ServiceProviderContract
         $serviceContainer->set(QueryBuilderContract::class, function() use ($serviceContainer) {
             $driver = $serviceContainer->get(DatabaseDriverContract::class);
             $queryBuilder = match(config('database.connection', 'mysql')) {
-                'mysql' => new MySQLQueryBuilder($driver)
+                'mysql' => new MySQLQueryBuilder($driver),
+                default => throw new \LightWeight\Database\Exceptions\DatabaseException("Unsupported database connection type")
             };
             
             return $queryBuilder;
-        });
-        
-        // Configurar el Model para usar el driver y query builder registrados
-        $serviceContainer->call(function(DatabaseDriverContract $databaseDriver, QueryBuilderContract $queryBuilder) {
-            Model::setDatabaseDriver($databaseDriver);
-            Model::setBuilderDriver($queryBuilder);
         });
     }
 }

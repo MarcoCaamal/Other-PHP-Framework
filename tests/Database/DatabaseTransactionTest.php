@@ -60,6 +60,7 @@ class DatabaseTransactionTest extends TestCase
             $count = TransactionModel::query()->count();
             $this->assertEquals(2, $count);
         } catch (Exception $e) {
+            var_dump($e->getMessage());
             $this->driver->rollback();
             $this->fail('Transaction should not have thrown an exception');
         }

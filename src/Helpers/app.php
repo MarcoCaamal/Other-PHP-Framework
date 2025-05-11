@@ -34,6 +34,19 @@ function singleton(string $class, string|callable|object|null $build = null)
     };
     return $container->get($class);
 }
+
+/**
+ * Obtiene una nueva instancia (transient) del contenedor
+ * 
+ * @template T
+ * @param class-string<T> $class
+ * @return T
+ */
+function make(string $class)
+{
+    return Container::getInstance()->make($class);
+}
+
 function env(string $variable, $default = null)
 {
     return $_ENV[$variable] ?? $default;

@@ -10,7 +10,7 @@ class Config
     {
         foreach(glob("$path/*.php") as $config) {
             $key = explode('.', basename($config))[0];
-            $values = require_once $config;
+            $values = require $config;
             self::$config[$key] = $values;
         }
     }

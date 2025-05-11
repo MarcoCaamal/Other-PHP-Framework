@@ -3,6 +3,7 @@
 namespace LightWeight\Routing;
 
 use LightWeight\Container\DependencyInjection;
+use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\HttpMethod;
 use LightWeight\Http\Request;
 use LightWeight\Http\HttpNotFoundException;
@@ -48,11 +49,11 @@ class Router
     /**
      * Resolve the route of the `$request`
      *
-     * @param \LightWeight\Http\Request $request
+     * @param \LightWeight\Http\Contracts\RequestContract $request
      * @throws \LightWeight\Http\HttpNotFoundException
      * @return \LightWeight\Routing\Route
      */
-    public function resolveRoute(Request $request): Route
+    public function resolveRoute(RequestContract $request): Route
     {
         foreach ($this->routes[$request->method()->value] as $route) {
             if ($route->matches($request->uri())) {
@@ -61,7 +62,7 @@ class Router
         }
         throw new HttpNotFoundException();
     }
-    public function resolve(Request $request): Response
+    public function resolve(RequestContract $request): Response
     {
         $route = $this->resolveRoute($request);
         $request->setRoute($route);
@@ -86,7 +87,7 @@ class Router
         }
         return $action(...$params);
     }
-    protected function runMiddlewares(Request $request, array $middlewares, \Closure $target): Response
+    protected function runMiddlewares(RequestContract $request, array $middlewares, \Closure $target): Response
     {
         if (count($middlewares) === 0) {
             return $target();

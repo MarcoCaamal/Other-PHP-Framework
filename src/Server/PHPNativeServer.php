@@ -2,6 +2,7 @@
 
 namespace LightWeight\Server;
 
+use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\HttpMethod;
 use LightWeight\Http\Request;
 use LightWeight\Server\Contracts\ServerContract;
@@ -72,7 +73,7 @@ class PHPNativeServer implements ServerContract
     /**
      * @inheritDoc
      */
-    public function getRequest(): Request
+    public function getRequest(): RequestContract
     {
         return (new Request())
             ->setUri(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH))

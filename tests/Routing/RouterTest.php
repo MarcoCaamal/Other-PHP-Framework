@@ -3,6 +3,7 @@
 namespace LightWeight\Tests\Routing;
 
 use LightWeight\Http\Contracts\MiddlewareContract;
+use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\Response;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +14,7 @@ use LightWeight\Routing\Router;
 
 class RouterTest extends TestCase
 {
-    private function createMockRequest(string $uri, HttpMethod $httpMethod): Request
+    private function createMockRequest(string $uri, HttpMethod $httpMethod): RequestContract
     {
         return (new Request())
             ->setUri($uri)
@@ -86,10 +87,10 @@ class RouterTest extends TestCase
         $middleware1 = new class () implements MiddlewareContract {
             /**
              *
-             * @param Request $request
+             * @param RequestContract $request
              * @param \Closure $next
              */
-            public function handle(Request $request, \Closure $next)
+            public function handle(RequestContract $request, \Closure $next)
             {
                 $response = $next($request);
                 $response->setHeader('x-test-one', 'test one');
@@ -101,10 +102,10 @@ class RouterTest extends TestCase
         $middleware2 = new class () implements MiddlewareContract {
             /**
              *
-             * @param Request $request
+             * @param RequestContract $request
              * @param \Closure $next
              */
-            public function handle(Request $request, \Closure $next)
+            public function handle(RequestContract $request, \Closure $next)
             {
                 $response = $next($request);
                 $response->setHeader('x-test-two', 'test two');
@@ -128,7 +129,7 @@ class RouterTest extends TestCase
     public function testMiddlewareStackCanBeStopped()
     {
         $stopMiddleware = new class () implements MiddlewareContract {
-            public function handle(Request $request, \Closure $next)
+            public function handle(RequestContract $request, \Closure $next)
             {
                 return Response::text('STOP!');
             }
@@ -137,10 +138,10 @@ class RouterTest extends TestCase
         $middleware2 = new class () implements MiddlewareContract {
             /**
              *
-             * @param Request $request
+             * @param RequestContract $request
              * @param \Closure $next
              */
-            public function handle(Request $request, \Closure $next)
+            public function handle(RequestContract $request, \Closure $next)
             {
                 $response = $next($request);
                 $response->setHeader('x-test-two', 'test two');

@@ -2,7 +2,7 @@
 
 namespace LightWeight\Server\Contracts;
 
-use LightWeight\Http\Request;
+use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\Response;
 
 /**
@@ -14,9 +14,9 @@ interface ServerContract
     /**
      * Get request sent by the client
      *
-     * @return Request
+     * @return RequestContract
      */
-    public function getRequest(): Request;
+    public function getRequest(): RequestContract;
     /**
      * Send the response to the client
      *

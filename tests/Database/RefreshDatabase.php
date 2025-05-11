@@ -2,11 +2,14 @@
 
 namespace LightWeight\Tests\Database;
 
+use LightWeight\Container\Container;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\ORM\Model;
 use LightWeight\Database\PdoDriver;
+use LightWeight\Database\QueryBuilder\Contracts\QueryBuilderContract;
 use LightWeight\Database\QueryBuilder\Drivers\MySQLQueryBuilder;
 use PDOException;
+use Psr\Container\ContainerInterface;
 
 trait RefreshDatabase
 {
@@ -16,13 +19,12 @@ trait RefreshDatabase
             // Configure driver as singleton
             $this->driver = singleton(DatabaseDriverContract::class, PdoDriver::class);
             
-            // Also configure QueryBuilder as singleton
-            $queryBuilder = new MySQLQueryBuilder($this->driver);
-            singleton(\LightWeight\Database\QueryBuilder\Contracts\QueryBuilderContract::class, $queryBuilder);
-            
-            // Set model drivers
-            Model::setDatabaseDriver($this->driver);
-            Model::setBuilderDriver($queryBuilder);
+            // Registrar una fábrica para crear instancias de MySQLQueryBuilder
+            Container::getInstance()->set(QueryBuilderContract::class, function(ContainerInterface $c) {
+                return new MySQLQueryBuilder($c->get(DatabaseDriverContract::class));
+            });
+
+            // Los modelos ahora obtienen sus dependencias del contenedor directamente
 
             try {
                 $dbConnection = getenv('DB_CONNECTION') ?: 'mysql';

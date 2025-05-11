@@ -2,9 +2,9 @@
 
 namespace LightWeight\Http\Contracts;
 
-use LightWeight\Http\Request;
+use LightWeight\Http\Contracts\RequestContract;
 
 interface MiddlewareContract
 {
-    public function handle(Request $request, \Closure $next);
+    public function handle(RequestContract $request, \Closure $next);
 }

@@ -2,6 +2,7 @@
 
 namespace LightWeight\Tests\Http;
 
+use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\HttpMethod;
 use LightWeight\Http\Request;
 use LightWeight\Routing\Route;

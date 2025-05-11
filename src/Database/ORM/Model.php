@@ -42,18 +42,53 @@ abstract class Model implements JsonSerializable
      * @var \LightWeight\Database\QueryBuilder\Metadata\Column[]|null
      */
     protected static ?array $columns = [];
-    private static ?DatabaseDriverContract $driver = null;
-    private static ?QueryBuilderContract $builder = null;
     
-
+    /**
+     * Get the database driver from the container (transient, new instance)
+     * 
+     * @return DatabaseDriverContract
+     * @throws DatabaseException If the database driver is not available
+     */
+    protected static function getDatabaseDriver(): DatabaseDriverContract
+    {
+        try {
+            return app(DatabaseDriverContract::class);
+        } catch (\Exception $e) {
+            throw new DatabaseException("Database driver not available: {$e->getMessage()}", 0, $e);
+        }
+    }
     
+    /**
+     * Get the query builder from the container (transient, new instance)
+     * 
+     * @return QueryBuilderContract
+     * @throws DatabaseException If the query builder is not available
+     */
+    protected static function getQueryBuilder(): QueryBuilderContract
+    {
+        try {
+            return make(QueryBuilderContract::class);
+        } catch (\Exception $e) {
+            throw new DatabaseException("Query builder not available: {$e->getMessage()}", 0, $e);
+        }
+    }
+    
+    /**
+     * @deprecated Use getDatabaseDriver() instead
+     */
     public static function setDatabaseDriver(DatabaseDriverContract $driver)
     {
-        self::$driver = $driver;
+        // Esta función se mantiene solo para compatibilidad con código existente
+        // y ahora no hace nada ya que obtenemos el driver del contenedor
     }
+    
+    /**
+     * @deprecated Use getQueryBuilder() instead
+     */
     public static function setBuilderDriver(QueryBuilderContract $builder)
     {
-        self::$builder = $builder;
+        // Esta función se mantiene solo para compatibilidad con código existente
+        // y ahora no hace nada ya que obtenemos el builder del contenedor
     }
     public function __construct()
     {
@@ -61,19 +96,24 @@ abstract class Model implements JsonSerializable
             $subclass = new \ReflectionClass(static::class);
             $this->table = snakeCase("{$subclass->getShortName()}s");
         }
-        if(self::$builder === null) {
-            throw new DatabaseException("Builder must be QueryBuilderContract");
-        }
-        if(static::$columns === null) {
-            $query = new Builder(self::$builder, static::class);
-            static::$columns = $query->getMetadataOfTableColumns();
-        }
-        // Initialize attributes with defaults from table schema
-        foreach(static::$columns as $column) {
-            // Only set defaults if the attribute doesn't already exist
-            if (!isset($this->attributes[$column->name])) {
-                $this->attributes[$column->name] = $column->default;
+        
+        try {
+            $queryBuilder = static::getQueryBuilder();
+            
+            if(static::$columns === null) {
+                $query = new Builder($queryBuilder, static::class);
+                static::$columns = $query->getMetadataOfTableColumns();
             }
+            
+            // Initialize attributes with defaults from table schema
+            foreach(static::$columns as $column) {
+                // Only set defaults if the attribute doesn't already exist
+                if (!isset($this->attributes[$column->name])) {
+                    $this->attributes[$column->name] = $column->default;
+                }
+            }
+        } catch (\Exception $e) {
+            throw new DatabaseException("Error initializing model: {$e->getMessage()}", 0, $e);
         }
     }
     public function __set($name, $value)
@@ -126,15 +166,21 @@ abstract class Model implements JsonSerializable
     }
     public static function __callStatic($method, $args)
     {
-        if (!method_exists(self::$builder, $method)) {
-            throw new QueryBuilderException("Method $method is not defined.");
+        try {
+            $queryBuilder = static::getQueryBuilder();
+            
+            if (!method_exists($queryBuilder, $method)) {
+                throw new QueryBuilderException("Method $method is not defined.");
+            }
+
+            $instance = new static();
+
+            return (new Builder($queryBuilder, static::class))
+                ->table($instance->getTable())
+                ->{$method}(...$args);
+        } catch (\Exception $e) {
+            throw new QueryBuilderException("Error in static call: {$e->getMessage()}", 0, $e);
         }
-
-        $instance = new static();
-
-        return (new Builder(self::$builder, static::class))
-            ->table($instance->getTable())
-            ->{$method}(...$args);
     }
     public function getTable(): ?string
     {
@@ -251,19 +297,20 @@ abstract class Model implements JsonSerializable
             $attributesToSave["created_at"] = date("Y-m-d H:i:s");
         }
         
-        if (self::$builder === null) {
-            throw new QueryBuilderException("QueryBuilder is not initialized");
+        try {
+            $queryBuilder = static::getQueryBuilder();
+            $builder = new Builder($queryBuilder);
+            $builder->table($this->table);
+            
+            // Use the copied attributes for the insert
+            if ($builder->insert($attributesToSave)) {
+                $this->{$this->primaryKey} = $builder->lastInsertId();
+            }
+            
+            return $this;
+        } catch (\Exception $e) {
+            throw new DatabaseException("Error saving model: {$e->getMessage()}", 0, $e);
         }
-        
-        $builder = new Builder(self::$builder);
-        $builder->table($this->table);
-        
-        // Use the copied attributes for the insert
-        if ($builder->insert($attributesToSave)) {
-            $this->{$this->primaryKey} = $builder->lastInsertId();
-        }
-        
-        return $this;
     }
     
     public function update(): static
@@ -300,16 +347,17 @@ abstract class Model implements JsonSerializable
             }
         }
         
-        if (self::$builder === null) {
-            throw new QueryBuilderException("QueryBuilder is not initialized");
+        try {
+            $queryBuilder = static::getQueryBuilder();
+            $builder = new Builder($queryBuilder);
+            $builder->table($this->table)
+                    ->where($this->primaryKey, '=', $primaryKey)
+                    ->update($attributesToUpdate);
+            
+            return $this;
+        } catch (\Exception $e) {
+            throw new DatabaseException("Error updating model: {$e->getMessage()}", 0, $e);
         }
-        
-        $builder = new Builder(self::$builder);
-        $builder->table($this->table)
-                ->where($this->primaryKey, '=', $primaryKey)
-                ->update($attributesToUpdate);
-        
-        return $this;
     }
     
     public function delete(): static
@@ -319,16 +367,17 @@ abstract class Model implements JsonSerializable
             throw new \RuntimeException("Cannot delete a model without a primary key value");
         }
         
-        if (self::$builder === null) {
-            throw new QueryBuilderException("QueryBuilder is not initialized");
+        try {
+            $queryBuilder = static::getQueryBuilder();
+            $builder = new Builder($queryBuilder);
+            $builder->table($this->table)
+                    ->where($this->primaryKey, '=', $primaryKey)
+                    ->delete();
+            
+            return $this;
+        } catch (\Exception $e) {
+            throw new DatabaseException("Error deleting model: {$e->getMessage()}", 0, $e);
         }
-        
-        $builder = new Builder(self::$builder);
-        $builder->table($this->table)
-                ->where($this->primaryKey, '=', $primaryKey)
-                ->delete();
-        
-        return $this;
     }
     public static function create(array $attributes): static
     {
@@ -341,12 +390,17 @@ abstract class Model implements JsonSerializable
      */
     public static function find(string|int $id): ?static
     {
-        $query = new Builder(self::$builder, static::class);
-        $instance = new static();
-        return $query
-            ->table($instance->getTable())
-            ->where($instance->getPrimaryKeyName(), '=', $id)
-            ->first();
+        try {
+            $queryBuilder = static::getQueryBuilder();
+            $query = new Builder($queryBuilder, static::class);
+            $instance = new static();
+            return $query
+                ->table($instance->getTable())
+                ->where($instance->getPrimaryKeyName(), '=', $id)
+                ->first();
+        } catch (\Exception $e) {
+            throw new DatabaseException("Error finding model: {$e->getMessage()}", 0, $e);
+        }
     }
     /**
      * Return all models
@@ -354,11 +408,16 @@ abstract class Model implements JsonSerializable
      */
     public static function all(): array
     {
-        $query = new Builder(self::$builder, static::class);
-        $instance = new static();
-        return $query
-            ->table($instance->getTable())
-            ->get();
+        try {
+            $queryBuilder = static::getQueryBuilder();
+            $query = new Builder($queryBuilder, static::class);
+            $instance = new static();
+            return $query
+                ->table($instance->getTable())
+                ->get();
+        } catch (\Exception $e) {
+            throw new DatabaseException("Error retrieving all models: {$e->getMessage()}", 0, $e);
+        }
     }
     /**
      * Create a new instance of the Builder for this model
@@ -367,12 +426,14 @@ abstract class Model implements JsonSerializable
      */
     public static function query(): Builder
     {
-        if(self::$builder === null) {
-            throw new QueryBuilderException("Not provided QueryBuilderContract.");
+        try {
+            $queryBuilder = static::getQueryBuilder();
+            $instance = new static();
+            return (new Builder($queryBuilder, static::class))
+                ->table($instance->getTable());
+        } catch (\Exception $e) {
+            throw new QueryBuilderException("Error creating query: {$e->getMessage()}", 0, $e);
         }
-        $instance = new static();
-        return (new Builder(self::$builder, static::class))
-            ->table($instance->getTable());
     }
     
     /**
@@ -382,12 +443,13 @@ abstract class Model implements JsonSerializable
      */
     protected function newQuery(): Builder
     {
-        if(self::$builder === null) {
-            throw new QueryBuilderException("Not provided QueryBuilderContract.");
+        try {
+            $queryBuilder = static::getQueryBuilder();
+            return (new Builder($queryBuilder, static::class))
+                ->table($this->getTable());
+        } catch (\Exception $e) {
+            throw new QueryBuilderException("Error creating new query: {$e->getMessage()}", 0, $e);
         }
-        
-        return (new Builder(self::$builder, static::class))
-            ->table($this->getTable());
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace LightWeight\Http;
 
+use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\HttpMethod;
 use LightWeight\Routing\Route;
 use LightWeight\Storage\File;
@@ -11,7 +12,7 @@ use LightWeight\Validation\Validator;
  * This class represent a Request HTTP.
  *
  */
-class Request
+class Request implements RequestContract
 {
     /**
      * URI requested by the client.
