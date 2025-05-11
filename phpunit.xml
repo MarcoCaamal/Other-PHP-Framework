@@ -30,6 +30,9 @@
         <testsuite name="Validation">
             <directory>./tests/Validation</directory>
         </testsuite>
+        <testsuite name="CLI">
+            <directory>./tests/CLI</directory>
+        </testsuite>
     </testsuites>
     <php>
         <env name="APP_ENV" value="testing"/>
