@@ -8,6 +8,7 @@ use LightWeight\Container\Container;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\Exceptions\DatabaseException;
 use LightWeight\Http\Contracts\RequestContract;
+use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\Http\HttpMethod;
 use LightWeight\Http\HttpNotFoundException;
 use LightWeight\Http\Request;
@@ -229,7 +230,7 @@ class AppTest extends TestCase
         // Expect sendResponse to be called with a 404 response
         $this->serverMock->expects($this->once())
             ->method('sendResponse')
-            ->with($this->callback(function(Response $response) {
+            ->with($this->callback(function(ResponseContract $response) {
                 return $response->getStatus() === 404 &&
                        $response->getContent() === 'Not Found';
             }));
@@ -255,7 +256,7 @@ class AppTest extends TestCase
         // Expect sendResponse to be called with a 422 JSON response
         $this->serverMock->expects($this->once())
             ->method('sendResponse')
-            ->with($this->callback(function(Response $response) {
+            ->with($this->callback(function(ResponseContract $response) {
                 $content = json_decode($response->getContent(), true);
                 return $response->getStatus() === 422 &&
                        $content['message'] === 'Validation Errors' &&
@@ -286,7 +287,7 @@ class AppTest extends TestCase
         // Expect sendResponse to be called with a 500 JSON response
         $this->serverMock->expects($this->once())
             ->method('sendResponse')
-            ->with($this->callback(function(Response $response) {
+            ->with($this->callback(function(ResponseContract $response) {
                 $content = json_decode($response->getContent(), true);
                 return $response->getStatus() === 500 &&
                        $content['message'] === 'Connection failed' &&

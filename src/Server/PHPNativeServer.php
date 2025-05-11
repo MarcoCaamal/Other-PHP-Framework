@@ -3,6 +3,7 @@
 namespace LightWeight\Server;
 
 use LightWeight\Http\Contracts\RequestContract;
+use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\Http\HttpMethod;
 use LightWeight\Http\Request;
 use LightWeight\Server\Contracts\ServerContract;
@@ -55,7 +56,7 @@ class PHPNativeServer implements ServerContract
     /**
      * @inheritDoc
      */
-    public function sendResponse(\LightWeight\Http\Response $response)
+    public function sendResponse(ResponseContract $response)
     {
         // PHP sends Content-Type header by default, but it has to be removed if
         // the response has not content. Content-Type header can't be removed

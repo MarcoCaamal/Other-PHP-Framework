@@ -4,6 +4,7 @@ namespace LightWeight\Tests\Http;
 
 use PHPUnit\Framework\TestCase;
 
+use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\Http\Response;
 
 class ResponseTest extends TestCase

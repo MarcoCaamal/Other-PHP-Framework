@@ -3,7 +3,7 @@
 namespace LightWeight\Server\Contracts;
 
 use LightWeight\Http\Contracts\RequestContract;
-use LightWeight\Http\Response;
+use LightWeight\Http\Contracts\ResponseContract;
 
 /**
  * Similar to PHP `$_SERVER` but having an interface allows us to mock these
@@ -22,5 +22,5 @@ interface ServerContract
      *
      * @return void
      */
-    public function sendResponse(Response $response);
+    public function sendResponse(ResponseContract $response);
 }

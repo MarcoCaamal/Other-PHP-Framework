@@ -4,6 +4,7 @@ namespace LightWeight\Tests\Routing;
 
 use LightWeight\Http\Contracts\MiddlewareContract;
 use LightWeight\Http\Contracts\RequestContract;
+use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\Http\Response;
 use PHPUnit\Framework\TestCase;
 

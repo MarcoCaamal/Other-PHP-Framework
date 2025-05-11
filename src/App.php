@@ -12,6 +12,7 @@ use LightWeight\Database\QueryBuilder\Drivers\MySQLQueryBuilder;
 use LightWeight\Http\HttpMethod;
 use LightWeight\Http\HttpNotFoundException;
 use LightWeight\Http\Contracts\RequestContract;
+use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\Http\Request;
 use LightWeight\Http\Response;
 use LightWeight\Routing\Router;
@@ -91,10 +92,10 @@ class App
     /**
      * Terminate the application with a response
      *
-     * @param Response $response The response to send
+     * @param ResponseContract $response The response to send
      * @return void
      */
-    public function terminate(Response $response): void
+    public function terminate(ResponseContract $response): void
     {
         $this->prepareNextRequest();
         $this->setCors($response);
@@ -175,10 +176,10 @@ class App
     /**
      * Apply CORS headers to the response
      * 
-     * @param Response $response The response to apply CORS headers to
+     * @param ResponseContract $response The response to apply CORS headers to
      * @return self
      */
-    public function setCors(Response &$response): self
+    public function setCors(ResponseContract &$response): self
     {
         $allowedOrigins = config('cors.allowed_origins', []);
         $this->setAllowOriginHeader($response, $allowedOrigins);
@@ -216,11 +217,11 @@ class App
     /**
      * Set the Access-Control-Allow-Origin header on the response
      * 
-     * @param Response $response The response to set headers on
+     * @param ResponseContract $response The response to set headers on
      * @param array $allowedOrigins List of allowed origins
      * @return void
      */
-    protected function setAllowOriginHeader(Response &$response, array $allowedOrigins): void
+    protected function setAllowOriginHeader(ResponseContract &$response, array $allowedOrigins): void
     {
         if (in_array('*', $allowedOrigins)) {
             $response->setHeader('Access-Control-Allow-Origin', '*');
@@ -336,9 +337,9 @@ class App
      * @param Throwable $e The exception
      * @param int $status HTTP status code
      * @param string $message User-friendly message
-     * @return Response
+     * @return ResponseContract
      */
-    protected function createExceptionResponse(Throwable $e, int $status, string $message): Response
+    protected function createExceptionResponse(Throwable $e, int $status, string $message): ResponseContract
     {
         $data = [
             'error' => $e::class,
@@ -367,10 +368,10 @@ class App
     /**
      * Abort the application with a response
      *
-     * @param Response $response
+     * @param ResponseContract $response
      * @return void
      */
-    public function abort(Response $response): void
+    public function abort(ResponseContract $response): void
     {
         $this->terminate($response);
     }

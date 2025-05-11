@@ -2,12 +2,13 @@
 
 namespace LightWeight\Http;
 
+use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\View\Contracts\ViewContract;
 
 /**
  * This class respresnts a HTTP Response that it will be sending to the client.
  */
-class Response
+class Response implements ResponseContract
 {
     /**
      * Response HTTP status code.
