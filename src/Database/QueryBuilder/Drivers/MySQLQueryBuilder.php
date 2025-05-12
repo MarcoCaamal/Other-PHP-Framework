@@ -29,7 +29,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
     protected array $aggregate = [];
 
     // Helper methods
-    protected function reset(): void
+    protected function resetInternal(): void
     {
         $this->columns = ['*'];
         $this->wheres = [];
@@ -44,6 +44,18 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $this->distinct = false;
         $this->unions = [];
         $this->aggregate = [];
+    }
+    
+    /**
+     * Reset the query builder state.
+     * Clears all conditions, joins, orders, limits, etc.
+     *
+     * @return static
+     */
+    public function reset(): static
+    {
+        $this->resetInternal();
+        return $this;
     }
 
     protected function compileSelect(): string
@@ -197,7 +209,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $bindingValues = array_values($this->bindings);
         
         $result = $this->db->execute($sql, $bindingValues);
-        $this->reset();
+        $this->resetInternal();
 
         return $result;
     }
@@ -208,7 +220,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
     public function first(): array|null
     {
         $result = $this->limit(1)->get();
-        $this->reset();
+        $this->resetInternal();
         return $result ? $result[0] : null;
     }
 
@@ -223,7 +235,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $bindingValues = array_values($this->bindings);
         
         $result = $this->db->statement($sql, $bindingValues);
-        $this->reset();
+        $this->resetInternal();
         return $result;
     }
 
@@ -241,7 +253,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})";
         
         $result = $this->db->execute($sql, array_values($data));
-        $this->reset();
+        $this->resetInternal();
 
         return $result;
     }
@@ -341,6 +353,19 @@ class MySQLQueryBuilder implements QueryBuilderContract
     }
 
     /**
+     * Add a raw select expression to the query.
+     *
+     * @param string $expression The raw SQL expression to add to the select clause
+     * @return static
+     */
+    public function selectRaw(string $expression): static
+    {
+        // Reemplazamos completamente la columna seleccionada con la expresión raw
+        $this->columns = [$expression];
+        return $this;
+    }
+
+    /**
      * @inheritDoc
      */
     public function table(string $table): static
@@ -374,7 +399,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $allValues = array_merge($updateValues, array_values($this->bindings));
         
         $result = $this->db->execute($sql, $allValues);
-        $this->reset();
+        $this->resetInternal();
 
         return $result;
     }
@@ -1029,5 +1054,15 @@ class MySQLQueryBuilder implements QueryBuilderContract
         }
 
         return $this;
+    }
+
+    /**
+     * Get the database connection instance.
+     *
+     * @return \LightWeight\Database\Contracts\DatabaseDriverContract
+     */
+    public function getConnection()
+    {
+        return $this->db;
     }
 }

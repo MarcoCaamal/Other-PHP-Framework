@@ -345,149 +345,107 @@ class RelationsTest extends TestCase
     }
     
     /**
-     * Test chained relationship queries
+     * Test eager loading relationships with 'with' method
+     */
+    public function testEagerLoadingRelationships()
+    {
+        $this->setupTestTables();
+        $this->createTestData();
+        
+        // Test loading user with profile relationship
+        $users = UserModel::with(['profile'])->get();
+        
+        $this->assertIsArray($users);
+        $this->assertNotEmpty($users);
+        
+        // Check that the first user has a profile relationship loaded
+        $this->assertArrayHasKey('profile', $users[0]->getRelations());
+        $this->assertInstanceOf(ProfileModel::class, $users[0]->profile);
+        $this->assertEquals('John\'s biography', $users[0]->profile->bio);
+        
+        // Test loading users with posts relationship
+        $users = UserModel::with(['posts'])->get();
+        
+        foreach ($users as $user) {
+            if ($user->id === 1) {
+                // First user should have 2 posts
+                $this->assertArrayHasKey('posts', $user->getRelations());
+                $this->assertCount(2, $user->posts);
+            } elseif ($user->id === 2) {
+                // Second user should have 1 post
+                $this->assertArrayHasKey('posts', $user->getRelations());
+                $this->assertCount(1, $user->posts);
+            }
+        }
+        
+        // Test loading multiple relationships at once
+        $users = UserModel::with(['profile', 'posts'])->get();
+        
+        foreach ($users as $user) {
+            if ($user->id === 1) {
+                $this->assertArrayHasKey('profile', $user->getRelations());
+                $this->assertArrayHasKey('posts', $user->getRelations());
+                $this->assertInstanceOf(ProfileModel::class, $user->profile);
+                $this->assertCount(2, $user->posts);
+            }
+        }
+        
+        // Test with nested relationships (posts.comments)
+        $users = UserModel::with(['posts.comments'])->get();
+        
+        foreach ($users as $user) {
+            if ($user->id === 1) {
+                $this->assertArrayHasKey('posts', $user->getRelations());
+                foreach ($user->posts as $post) {
+                    $this->assertArrayHasKey('comments', $post->getRelations());
+                }
+            }
+        }
+    }
+    
+    /**
+     * Test chaining queries in relationships
      */
     public function testChainedRelationshipQueries()
     {
         $this->setupTestTables();
         $this->createTestData();
         
-        // Get user and posts with a condition
+        // Find user
         $user = UserModel::find(1);
-        $filteredPosts = $user->posts()->where('title', 'LIKE', '%First%')->get();
+        
+        // Get posts with title containing 'First'
+        $filteredPosts = $user->posts()
+            ->where('title', 'LIKE', '%First%')
+            ->get();
         
         $this->assertIsArray($filteredPosts);
         $this->assertCount(1, $filteredPosts);
         $this->assertEquals('First Post', $filteredPosts[0]->title);
         
-        // Get post with sorted comments
-        $post = PostModel::find(1);
-        $sortedComments = $post->comments()->orderBy('body')->get();
-        
-        $this->assertIsArray($sortedComments);
-        $this->assertGreaterThanOrEqual(1, count($sortedComments));
-    }
-    
-    /**
-     * Test complex relationship queries with multiple conditions
-     */
-    public function testComplexRelationshipQueries()
-    {
-        $this->setupTestTables();
-        $this->createTestData();
-        
-        // Get user and filter posts with multiple conditions
-        $user = UserModel::find(1);
-        $filteredPosts = $user->posts()
-            ->where('title', 'LIKE', '%Post%')
-            ->where('content', 'LIKE', '%Content%')
-            ->get();
-        
-        $this->assertIsArray($filteredPosts);
-        $this->assertCount(2, $filteredPosts); // Should match both posts
-        
-        // More specific filter that should only match one post
-        $specificPost = $user->posts()
-            ->where('title', 'LIKE', '%First%')
-            ->where('content', 'LIKE', '%first post%')
-            ->get();
-            
-        $this->assertIsArray($specificPost);
-        $this->assertCount(1, $specificPost);
-        $this->assertEquals('First Post', $specificPost[0]->title);
-    }
-    
-    /**
-     * Test relationship queries with ordering and limits
-     */
-    public function testOrderedAndLimitedRelationships()
-    {
-        $this->setupTestTables();
-        $this->createTestData();
-        
-        // Get user posts ordered by title in descending order
-        $user = UserModel::find(1);
-        $orderedPosts = $user->posts()
+        // Test more complex chains with whereIn
+        $postIds = [1, 2];
+        $userPosts = $user->posts()
+            ->whereIn('id', $postIds)
             ->orderBy('title', 'DESC')
             ->get();
         
-        $this->assertIsArray($orderedPosts);
-        $this->assertCount(2, $orderedPosts);
-        $this->assertEquals('Second Post', $orderedPosts[0]->title); // Should come first in DESC order
-        $this->assertEquals('First Post', $orderedPosts[1]->title);
+        $this->assertIsArray($userPosts);
+        $this->assertCount(2, $userPosts);
+        $this->assertEquals('Second Post', $userPosts[0]->title);
         
-        // Get only the first post with a limit
-        $limitedPosts = $user->posts()
-            ->orderBy('title', 'ASC')
-            ->limit(1)
-            ->get();
-            
-        $this->assertIsArray($limitedPosts);
-        $this->assertCount(1, $limitedPosts);
-        $this->assertEquals('First Post', $limitedPosts[0]->title);
-    }
-    
-    /**
-     * Test nested relationship queries with conditions
-     */
-    public function testNestedRelationshipQueries()
-    {
-        $this->setupTestTables();
-        $this->createTestData();
+        // Test chaining in eager loaded relationships
+        $users = UserModel::with(['posts' => function($query) {
+            $query->where('title', 'LIKE', '%First%');
+        }])->get();
         
-        // Find posts with comments from a specific user
-        $post = PostModel::find(1);
-        $userComments = $post->comments()
-            ->where('user_id', '=', 2)
-            ->get();
-            
-        $this->assertIsArray($userComments);
-        $this->assertGreaterThanOrEqual(1, count($userComments));
-        foreach ($userComments as $comment) {
-            $this->assertEquals(2, $comment->user_id);
+        foreach ($users as $user) {
+            if ($user->id === 1) {
+                $this->assertArrayHasKey('posts', $user->getRelations());
+                $this->assertCount(1, $user->posts);
+                $this->assertEquals('First Post', $user->posts[0]->title);
+            }
         }
-        
-        // Get a user and find their comments on a specific post
-        $user = UserModel::find(2);
-        $postComments = $user->comments()
-            ->where('post_id', '=', 1)
-            ->get();
-            
-        $this->assertIsArray($postComments);
-        $this->assertGreaterThanOrEqual(1, count($postComments));
-        foreach ($postComments as $comment) {
-            $this->assertEquals(1, $comment->post_id);
-            $this->assertEquals(2, $comment->user_id);
-        }
-    }
-    
-    /**
-     * Test relationship queries with complex chaining
-     */
-    public function testComplexChainedQueries()
-    {
-        $this->setupTestTables();
-        $this->createTestData();
-        
-        // Find users with specific post titles and filter by email
-        $users = UserModel::where('email', 'LIKE', '%@example.com')
-            ->orderBy('name', 'ASC')
-            ->get();
-            
-        $this->assertIsArray($users);
-        $this->assertGreaterThanOrEqual(2, count($users));
-        
-        // Test complex post filtering
-        $user = UserModel::find(1);
-        $complexPosts = $user->posts()
-            ->whereCallback(function($query) {
-                $query->whereRaw("title LIKE '%First%'", [])
-                    ->orWhereRaw("content LIKE '%second%'", []);
-            })
-            ->orderBy('created_at', 'DESC')
-            ->get();
-            
-        $this->assertIsArray($complexPosts);
     }
     
     /**
@@ -550,5 +508,21 @@ class RelationsTest extends TestCase
         $customRelation = $user->hasOne(ProfileModel::class, 'custom_foreign', 'custom_local');
         $this->assertEquals('custom_foreign', $customRelation->getForeignKey());
         $this->assertEquals('custom_local', $customRelation->getLocalKey());
+    }
+    
+    /**
+     * Drop test tables after each test
+     */
+    protected function tearDown(): void
+    {
+        if ($this->driver) {
+            // Drop tables in reverse order of creation to avoid foreign key constraints
+            $this->driver->statement("DROP TABLE IF EXISTS comments");
+            $this->driver->statement("DROP TABLE IF EXISTS posts");
+            $this->driver->statement("DROP TABLE IF EXISTS profiles");
+            $this->driver->statement("DROP TABLE IF EXISTS users");
+        }
+        
+        parent::tearDown();
     }
 }

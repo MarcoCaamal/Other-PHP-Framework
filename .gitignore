@@ -4,3 +4,5 @@ vendor/
 /tests/Database/migrations
 .env
 .phpunit.result.cache
+apache_access.log
+apache_error.log

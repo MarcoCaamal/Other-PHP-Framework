@@ -604,4 +604,108 @@ abstract class Model implements JsonSerializable
         
         return $this;
     }
+    
+    /**
+     * Set relationships that should be eager loaded.
+     *
+     * @param string|array $relations
+     * @return Builder
+     */
+    public static function with($relations): Builder
+    {
+        $instance = new static;
+        $query = $instance->newQuery();
+        
+        $relations = is_array($relations) ? $relations : func_get_args();
+        $query->eagerLoadRelations($relations);
+        
+        return $query;
+    }
+    
+    // withCount method removed
+    
+    /**
+     * Save a new model and associate it with this parent model.
+     *
+     * @param Model $model
+     * @param string $relation
+     * @return Model
+     */
+    public function associate(Model $model, string $relation): Model
+    {
+        // Get the relation instance
+        $relationInstance = $this->$relation();
+        
+        if ($relationInstance instanceof BelongsTo) {
+            // Set the foreign key on this model to the related model's key
+            $this->{$relationInstance->getForeignKey()} = $model->getKey();
+            $this->save();
+            
+            // Store the relation
+            $this->relations[$relation] = $model;
+            
+            return $this;
+        }
+        
+        throw new \RuntimeException("The relation {$relation} is not a BelongsTo relation");
+    }
+
+    /**
+     * Save a related model for a HasOne or HasMany relationship.
+     * 
+     * @param string $relation Relation name
+     * @param Model $model Model to save
+     * @return Model The saved model
+     */
+    public function saveRelated(string $relation, Model $model): Model
+    {
+        // Get the relation instance
+        $relationInstance = $this->$relation();
+        
+        if ($relationInstance instanceof HasOne || $relationInstance instanceof HasMany) {
+            // Set the foreign key on the related model
+            $foreignKey = $relationInstance->getForeignKey();
+            $localKey = $relationInstance->getLocalKey();
+            
+            $model->{$foreignKey} = $this->{$localKey};
+            $model->save();
+            
+            // Store the relation in the relations array
+            if ($relationInstance instanceof HasOne) {
+                $this->relations[$relation] = $model;
+            } elseif ($relationInstance instanceof HasMany) {
+                if (!isset($this->relations[$relation])) {
+                    $this->relations[$relation] = [];
+                }
+                $this->relations[$relation][] = $model;
+            }
+            
+            return $model;
+        }
+        
+        throw new \RuntimeException("The relation {$relation} is not a HasOne or HasMany relation");
+    }
+    
+    /**
+     * Get all the loaded relations for the model.
+     *
+     * @return array
+     */
+    public function getRelations(): array
+    {
+        return $this->relations;
+    }
+    
+    /**
+     * Set a relationship on the model.
+     *
+     * @param string $relation
+     * @param mixed $value
+     * @return $this
+     */
+    public function setRelation(string $relation, $value): self
+    {
+        $this->relations[$relation] = $value;
+        return $this;
+    }
 }
