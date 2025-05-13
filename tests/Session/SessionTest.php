@@ -6,21 +6,50 @@ use LightWeight\Session\Contracts\SessionStorageContract;
 use LightWeight\Session\Session;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Mock implementation of SessionStorageContract for testing
+ */
+class MockSessionStorage implements SessionStorageContract
+{
+    public array $storage = [];
+    
+    public function start() {}
+    
+    public function save() {}
+    
+    public function id(): string
+    {
+        return "id";
+    }
+    
+    public function get(string $key, $default = null)
+    {
+        return $this->storage[$key] ?? $default;
+    }
+    
+    public function set(string $key, mixed $value)
+    {
+        $this->storage[$key] = $value;
+    }
+    
+    public function has(string $key): bool
+    {
+        return isset($this->storage[$key]);
+    }
+    
+    public function remove(string $key)
+    {
+        unset($this->storage[$key]);
+    }
+    
+    public function destroy() {}
+}
+
 class SessionTest extends TestCase
 {
     private function createMockSessionStorage()
     {
-        // $mock = $this->getMockBuilder(SessionContract::class)->getMock();
-        $mock = $this->createMock(SessionStorageContract::class);
-        $mock->method("id")->willReturn("id");
-        $mock->storage = [];
-        $mock->method("has")->willReturnCallback(fn ($key) => isset($mock->storage[$key]));
-        $mock->method("get")->willReturnCallback(fn ($key) => $mock->storage[$key] ?? null);
-        $mock->method("set")->willReturnCallback(fn ($key, $value) => $mock->storage[$key] = $value);
-        $mock->method("remove")->willReturnCallback(function ($key) use ($mock) {
-            unset($mock->storage[$key]);
-        });
-        return $mock;
+        return new MockSessionStorage();
     }
     public function testAgeFlashData()
     {

@@ -17,7 +17,7 @@ class Migrator
         $this->migrationsDirectory = $migrationsDirectory;
         $this->templatesDirectory = $templatesDirectory;
         $this->driver = $driver;
-        $this->$logProgress = $logProgress;
+        $this->logProgress = $logProgress;
         $this->output = new ConsoleOutput();
     }
 

@@ -157,7 +157,7 @@ abstract class Relation
      * @param callable|null $default
      * @return $this
      */
-    public function when($value, callable $callback, callable $default = null)
+    public function when($value, callable $callback, ?callable $default = null)
     {
         if ($value) {
             return $callback($this, $value) ?: $this;
