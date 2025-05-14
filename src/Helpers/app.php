@@ -63,6 +63,16 @@ function rootDirectory(): string
 {
     return App::$root;
 }
+/**
+ * Get the path to the storage directory.
+ *
+ * @param  string  $path
+ * @return string
+ */
+function storagePath(string $path = ''): string
+{
+    return App::$root . '/storage' . ($path ? '/' . ltrim($path, '/') : '');
+}
 function debugDie($var)
 {
     echo var_dump($var);
