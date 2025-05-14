@@ -1,15 +1,18 @@
 <?php
 
 use LightWeight\Database\Migrations\Contracts\MigrationContract;
+use LightWeight\Database\Migrations\Schema;
+use LightWeight\Database\Migrations\Blueprint;
 use LightWeight\Database\DB;
 
 return new class () implements MigrationContract {
     public function up()
     {
-        DB::statement("\$UP");
+        UP_STATEMENT_PLACEHOLDER
     }
+    
     public function down()
     {
-        DB::statement("\$DOWN");
+        DOWN_STATEMENT_PLACEHOLDER
     }
 };

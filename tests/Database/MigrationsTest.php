@@ -25,6 +25,15 @@ class MigrationsTest extends TestCase
         if (!file_exists($this->migrationsDirectory)) {
             mkdir($this->migrationsDirectory);
         }
+        
+        // Asegurarse de que existe la plantilla de migración para pruebas
+        if (!file_exists("$this->templatesDirectory/migration.template")) {
+            copy(
+                "/home/marco/public_html/LightWeight/src/templates/migration.template",
+                "$this->templatesDirectory/migration.template"
+            );
+        }
+        
         $this->dbSetUp();
         $this->migrator = new Migrator(
             $this->migrationsDirectory,
@@ -74,15 +83,22 @@ class MigrationsTest extends TestCase
     #[Depends('testCreatesMigrationFiles')]
     public function testMigrateFiles()
     {
+        // Crear migraciones para tablas usando el nuevo Schema
         $tables = ["users", "products", "sellers"];
         $migrated = [];
         foreach ($tables as $table) {
             $migrated[] = $this->migrator->make("create_{$table}_table");
         }
+        
+        // Ejecutar las migraciones
         $this->migrator->migrate();
+        
+        // Verificar que se registraron las migraciones
         $rows = $this->driver->statement("SELECT * FROM migrations");
         $this->assertEquals(3, count($rows));
         $this->assertEquals($migrated, array_column($rows, "name"));
+        
+        // Verificar que las tablas fueron creadas
         foreach ($tables as $table) {
             try {
                 $this->driver->statement("SELECT * FROM $table");
@@ -90,44 +106,80 @@ class MigrationsTest extends TestCase
                 $this->fail("Failed accessing migrated table $table: {$e->getMessage()}");
             }
         }
+        
+        // Verificar que cada tabla tiene al menos las columnas id, created_at y updated_at
+        foreach ($tables as $table) {
+            $columns = $this->driver->statement("SHOW COLUMNS FROM $table");
+            $columnNames = array_column($columns, 'Field');
+            $this->assertContains('id', $columnNames);
+            $this->assertContains('created_at', $columnNames);
+            $this->assertContains('updated_at', $columnNames);
+        }
     }
     #[Depends('testCreatesMigrationFiles')]
     public function testRollbackFiles()
     {
+        // Crear migraciones para varias tablas
         $tables = ["users", "products", "sellers", "providers", "referals"];
         $migrated = [];
+        
         foreach ($tables as $table) {
             $migrated[] = $this->migrator->make("create_{$table}_table");
         }
+        
+        // Ejecutar migraciones
         $this->migrator->migrate();
-        // Rollback last migration
+        
+        // Revertir la última migración
         $this->migrator->rollback(1);
+        
+        // Verificar que se eliminó la última migración
         $rows = $this->driver->statement("SELECT * FROM migrations");
         $this->assertEquals(4, count($rows));
         $this->assertEquals(array_slice($migrated, 0, 4), array_column($rows, "name"));
+        
+        // Verificar que la tabla fue eliminada
+        $lastTable = $tables[count($tables) - 1];
         try {
-            $table = $table[count($tables) - 1];
-            $this->driver->statement("SELECT * FROM $table");
-            $this->fail("Table $table was not deleted after rolling back");
+            $this->driver->statement("SELECT * FROM $lastTable");
+            $this->fail("Table $lastTable was not deleted after rolling back");
         } catch (PDOException $e) {
-            // OK
+            // OK - Se espera que la tabla no exista
         }
-        // Rollback another 2 migrationss
+        
+        // Revertir otras 2 migraciones
         $this->migrator->rollback(2);
+        
+        // Verificar que se eliminaron las migraciones
         $rows = $this->driver->statement("SELECT * FROM migrations");
         $this->assertEquals(2, count($rows));
         $this->assertEquals(array_slice($migrated, 0, 2), array_column($rows, "name"));
+        
+        // Verificar que las tablas fueron eliminadas
         foreach (array_slice($tables, 2, 2) as $table) {
             try {
                 $this->driver->statement("SELECT * FROM $table");
                 $this->fail("Table '$table' was not deleted after rolling back");
             } catch (PDOException $e) {
-                // OK
+                // OK - Se espera que la tabla no exista
             }
         }
-        // Rollback remaining
+        
+        // Revertir las migraciones restantes
         $this->migrator->rollback();
+        
+        // Verificar que todas las migraciones fueron eliminadas
         $rows = $this->driver->statement("SELECT * FROM migrations");
         $this->assertEquals(0, count($rows));
+        
+        // Verificar que todas las tablas fueron eliminadas
+        foreach ($tables as $table) {
+            try {
+                $this->driver->statement("SELECT * FROM $table");
+                $this->fail("Table '$table' was not deleted after rolling back all migrations");
+            } catch (PDOException $e) {
+                // OK - Se espera que la tabla no exista
+            }
+        }
     }
 }

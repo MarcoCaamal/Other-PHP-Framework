@@ -38,6 +38,18 @@ class DB
     }
     
     /**
+     * Execute a select query against the database
+     * 
+     * @param string $query
+     * @param array $bindings
+     * @return array
+     */
+    public static function select(string $query, array $bindings = []): array
+    {
+        return self::statement($query, $bindings);
+    }
+    
+    /**
      * Begin a transaction
      */
     public static function beginTransaction(): bool

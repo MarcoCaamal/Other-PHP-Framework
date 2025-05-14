@@ -8,14 +8,11 @@ use LightWeight\Database\DB;
 return new class () implements MigrationContract {
     public function up()
     {
-        Schema::create('products', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+        UP_STATEMENT_PLACEHOLDER
     }
     
     public function down()
     {
-        Schema::dropIfExists('products');
+        DOWN_STATEMENT_PLACEHOLDER
     }
 };
