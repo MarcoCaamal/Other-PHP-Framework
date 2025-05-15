@@ -344,6 +344,133 @@ class BlueprintAdvancedTest extends TestCase
     }
     
     /**
+     * Prueba el acortamiento de nombres para claves foráneas
+     */
+    public function testForeignKeyNameShortening()
+    {
+        // Crear una instancia de Blueprint para probar el método protegido usando reflexión
+        $blueprint = new Blueprint('test_table');
+        $reflectionClass = new \ReflectionClass(Blueprint::class);
+        
+        // Hacer accesible el método protegido shortenIdentifier
+        $method = $reflectionClass->getMethod('shortenIdentifier');
+        $method->setAccessible(true);
+        
+        // Probar varios casos de acortamiento
+        $testCases = [
+            'nombre_corto' => 'nombre_corto',           // No debería cambiarse
+            'nombre_largo_que_necesita_acortarse' => 'nmbr_lrg_q',    // Debe acortarse
+            'inventory_equipment_reference' => 'nvntry_qpm',         // Debe acortarse
+            'usuarios_administradores_sistema' => 'srs_dmnstr',      // Debe acortarse
+            'a' => 'a',                                 // No debería cambiarse
+            'aeiou' => 'aeiou'                          // No debería cambiarse
+        ];
+        
+        foreach ($testCases as $original => $expectedLength) {
+            $shortened = $method->invoke($blueprint, $original, 10);
+            $this->assertLessThanOrEqual(10, strlen($shortened), "El identificador acortado '$shortened' excede la longitud máxima");
+            
+            if (strlen($original) <= 10) {
+                $this->assertEquals($original, $shortened, "El identificador corto no debería modificarse");
+            } else {
+                $this->assertNotEquals($original, $shortened, "El identificador largo debería acortarse");
+            }
+        }
+        
+        // Probar diferentes longitudes máximas
+        $longIdentifier = 'columna_extremadamente_larga_que_definitivamente_debe_ser_acortada';
+        
+        $shortened5 = $method->invoke($blueprint, $longIdentifier, 5);
+        $this->assertLessThanOrEqual(5, strlen($shortened5));
+        
+        $shortened15 = $method->invoke($blueprint, $longIdentifier, 15);
+        $this->assertLessThanOrEqual(15, strlen($shortened15));
+        
+        $shortened30 = $method->invoke($blueprint, $longIdentifier, 30);
+        $this->assertLessThanOrEqual(30, strlen($shortened30));
+    }
+    
+    /**
+     * Prueba la creación de nombres de claves foráneas con límite de longitud
+     */
+    public function testCreateForeignKeyName()
+    {
+        // Crear una instancia de Blueprint para probar el método protegido usando reflexión
+        $blueprint = new Blueprint('test_table');
+        $reflectionClass = new \ReflectionClass(Blueprint::class);
+        
+        // Hacer accesible el método protegido createForeignKeyName
+        $method = $reflectionClass->getMethod('createForeignKeyName');
+        $method->setAccessible(true);
+        
+        $testCases = [
+            // Caso: nombres cortos (no deberían modificarse significativamente)
+            [
+                'table' => 'users', 
+                'foreignTable' => 'roles', 
+                'columns' => ['role_id'],
+                'maxLength' => 64
+            ],
+            // Caso: nombres medianos
+            [
+                'table' => 'user_profiles', 
+                'foreignTable' => 'organizations', 
+                'columns' => ['organization_id'],
+                'maxLength' => 64
+            ],
+            // Caso: nombres largos
+            [
+                'table' => 'organization_department_employee_assignments', 
+                'foreignTable' => 'employee_position_history_records', 
+                'columns' => ['employee_position_id', 'assignment_reference_code'],
+                'maxLength' => 64
+            ],
+            // Caso extremo: nombres muy largos y múltiples columnas
+            [
+                'table' => 'international_organization_department_employee_assignments_with_very_long_name', 
+                'foreignTable' => 'employee_historical_position_department_reference_records_extended', 
+                'columns' => [
+                    'employee_position_historical_id', 
+                    'assignment_reference_code_extended',
+                    'international_department_code',
+                    'additional_verification_token'
+                ],
+                'maxLength' => 64
+            ],
+        ];
+        
+        foreach ($testCases as $case) {
+            $foreignKeyName = $method->invokeArgs(
+                $blueprint, 
+                [
+                    $case['table'], 
+                    $case['foreignTable'], 
+                    $case['columns'],
+                    $case['maxLength']
+                ]
+            );
+            
+            // Verificar longitud máxima
+            $this->assertLessThanOrEqual(
+                $case['maxLength'], 
+                strlen($foreignKeyName), 
+                "El nombre de clave foránea debería ser menor o igual a {$case['maxLength']} caracteres"
+            );
+            
+            // Verificar que el nombre comienza con fk_
+            $this->assertStringStartsWith(
+                'fk_', 
+                $foreignKeyName, 
+                "El nombre de clave foránea debería comenzar con 'fk_'"
+            );
+            
+            echo "Original: table={$case['table']}, foreignTable={$case['foreignTable']}, columns=" . 
+                 implode(',', $case['columns']) . "\n";
+            echo "Generated FK name: $foreignKeyName (" . strlen($foreignKeyName) . " chars)\n\n";
+        }
+    }
+    
+    /**
      * Verifica si una tabla existe en la base de datos
      */
     protected function tableExists(string $tableName): bool

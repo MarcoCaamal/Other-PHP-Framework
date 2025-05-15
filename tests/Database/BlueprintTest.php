@@ -383,4 +383,49 @@ class BlueprintTest extends TestCase
         $this->assertStringContainsString("UNIQUE", $createTableSql);
         $this->assertStringContainsString("`appointment_time`", $createTableSql);
     }
+    
+    /**
+     * Prueba que las claves foráneas con nombres largos se acorten correctamente
+     */
+    public function testLongForeignKeyNames()
+    {
+        // Crear tablas con nombres largos y columnas con nombres largos
+        Schema::create('tabla_con_nombre_muy_largo_para_prueba', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre_de_columna_muy_largo_para_pruebas');
+            $table->string('otra_columna_con_nombre_largo');
+        });
+        
+        Schema::create('otra_tabla_referenciada_con_nombre_largo', function (Blueprint $table) {
+            $table->id();
+            $table->integer('columna_referencia_a_tabla_anterior_id');
+            $table->string('descripcion_de_la_relacion');
+            
+            // Añadir clave foránea con nombres largos
+            $table->foreign('columna_referencia_a_tabla_anterior_id')
+                  ->references('id')
+                  ->on('tabla_con_nombre_muy_largo_para_prueba');
+        });
+        
+        // Verificar que se creó la relación correctamente
+        $createTableSql = $this->driver->statement(
+            "SHOW CREATE TABLE otra_tabla_referenciada_con_nombre_largo"
+        )[0]['Create Table'];
+        
+        // La relación debe existir
+        $this->assertStringContainsString('FOREIGN KEY', $createTableSql);
+        $this->assertStringContainsString('`columna_referencia_a_tabla_anterior_id`', $createTableSql);
+        $this->assertStringContainsString('`tabla_con_nombre_muy_largo_para_prueba`', $createTableSql);
+        
+        // Verificar que el nombre de la restricción no supera los 64 caracteres
+        preg_match('/CONSTRAINT `([^`]+)`/', $createTableSql, $matches);
+        
+        if (isset($matches[1])) {
+            $constraintName = $matches[1];
+            $this->assertLessThanOrEqual(64, strlen($constraintName), 
+                "El nombre de la restricción es demasiado largo: " . strlen($constraintName) . " caracteres");
+        } else {
+            $this->fail("No se pudo encontrar el nombre de la restricción en la consulta SQL");
+        }
+    }
 }

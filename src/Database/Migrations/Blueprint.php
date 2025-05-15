@@ -964,9 +964,83 @@ class Blueprint
         $columns = implode(', ', array_map(fn($col) => "`$col`", $command['columns']));
         $foreignColumns = implode(', ', array_map(fn($col) => "`$col`", $command['foreignColumns']));
         
-        return "CONSTRAINT `fk_{$this->table}_{$command['table']}_" . implode('_', $command['columns']) . "` " .
+        $constraintName = $this->createForeignKeyName($this->table, $command['table'], $command['columns']);
+        
+        return "CONSTRAINT `$constraintName` " .
                "FOREIGN KEY ($columns) " .
                "REFERENCES {$command['table']}($foreignColumns)";
+    }
+    
+    /**
+     * Crea un nombre para la clave foránea que cumpla con el límite de 64 caracteres de MySQL
+     *
+     * @param string $table Tabla local
+     * @param string $foreignTable Tabla referenciada
+     * @param array $columns Columnas locales
+     * @param int $maxLength Longitud máxima del nombre (MySQL tiene un límite de 64 caracteres)
+     * @return string
+     */
+    protected function createForeignKeyName(string $table, string $foreignTable, array $columns, int $maxLength = 64): string
+    {
+        // Prefijo estándar para claves foráneas
+        $prefix = 'fk_';
+        
+        // Acortamos nombres de tablas si son muy largos
+        $tableShort = $this->shortenIdentifier($table, 10);
+        $foreignTableShort = $this->shortenIdentifier($foreignTable, 10);
+        
+        // Acortamos nombres de columnas si hay varias o son muy largas
+        $columnsStr = '';
+        if (count($columns) > 3) {
+            // Si hay más de 3 columnas, solo usamos las primeras y añadimos "etc"
+            $columnsStr = $this->shortenIdentifier(implode('_', array_slice($columns, 0, 2)) . '_etc', 15);
+        } else {
+            // Acortamos cada columna individualmente y las unimos
+            $shortColumns = array_map(fn($col) => $this->shortenIdentifier($col, 10), $columns);
+            $columnsStr = implode('_', $shortColumns);
+        }
+        
+        // Combinamos las partes con un formato predecible
+        $name = "{$prefix}{$tableShort}_{$foreignTableShort}_{$columnsStr}";
+        
+        // Nos aseguramos de que el nombre final no exceda la longitud máxima
+        if (strlen($name) > $maxLength) {
+            $name = substr($name, 0, $maxLength - 6) . md5($name); // Añadimos un hash para evitar colisiones
+            $name = substr($name, 0, $maxLength);
+        }
+        
+        return $name;
+    }
+    
+    /**
+     * Acorta un identificador manteniendo su legibilidad
+     * 
+     * @param string $identifier Identificador a acortar
+     * @param int $maxLength Longitud máxima deseada
+     * @return string
+     */
+    protected function shortenIdentifier(string $identifier, int $maxLength = 10): string
+    {
+        if (strlen($identifier) <= $maxLength) {
+            return $identifier;
+        }
+        
+        // Eliminamos vocales excepto la primera letra
+        $vowels = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
+        $result = $identifier[0]; // Mantenemos la primera letra
+        
+        for ($i = 1; $i < strlen($identifier); $i++) {
+            if (!in_array($identifier[$i], $vowels)) {
+                $result .= $identifier[$i];
+            }
+        }
+        
+        // Si aún es demasiado largo, lo truncamos
+        if (strlen($result) > $maxLength) {
+            $result = substr($result, 0, $maxLength);
+        }
+        
+        return $result;
     }
     
     /**
