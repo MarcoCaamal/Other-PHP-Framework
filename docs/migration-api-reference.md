@@ -115,6 +115,37 @@ La clase `Blueprint` se utiliza dentro de los callbacks de `Schema` para definir
 | `onUpdate()` | Acción en actualización | `(string $action)` |
 | `dropForeign()` | Elimina clave foránea | `(string $foreignKey)` |
 
+#### Acciones Referenciales para Claves Foráneas
+
+Las opciones disponibles para los métodos `onDelete()` y `onUpdate()` son:
+
+| Acción | Descripción |
+|--------|-------------|
+| `CASCADE` | Al eliminar/actualizar el registro padre, los registros hijos relacionados se eliminan/actualizan automáticamente |
+| `SET NULL` | Al eliminar/actualizar el registro padre, los valores de las claves foráneas se establecen a NULL (la columna debe ser nullable) |
+| `RESTRICT` | Impide la eliminación/actualización del registro padre si existen registros hijos relacionados |
+| `NO ACTION` | Similar a RESTRICT, pero la verificación se realiza después de intentar modificar todas las filas |
+| `SET DEFAULT` | Al eliminar/actualizar el registro padre, las claves foráneas se establecen a su valor por defecto |
+
+> **Importante**: Cuando se usan los métodos `onDelete()` y `onUpdate()`, estos deben llamarse **antes** que el método `on()`.
+
+**Ejemplo correcto:**
+```php
+$table->foreign('user_id')
+      ->references('id')
+      ->onDelete('CASCADE')
+      ->onUpdate('CASCADE')
+      ->on('users');
+```
+
+**Ejemplo incorrecto:**
+```php
+$table->foreign('user_id')
+      ->references('id')
+      ->on('users')
+      ->onDelete('CASCADE');  // Esto no tendrá efecto
+```
+
 ### Configuración de Tabla
 
 | Método | Descripción | Parámetros |

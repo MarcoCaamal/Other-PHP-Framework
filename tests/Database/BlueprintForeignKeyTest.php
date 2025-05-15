@@ -219,12 +219,18 @@ class BlueprintForeignKeyTest extends TestCase
         });
         
         // 2. Modify the foreign key to add ON DELETE CASCADE (using direct SQL)
+        // First get the actual name of the foreign key constraint
+        $createTableSql = $this->driver->statement("SHOW CREATE TABLE employees")[0]['Create Table'];
+        preg_match('/CONSTRAINT `([^`]+)`/', $createTableSql, $matches);
+        $foreignKeyName = $matches[1];
+        
+        // Now drop and recreate the foreign key with the actual name
         $this->driver->statement(
-            "ALTER TABLE employees DROP FOREIGN KEY `fk_employees_departments_department_id`"
+            "ALTER TABLE employees DROP FOREIGN KEY `$foreignKeyName`"
         );
         
         $this->driver->statement(
-            "ALTER TABLE employees ADD CONSTRAINT `fk_employees_departments_department_id` " .
+            "ALTER TABLE employees ADD CONSTRAINT `{$foreignKeyName}` " .
             "FOREIGN KEY (`department_id`) REFERENCES `departments`(`id`) ON DELETE CASCADE"
         );
         
@@ -259,6 +265,99 @@ class BlueprintForeignKeyTest extends TestCase
         )[0]['count'];
         
         $this->assertEquals(0, $remainingEmployees);
+    }
+    
+    /**
+     * Test foreign key constraints with ON DELETE and ON UPDATE actions
+     */
+    public function testForeignKeyActions()
+    {
+        // Drop tables if they exist (for clean state)
+        Schema::dropIfExists('fk_child_cascade_delete');
+        Schema::dropIfExists('fk_child_cascade_update');
+        Schema::dropIfExists('fk_child_both_actions');
+        Schema::dropIfExists('fk_parent_actions');
+        
+        // Create parent table
+        Schema::create('fk_parent_actions', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+        });
+        
+        // 1. Test ON DELETE CASCADE
+        Schema::create('fk_child_cascade_delete', function (Blueprint $table) {
+            $table->id();
+            $table->integer('parent_id');
+            $table->string('description');
+            
+            // Add foreign key with ON DELETE CASCADE
+            $table->foreign('parent_id')
+                  ->references('id')
+                  ->onDelete('CASCADE')  // Llamar a onDelete antes de on
+                  ->on('fk_parent_actions');
+        });
+        
+        // Verify ON DELETE CASCADE constraint
+        $cascadeTableSql = $this->driver->statement("SHOW CREATE TABLE fk_child_cascade_delete")[0]['Create Table'];
+        $this->assertStringContainsString('ON DELETE CASCADE', $cascadeTableSql);
+        
+        // 2. Test ON UPDATE CASCADE
+        Schema::create('fk_child_cascade_update', function (Blueprint $table) {
+            $table->id();
+            $table->integer('parent_id');
+            $table->string('description');
+            
+            // Add foreign key with ON UPDATE CASCADE
+            $table->foreign('parent_id')
+                  ->references('id')
+                  ->onUpdate('CASCADE')
+                  ->on('fk_parent_actions');
+        });
+        
+        // Verify ON UPDATE CASCADE constraint
+        $updateTableSql = $this->driver->statement("SHOW CREATE TABLE fk_child_cascade_update")[0]['Create Table'];
+        $this->assertStringContainsString('ON UPDATE CASCADE', $updateTableSql);
+        
+        // 3. Test both ON DELETE SET NULL and ON UPDATE CASCADE
+        Schema::create('fk_child_both_actions', function (Blueprint $table) {
+            $table->id();
+            $table->integer('parent_id')->nullable();
+            $table->string('description');
+            
+            // Add foreign key with both actions
+            $table->foreign('parent_id')
+                  ->references('id')
+                  ->onDelete('SET NULL')
+                  ->onUpdate('CASCADE')
+                  ->on('fk_parent_actions');
+        });
+        
+        // Verify both constraints
+        $bothTableSql = $this->driver->statement("SHOW CREATE TABLE fk_child_both_actions")[0]['Create Table'];
+        $this->assertStringContainsString('ON DELETE SET NULL', $bothTableSql);
+        $this->assertStringContainsString('ON UPDATE CASCADE', $bothTableSql);
+        
+        // 4. Test functionality of ON DELETE CASCADE
+        // Insert test data
+        $this->driver->statement("INSERT INTO fk_parent_actions (id, name) VALUES (1, 'Parent')");
+        $this->driver->statement("INSERT INTO fk_child_cascade_delete (parent_id, description) VALUES (1, 'Child')");
+        
+        // Verify record exists
+        $childRecords = $this->driver->statement("SELECT * FROM fk_child_cascade_delete WHERE parent_id = 1");
+        $this->assertCount(1, $childRecords);
+        
+        // Delete parent record
+        $this->driver->statement("DELETE FROM fk_parent_actions WHERE id = 1");
+        
+        // Verify child record was cascaded (deleted)
+        $childRecords = $this->driver->statement("SELECT * FROM fk_child_cascade_delete WHERE parent_id = 1");
+        $this->assertCount(0, $childRecords);
+        
+        // 5. Clean up
+        Schema::dropIfExists('fk_child_cascade_delete');
+        Schema::dropIfExists('fk_child_cascade_update');
+        Schema::dropIfExists('fk_child_both_actions');
+        Schema::dropIfExists('fk_parent_actions');
     }
     
     /**

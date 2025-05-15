@@ -423,15 +423,25 @@ class Blueprint
      * @param array $columns
      * @param string $table
      * @param array $foreignColumns
+     * @param string|null $onDelete
+     * @param string|null $onUpdate
      * @return $this
      */
-    public function addForeignKeyCommand(array $columns, string $table, array $foreignColumns): self
+    public function addForeignKeyCommand(
+        array $columns, 
+        string $table, 
+        array $foreignColumns,
+        ?string $onDelete = null,
+        ?string $onUpdate = null
+    ): self
     {
         $this->commands[] = [
             'type' => 'foreign',
             'columns' => $columns,
             'table' => $table,
             'foreignColumns' => $foreignColumns,
+            'onDelete' => $onDelete,
+            'onUpdate' => $onUpdate,
         ];
         
         return $this;
@@ -964,11 +974,30 @@ class Blueprint
         $columns = implode(', ', array_map(fn($col) => "`$col`", $command['columns']));
         $foreignColumns = implode(', ', array_map(fn($col) => "`$col`", $command['foreignColumns']));
         
-        $constraintName = $this->createForeignKeyName($this->table, $command['table'], $command['columns']);
+        $constraintName = $this->createForeignKeyName(
+            $this->table, 
+            $command['table'], 
+            $command['columns'],
+            64,
+            $command['onDelete'] ?? null,
+            $command['onUpdate'] ?? null
+        );
         
-        return "CONSTRAINT `$constraintName` " .
+        $sql = "CONSTRAINT `$constraintName` " .
                "FOREIGN KEY ($columns) " .
                "REFERENCES {$command['table']}($foreignColumns)";
+        
+        // Añadir cláusula ON DELETE si está especificada
+        if (!empty($command['onDelete'])) {
+            $sql .= " ON DELETE {$command['onDelete']}";
+        }
+        
+        // Añadir cláusula ON UPDATE si está especificada
+        if (!empty($command['onUpdate'])) {
+            $sql .= " ON UPDATE {$command['onUpdate']}";
+        }
+        
+        return $sql;
     }
     
     /**
@@ -978,34 +1007,84 @@ class Blueprint
      * @param string $foreignTable Tabla referenciada
      * @param array $columns Columnas locales
      * @param int $maxLength Longitud máxima del nombre (MySQL tiene un límite de 64 caracteres)
+     * @param string|null $onDelete Acción ON DELETE
+     * @param string|null $onUpdate Acción ON UPDATE
      * @return string
      */
-    protected function createForeignKeyName(string $table, string $foreignTable, array $columns, int $maxLength = 64): string
+    protected function createForeignKeyName(
+        string $table, 
+        string $foreignTable, 
+        array $columns, 
+        int $maxLength = 64,
+        ?string $onDelete = null,
+        ?string $onUpdate = null
+    ): string
     {
         // Prefijo estándar para claves foráneas
         $prefix = 'fk_';
         
         // Acortamos nombres de tablas si son muy largos
-        $tableShort = $this->shortenIdentifier($table, 10);
-        $foreignTableShort = $this->shortenIdentifier($foreignTable, 10);
+        $tableShort = $this->shortenIdentifier($table, 8);
+        $foreignTableShort = $this->shortenIdentifier($foreignTable, 8);
         
         // Acortamos nombres de columnas si hay varias o son muy largas
         $columnsStr = '';
-        if (count($columns) > 3) {
-            // Si hay más de 3 columnas, solo usamos las primeras y añadimos "etc"
-            $columnsStr = $this->shortenIdentifier(implode('_', array_slice($columns, 0, 2)) . '_etc', 15);
+        if (count($columns) > 2) {
+            // Si hay más de 2 columnas, solo usamos la primera y añadimos un hash
+            $columnsStr = $this->shortenIdentifier($columns[0], 8) . '_' . substr(md5(implode('_', $columns)), 0, 4);
         } else {
             // Acortamos cada columna individualmente y las unimos
-            $shortColumns = array_map(fn($col) => $this->shortenIdentifier($col, 10), $columns);
+            $shortColumns = array_map(fn($col) => $this->shortenIdentifier($col, 8), $columns);
             $columnsStr = implode('_', $shortColumns);
         }
         
+        // Incorporamos información de acciones en un sufijo corto
+        $actionSuffix = '';
+        if (!empty($onDelete)) {
+            $actionMap = [
+                'CASCADE' => 'cd',
+                'SET NULL' => 'sn',
+                'RESTRICT' => 'rs',
+                'NO ACTION' => 'na',
+                'SET DEFAULT' => 'sd'
+            ];
+            $actionKey = strtoupper($onDelete);
+            $actionSuffix .= isset($actionMap[$actionKey]) ? '_d' . $actionMap[$actionKey] : '_d' . substr(strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $onDelete)), 0, 2);
+        }
+        
+        if (!empty($onUpdate)) {
+            $actionMap = [
+                'CASCADE' => 'cd',
+                'SET NULL' => 'sn',
+                'RESTRICT' => 'rs',
+                'NO ACTION' => 'na',
+                'SET DEFAULT' => 'sd'
+            ];
+            $actionKey = strtoupper($onUpdate);
+            $actionSuffix .= isset($actionMap[$actionKey]) ? '_u' . $actionMap[$actionKey] : '_u' . substr(strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $onUpdate)), 0, 2);
+        }
+        
+        // Añadir un identificador único basado en todas las partes
+        $uniquePart = '';
+        if (empty($actionSuffix)) {
+            // Si no hay acciones, usamos un hash basado en las tablas y columnas
+            $uniquePart = '_' . substr(md5($table . $foreignTable . implode('_', $columns)), 0, 4);
+        }
+        
         // Combinamos las partes con un formato predecible
-        $name = "{$prefix}{$tableShort}_{$foreignTableShort}_{$columnsStr}";
+        $name = "{$prefix}{$tableShort}_{$foreignTableShort}_{$columnsStr}{$actionSuffix}{$uniquePart}";
         
         // Nos aseguramos de que el nombre final no exceda la longitud máxima
         if (strlen($name) > $maxLength) {
-            $name = substr($name, 0, $maxLength - 6) . md5($name); // Añadimos un hash para evitar colisiones
+            // Truncar conservando el prefijo y añadiendo un hash
+            $hashLength = 8; // Longitud del hash para evitar colisiones
+            $prefixLength = strlen($prefix);
+            $availableLength = $maxLength - $prefixLength - $hashLength - 1; // -1 por el guión
+            
+            $shortenedName = substr($name, $prefixLength, $availableLength);
+            $hash = substr(md5($name), 0, $hashLength);
+            
+            $name = $prefix . $shortenedName . '_' . $hash;
             $name = substr($name, 0, $maxLength);
         }
         
@@ -1025,22 +1104,57 @@ class Blueprint
             return $identifier;
         }
         
-        // Eliminamos vocales excepto la primera letra
-        $vowels = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
-        $result = $identifier[0]; // Mantenemos la primera letra
+        // Estrategia mejorada para acortar identificadores
         
-        for ($i = 1; $i < strlen($identifier); $i++) {
-            if (!in_array($identifier[$i], $vowels)) {
-                $result .= $identifier[$i];
+        // 1. Eliminar palabras comunes que no aportan mucho valor semántico
+        $commonWords = ['the', 'and', 'for', 'with', 'from', 'that', 'this', 'table', 'column', 'field'];
+        $parts = explode('_', $identifier);
+        $parts = array_filter($parts, function($part) use ($commonWords) {
+            return !in_array(strtolower($part), $commonWords);
+        });
+        $identifier = implode('_', $parts);
+        
+        // Si aún es demasiado largo después de eliminar palabras comunes
+        if (strlen($identifier) <= $maxLength) {
+            return $identifier;
+        }
+        
+        // 2. Abreviación mediante eliminación de vocales (excepto la primera letra de cada palabra)
+        $parts = explode('_', $identifier);
+        $result = [];
+        
+        foreach ($parts as $part) {
+            if (empty($part)) continue;
+            
+            // Mantener la primera letra intacta
+            $abbreviated = $part[0];
+            
+            // Eliminar vocales del resto de la palabra
+            $vowels = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
+            for ($i = 1; $i < strlen($part); $i++) {
+                if (!in_array($part[$i], $vowels)) {
+                    $abbreviated .= $part[$i];
+                }
+            }
+            
+            $result[] = $abbreviated;
+        }
+        
+        $identifier = implode('_', $result);
+        
+        // 3. Si aún es demasiado largo, truncar el resultado
+        if (strlen($identifier) > $maxLength) {
+            // Para nombres muy largos, podemos usar una técnica de hash para la parte final
+            if (strlen($identifier) > $maxLength + 10) {
+                $mainPart = substr($identifier, 0, $maxLength - 5);
+                $hashPart = substr(md5($identifier), 0, 4);
+                $identifier = $mainPart . $hashPart;
+            } else {
+                $identifier = substr($identifier, 0, $maxLength);
             }
         }
         
-        // Si aún es demasiado largo, lo truncamos
-        if (strlen($result) > $maxLength) {
-            $result = substr($result, 0, $maxLength);
-        }
-        
-        return $result;
+        return $identifier;
     }
     
     /**
@@ -1113,5 +1227,14 @@ class Blueprint
     {
         $this->collation = $collation;
         return $this;
+    }
+    
+    /**
+     * Helper function to see what's in the command
+     */
+    private function debugForeignKeyCommand(array $command): void
+    {
+        echo "DEBUG COMMAND:\n";
+        var_dump($command);
     }
 }

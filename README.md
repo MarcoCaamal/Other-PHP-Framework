@@ -2,6 +2,12 @@
 
 LightWeight es un framework PHP ligero y elegante diseñado para facilitar el desarrollo de aplicaciones web modernas y APIs RESTful. Inspirado en las mejores prácticas actuales, ofrece una estructura clara y componentes desacoplados que favorecen el desarrollo rápido y mantenible.
 
+## Nuevas funcionalidades (Mayo 2025)
+
+- **Soporte para acciones en claves foráneas** - Ahora puedes especificar comportamientos `ON DELETE` y `ON UPDATE` (CASCADE, SET NULL, etc.) en las relaciones de clave foránea.
+- **Sistema mejorado de nombres de restricciones** - Mejor manejo de nombres de restricciones con soporte para evitar colisiones incluso con acciones referenciales.
+- **Validación integrada de acciones referenciales** - Validación automática de las acciones permitidas para mantener la integridad de la base de datos.
+
 ## Características principales
 
 - **Arquitectura MVC** - Organización clara siguiendo el patrón Modelo-Vista-Controlador
@@ -181,6 +187,8 @@ Para más información sobre cómo utilizar LightWeight, consulta la documentaci
 ### Sistema de base de datos y migraciones
 - [Guía de creación de migraciones](docs/create-migration-guide.md)
 - [Referencia de API para migraciones](docs/migration-api-reference.md)
+- [Acciones de claves foráneas](docs/foreign-key-actions.md) - Cómo usar las acciones ON DELETE y ON UPDATE
+- [Ejemplos de acciones de claves foráneas](docs/foreign-key-actions-examples.md) - Ejemplos prácticos del uso de acciones referenciales
 - [Mejoras del sistema de migraciones](docs/migration-system-enhancements.md)
 - [Documentación de mejoras en migraciones](docs/migration-enhancement-documentation.md)
 - [Mejores prácticas para migraciones](docs/migration-best-practices.md)

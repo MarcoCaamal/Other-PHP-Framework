@@ -21,6 +21,9 @@
 4. **Foreign Key Management**
    - Full foreign key support: `$table->foreign('user_id')->references('id')->on('users')`
    - Foreign key implementation in both `CREATE TABLE` and `ALTER TABLE` statements
+   - Support for referential actions: `onDelete('CASCADE')` and `onUpdate('CASCADE')`
+   - Validation of referential actions with proper SQL syntax generation
+   - Support for all standard actions: CASCADE, SET NULL, RESTRICT, NO ACTION, SET DEFAULT
 
 5. **Table Operations**
    - Table creation: `Schema::create()`
