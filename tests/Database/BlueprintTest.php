@@ -40,6 +40,7 @@ class BlueprintTest extends TestCase
             $table->datetime('created_at');
             $table->date('birth_date');
             $table->timestamp('logged_at');
+            $table->time('schedule_time');
             $table->enum('status', ['pending', 'active', 'cancelled']);
         });
         
@@ -54,7 +55,7 @@ class BlueprintTest extends TestCase
             }
             
             // Verificar que existen las columnas con los tipos correctos
-            $this->assertEquals(10, count($columns));
+            $this->assertEquals(11, count($columns));
             $this->assertArrayHasKey('id', $columnMap);
             $this->assertArrayHasKey('name', $columnMap);
             $this->assertArrayHasKey('age', $columnMap);
@@ -64,6 +65,7 @@ class BlueprintTest extends TestCase
             $this->assertArrayHasKey('created_at', $columnMap);
             $this->assertArrayHasKey('birth_date', $columnMap);
             $this->assertArrayHasKey('logged_at', $columnMap);
+            $this->assertArrayHasKey('schedule_time', $columnMap);
             $this->assertArrayHasKey('status', $columnMap);
             
             // Verificar los tipos de datos
@@ -76,6 +78,7 @@ class BlueprintTest extends TestCase
             $this->assertStringContainsString('datetime', $columnMap['created_at']);
             $this->assertStringContainsString('date', $columnMap['birth_date']);
             $this->assertStringContainsString('timestamp', $columnMap['logged_at']);
+            $this->assertStringContainsString('time', $columnMap['schedule_time']);
             $this->assertStringContainsString("enum('pending','active','cancelled')", $columnMap['status']);
             
         } catch (\Exception $e) {
@@ -302,5 +305,82 @@ class BlueprintTest extends TestCase
         } catch (\Exception $e) {
             return false;
         }
+    }
+    
+    /**
+     * Prueba el tipo de campo TIME
+     */
+    public function testTimeColumn()
+    {
+        // Crear una tabla con diferentes usos del campo time
+        Schema::create('time_test_table', function (Blueprint $table) {
+            $table->id();
+            $table->time('start_time');                 // time normal
+            $table->time('end_time')->nullable();       // time nullable
+            $table->time('break_time')->default('12:00:00'); // time con valor predeterminado
+        });
+        
+        // Verificar que la tabla fue creada correctamente
+        $columns = $this->driver->statement("SHOW COLUMNS FROM time_test_table");
+        
+        // Mapear los detalles de las columnas
+        $columnDetails = [];
+        foreach ($columns as $column) {
+            $columnDetails[$column['Field']] = [
+                'type' => $column['Type'],
+                'null' => $column['Null'],
+                'default' => $column['Default'] ?? 'N/A'
+            ];
+        }
+        
+        // Verificar que existen las columnas de tipo time
+        $this->assertArrayHasKey('start_time', $columnDetails);
+        $this->assertArrayHasKey('end_time', $columnDetails);
+        $this->assertArrayHasKey('break_time', $columnDetails);
+        
+        // Verificar los tipos de datos
+        $this->assertStringContainsString('time', $columnDetails['start_time']['type']);
+        $this->assertStringContainsString('time', $columnDetails['end_time']['type']);
+        $this->assertStringContainsString('time', $columnDetails['break_time']['type']);
+        
+        // Verificar características de las columnas
+        $this->assertEquals('NO', $columnDetails['start_time']['null']);    // Not nullable
+        $this->assertEquals('YES', $columnDetails['end_time']['null']);     // Nullable
+        $this->assertEquals('12:00:00', $columnDetails['break_time']['default']); // Default
+    }
+    
+    /**
+     * Prueba el tipo de campo TIME con todos los modificadores disponibles
+     */
+    public function testTimeColumnWithAllModifiers()
+    {
+        // Crear una tabla con el campo time usando todos los modificadores disponibles
+        Schema::create('complex_time_table', function (Blueprint $table) {
+            $table->id();
+            $table->time('appointment_time')
+                 ->nullable()
+                 ->default('09:00:00')
+                 ->comment('Hora de la cita médica')
+                 ->unique();
+        });
+        
+        // Verificar la estructura de la tabla
+        $createTableSql = $this->driver->statement("SHOW CREATE TABLE complex_time_table")[0]['Create Table'];
+        
+        // Verificar que contiene el tipo de dato TIME
+        $this->assertStringContainsString('`appointment_time` time', $createTableSql);
+        
+        // Verificar que es nullable
+        $this->assertStringContainsString('NULL', $createTableSql);
+        
+        // Verificar valor predeterminado
+        $this->assertStringContainsString("DEFAULT '09:00:00'", $createTableSql);
+        
+        // Verificar comentario
+        $this->assertStringContainsString("COMMENT 'Hora de la cita médica'", $createTableSql);
+        
+        // Verificar restricción unique
+        $this->assertStringContainsString("UNIQUE", $createTableSql);
+        $this->assertStringContainsString("`appointment_time`", $createTableSql);
     }
 }

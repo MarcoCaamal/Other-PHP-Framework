@@ -217,6 +217,17 @@ class Blueprint
     }
     
     /**
+     * Create a time column
+     *
+     * @param string $column
+     * @return $this
+     */
+    public function time(string $column): self
+    {
+        return $this->addColumn('time', $column);
+    }
+    
+    /**
      * Create an enum column
      *
      * @param string $column
