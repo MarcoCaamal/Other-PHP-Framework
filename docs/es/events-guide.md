@@ -147,6 +147,8 @@ $app->register(App\Providers\EventServiceProvider::class);
 
 Para más detalles sobre los providers de servicios, consulta la [documentación del Event Service Provider](event-service-provider.md).
 
+> **Nota Importante**: Si experimentas el error `PHP Fatal error: Constant expression contains invalid operations` al intentar usar closures en tus providers de eventos, consulta la guía específica sobre [Error de Expresión Constante](constant-expression-error.md) para entender el problema y su solución.
+
 ## Eventos del Sistema
 
 LightWeight dispara automáticamente varios eventos del sistema:

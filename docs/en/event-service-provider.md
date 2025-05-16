@@ -61,27 +61,40 @@ class AppEventServiceProvider extends BaseEventServiceProvider
 {
     /**
      * List of listeners to register
+     * 
+     * Note: Only class references are allowed here.
+     * For closures, use the registerServices method.
      */
     protected array $listen = [
         'user.registered' => [
             SendWelcomeEmail::class,
         ],
-        'application.bootstrapped' => [
-            function ($event) {
-                // Perform tasks when the application finishes initializing
-            }
-        ]
     ];
     
     /**
-     * Register additional event-related services
+     * Register application services and event listeners
      */
     public function registerServices($container)
     {
-        // Call the parent method to register the EventDispatcher
+        // Call the parent method to register the EventDispatcher and class-based listeners
         parent::registerServices($container);
         
-        // Add additional event-related services if necessary
+        // Get the event dispatcher to register closure-based listeners
+        $dispatcher = $container->get(EventDispatcherInterface::class);
+        
+        // Register closure-based listeners
+        $dispatcher->listen('user.login', function ($event) {
+            // Logic to handle user login
+            $user = $event->getData()['user'] ?? null;
+            if ($user) {
+                // Example: Update last login date
+                // $user->updateLastLogin();
+            }
+        });
+        
+        $dispatcher->listen('application.bootstrapped', function ($event) {
+            // Logic to execute when the application has been bootstrapped
+        });
     }
 }
 ```
@@ -157,3 +170,20 @@ class UserEventSubscriber implements EventSubscriberInterface
 ```
 
 Subscribers provide an organized way to manage related listeners.
+
+## Important Note About Closures
+
+In PHP, when defining class properties with initial values, those values must be constant expressions. Anonymous functions (closures) are not considered constant expressions, so they cannot be used directly in the `$listen` property definition.
+
+```php
+// This will cause a PHP Fatal error: Constant expression contains invalid operations
+protected array $listen = [
+    'event.name' => [
+        function ($event) { /* ... */ },  // Not allowed as property value
+    ],
+];
+```
+
+Instead, register closures using the `registerServices` method as shown in the example above. This approach avoids the PHP limitation while maintaining the ability to use closures as event listeners.
+
+For more detailed guidance, see [Event Listener Best Practices](event-listener-best-practices.md).

@@ -53,7 +53,7 @@ Puedes extender el `EventServiceProvider` para registrar listeners específicos 
 
 namespace App\Providers;
 
-use App\Events\Listeners\SendWelcomeEmail;
+use App\Events\Listeners\SendWelcomeEmailListener;
 use LightWeight\Events\Contracts\EventDispatcherInterface;
 use LightWeight\Providers\EventServiceProvider as BaseEventServiceProvider;
 
@@ -61,27 +61,45 @@ class AppEventServiceProvider extends BaseEventServiceProvider
 {
     /**
      * Lista de listeners a registrar
+     * 
+     * IMPORTANTE: Solo se permiten referencias a clases aquí.
+     * Para closures, usa el método registerServices.
+     * 
+     * @var array<string, array<class-string>>
      */
     protected array $listen = [
         'user.registered' => [
-            SendWelcomeEmail::class,
+            SendWelcomeEmailListener::class,
         ],
-        'application.bootstrapped' => [
-            function ($event) {
-                // Realizar tareas cuando la aplicación termina de inicializarse
-            }
-        ]
     ];
     
     /**
-     * Register additional event-related services
+     * Registra servicios de aplicación y listeners de eventos
+     *
+     * @param \DI\Container $container El contenedor de inyección de dependencias
+     * @return void
      */
     public function registerServices($container)
     {
-        // Llamar al método padre para registrar el EventDispatcher
+        // Llamar al método padre para registrar el EventDispatcher y los listeners basados en clases
         parent::registerServices($container);
         
-        // Añadir servicios adicionales relacionados con eventos si es necesario
+        // Obtiene el dispatcher de eventos para registrar listeners basados en closures
+        $dispatcher = $container->get(EventDispatcherInterface::class);
+        
+        // Registra listeners basados en closures
+        $dispatcher->listen('user.login', function ($event) {
+            // Lógica para manejar el inicio de sesión
+            $user = $event->getData()['user'] ?? null;
+            if ($user) {
+                // Ejemplo: Actualizar fecha de último login
+                // $user->updateLastLogin();
+            }
+        });
+        
+        $dispatcher->listen('application.bootstrapped', function ($event) {
+            // Lógica para ejecutar cuando la aplicación ha sido inicializada
+        });
     }
 }
 ```
@@ -157,3 +175,41 @@ class UserEventSubscriber implements EventSubscriberInterface
 ```
 
 Los suscriptores proporcionan una forma organizada de gestionar listeners relacionados.
+
+## Nota Importante Sobre Closures y Errores de Expresión Constante
+
+En PHP, cuando se definen propiedades de clase con valores iniciales, esos valores deben ser expresiones constantes. Las funciones anónimas (closures) no se consideran expresiones constantes, por lo que no se pueden usar directamente en la definición de la propiedad `$listen`. Intentar hacerlo resultará en un error fatal de PHP.
+
+### Ejemplo del error
+
+```php
+// Esto causará un error: PHP Fatal error: Constant expression contains invalid operations
+protected array $listen = [
+    'user.login' => [
+        function ($event) { /* ... */ },  // No permitido como valor de propiedad
+    ],
+];
+```
+
+### Solución correcta
+
+En lugar de intentar definir closures en la propiedad `$listen`, debes registrarlos directamente mediante el método `registerServices` usando el dispatcher de eventos:
+
+```php
+public function registerServices($container)
+{
+    // Primero llamar al padre para manejar los listeners de clase
+    parent::registerServices($container);
+    
+    // Luego registrar los closures
+    $dispatcher = $container->get(EventDispatcherInterface::class);
+    
+    $dispatcher->listen('user.login', function ($event) {
+        // Lógica para el evento...
+    });
+}
+```
+
+Este enfoque evita la limitación de PHP relacionada con expresiones constantes mientras mantiene la capacidad de usar closures como listeners de eventos.
+
+Para una guía más detallada sobre cuándo usar closures vs clases de listeners, consulta [Mejores Prácticas para Listeners de Eventos](event-listener-best-practices.md).
