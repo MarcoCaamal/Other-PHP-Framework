@@ -1,53 +1,56 @@
 # LightWeight PHP Framework
 
-LightWeight es un framework PHP ligero y elegante diseñado para facilitar el desarrollo de aplicaciones web modernas y APIs RESTful. Inspirado en las mejores prácticas actuales, ofrece una estructura clara y componentes desacoplados que favorecen el desarrollo rápido y mantenible.
+LightWeight is a lightweight and elegant PHP framework designed to facilitate the development of modern web applications and RESTful APIs. Inspired by current best practices, it offers a clear structure and decoupled components that promote rapid and maintainable development.
 
-## Nuevas funcionalidades (Mayo 2025)
+> 🌐 [Documentación en Español](README.es.md)
 
-- **Sistema de eventos (Observer Pattern)** - Implementación del patrón observador para gestionar eventos en la aplicación, permitiendo desacoplar componentes y mejorar la extensibilidad.
-- **Soporte para acciones en claves foráneas** - Ahora puedes especificar comportamientos `ON DELETE` y `ON UPDATE` (CASCADE, SET NULL, etc.) en las relaciones de clave foránea.
-- **Sistema mejorado de nombres de restricciones** - Mejor manejo de nombres de restricciones con soporte para evitar colisiones incluso con acciones referenciales.
-- **Validación integrada de acciones referenciales** - Validación automática de las acciones permitidas para mantener la integridad de la base de datos.
-- **Sistema avanzado de manejo de excepciones** - Manejo centralizado de excepciones con soporte para personalización, logging y notificaciones automáticas para errores críticos.
+## New Features (May 2025)
 
-## Características principales
+- **Event System (Observer Pattern)** - Implementation of the observer pattern to manage events in the application, allowing components to be decoupled and improving extensibility.
+- **Support for Foreign Key Actions** - Now you can specify `ON DELETE` and `ON UPDATE` behaviors (CASCADE, SET NULL, etc.) in foreign key relationships.
+- **Improved Constraint Naming System** - Better handling of constraint names with support to avoid collisions even with referential actions.
+- **Integrated Validation of Referential Actions** - Automatic validation of allowed actions to maintain database integrity.
+- **Advanced Exception Handling System** - Centralized exception handling with support for customization, logging, and automatic notifications for critical errors.
+- **Email System** - Complete email system with support for templates and multiple drivers.
 
-- **Arquitectura MVC** - Organización clara siguiendo el patrón Modelo-Vista-Controlador
-- **Sistema ORM** - Interacción con la base de datos a través de modelos que sigue el patrón active record
-- **Contenedor de dependencias** - Inyección de dependencias para código desacoplado
-- **Enrutamiento intuitivo** - Sistema flexible para definir rutas de la aplicación
-- **Migraciones de base de datos** - Control de versiones para el esquema de datos
-- **Validación robusta** - Validación de datos de entrada con reglas personalizables
-- **Autenticación y autorización** - Sistema seguro con soporte para JWT
-- **Sistema de plantillas** - Motor de vistas ligero y potente
-- **Gestión de sesiones** - Manejo sencillo de datos de sesión
-- **Sistema de eventos** - Implementación del patrón observador para la comunicación desacoplada entre componentes
-- **CLI incorporada** - Comandos para tareas comunes de desarrollo
-- **Manejo de excepciones centralizado** - Sistema modular para gestionar, reportar y mostrar errores
-- **Notificación de errores críticos** - Alertas automáticas por email, Slack u otros canales
+## Main Features
 
-## Documentación
+- **MVC Architecture** - Clear organization following the Model-View-Controller pattern
+- **ORM System** - Database interaction through models that follow the active record pattern
+- **Dependency Container** - Dependency injection for decoupled code
+- **Intuitive Routing** - Flexible system for defining application routes
+- **Database Migrations** - Version control for data schema
+- **Robust Validation** - Validation of input data with customizable rules
+- **Authentication and Authorization** - Secure system with JWT support
+- **Template System** - Lightweight and powerful view engine
+- **Session Management** - Simple handling of session data
+- **Event System** - Implementation of the observer pattern for decoupled communication between components
+- **Built-in CLI** - Commands for common development tasks
+- **Centralized Exception Handling** - Modular system for managing, reporting, and displaying errors
+- **Critical Error Notification** - Automatic alerts via email, Slack, or other channels
 
-La documentación completa del framework está disponible en la carpeta `/docs`. Puedes comenzar en el [índice de documentación](docs/index.md) que contiene enlaces a todas las guías disponibles, incluyendo:
+## Documentation
 
-- Arquitectura básica (rutas, controladores, middleware, vistas)
-- Características principales (peticiones/respuestas, autenticación, validación, eventos)
-- Base de datos (migraciones, transacciones, esquema, claves foráneas)
-- Actualizaciones recientes
+The complete framework documentation is available in the `/docs` folder. You can start at the [documentation index](docs/index.md) which contains links to all available guides, including:
 
-## Requisitos
+- Basic architecture (routes, controllers, middleware, views)
+- Main features (requests/responses, authentication, validation, events, emails)
+- Database (migrations, transactions, schema, foreign keys)
+- Recent updates
 
-- PHP 8.4 o superior
+## Requirements
+
+- PHP 8.4 or higher
 - Composer
-- MySQL/MariaDB (para características de base de datos)
+- MySQL/MariaDB (for database features)
 
-## Instalación
+## Installation
 
 ```bash
 composer require marco/lightweight
 ```
 
-O clonar el repositorio para comenzar un proyecto:
+Or clone the repository to start a project:
 
 ```bash
 git clone https://github.com/yourusername/lightweight.git
@@ -55,9 +58,9 @@ cd lightweight
 composer install
 ```
 
-## Uso básico
+## Basic Usage
 
-### Creación de una ruta
+### Creating a Route
 
 ```php
 <?php
@@ -72,7 +75,7 @@ Route::get('/', function() {
 Route::get('/users/{id}', 'UserController@show');
 ```
 
-### Creación de un controlador
+### Creating a Controller
 
 ```php
 <?php
@@ -91,7 +94,7 @@ class UserController extends ControllerBase
         $user = \App\Models\User::find($id);
         
         if (!$user) {
-            return Response::notFound('Usuario no encontrado');
+            return Response::notFound('User not found');
         }
         
         return Response::json($user);
@@ -99,31 +102,31 @@ class UserController extends ControllerBase
 }
 ```
 
-### Uso del sistema de eventos
+### Using the Event System
 
 ```php
 <?php
-// Registrar un listener para un evento
+// Register a listener for an event
 on('user.created', function($event) {
     $user = $event->getData()['user'];
-    // Enviar email de bienvenida
-    Mailer::send($user->email, 'Bienvenido a nuestra aplicación');
+    // Send welcome email
+    mailTemplate($user->email, 'Welcome to our app', 'welcome', ['userName' => $user->name]);
 });
 
-// Disparar el evento cuando se crea un usuario
+// Trigger the event when a user is created
 $user = new User();
 $user->fill($request->all());
 
 if ($user->save()) {
-    // Notificar a otros componentes del sistema
+    // Notify other system components
     event('user.created', ['user' => $user]);
     return redirect('/dashboard');
 }
 ```
 
-Para una guía completa sobre el sistema de eventos, consulta la [documentación de eventos](docs/events-guide.md).
+For a complete guide on the event system, see the [events documentation](docs/en/events-guide.md).
 
-### Definición de un modelo
+### Defining a Model
 
 ```php
 <?php
@@ -146,7 +149,7 @@ class User extends Model
 }
 ```
 
-### Uso de migraciones
+### Using Migrations
 
 ```php
 <?php
@@ -175,43 +178,68 @@ class CreateUsersTable extends Migration
 }
 ```
 
-## Comandos CLI
+### Sending Emails
 
-LightWeight incluye una interfaz de comandos para tareas comunes:
+```php
+<?php
+// Send a simple email
+mailSend(
+    'recipient@example.com',
+    'Hello from LightWeight',
+    '<p>This is a <strong>test email</strong> from LightWeight framework!</p>'
+);
+
+// Send an email using a template
+mailTemplate(
+    'new-user@example.com',
+    'Welcome to our platform',
+    'welcome',  // Using resources/views/emails/welcome.php template
+    [
+        'userName' => 'John Doe',
+        'activationLink' => 'https://example.com/activate/123'
+    ]
+);
+```
+
+For a complete guide on the email system, see the [email system documentation](docs/en/mail-system.md).
+
+## CLI Commands
+
+LightWeight includes a command interface for common tasks:
 
 ```bash
-# Crear un nuevo controlador
+# Create a new controller
 php light make:controller UserController
 
-# Crear un nuevo modelo
+# Create a new model
 php light make:model User
 
-# Crear una migración
+# Create a migration
 php light make:migration create_users_table
 
-# Ejecutar migraciones
+# Run migrations
 php light migrate
 
-# Ver rutas disponibles
+# View available routes
 php light routes:list
 ```
 
 ## Testing
 
-LightWeight tiene integración con PHPUnit para pruebas unitarias y de integración:
+LightWeight has integration with PHPUnit for unit and integration tests:
 
 ```bash
 composer run tests
 ```
 
-## Contribuir
+## Contributing
 
-Las contribuciones son bienvenidas y valoradas. Por favor, lee las directrices de contribución antes de enviar un pull request.
+Contributions are welcome and appreciated. Please read the contribution guidelines before submitting a pull request.
 
-## Licencia
+## License
 
-LightWeight es un software de código abierto bajo la licencia MIT.
+LightWeight is open-source software licensed under the MIT license.
 
-## Créditos
+## Credits
 
-Desarrollado por Marco.
+Developed by Marco.
