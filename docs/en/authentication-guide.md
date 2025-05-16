@@ -232,16 +232,19 @@ Route::group(['middleware' => 'auth:jwt', 'prefix' => 'api'], function() {
 
 ## Events
 
-The authentication system fires several events that you can listen for:
+The authentication system could integrate with the following events (note: currently under development and not available in the current version):
 
-- `auth.attempt`: Fired when an authentication attempt is made
-- `auth.login`: Fired when a user logs in
-- `auth.logout`: Fired when a user logs out
-- `auth.failed`: Fired when authentication fails
+- `auth.attempt`: Would be fired when an authentication attempt is made
+- `auth.login`: Would be fired when a user logs in
+- `auth.logout`: Would be fired when a user logs out
+- `auth.failed`: Would be fired when authentication fails
 
-Example:
+> **Important note**: These events are planned for future versions of the framework, but are **not currently implemented**. If you need similar functionality, you can implement your own event system for authentication.
+
+Example of future implementation:
 
 ```php
+// EXAMPLE FOR REFERENCE ONLY - NOT CURRENTLY IMPLEMENTED
 on('auth.login', function($event) {
     $user = $event->getData()['user'];
     // Log the login activity

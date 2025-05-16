@@ -73,6 +73,20 @@ class Router
     {
         foreach ($this->routes[$request->method()->value] as $route) {
             if ($route->matches($request->uri())) {
+                // Disparar el evento router.matched cuando se encuentra una ruta
+                try {
+                    $app = app();
+                    if (isset($app->events)) {
+                        $app->events->dispatch(new \LightWeight\Events\System\RouterMatched([
+                            'route' => $route,
+                            'uri' => $request->uri(),
+                            'method' => $request->method()->value
+                        ]));
+                    }
+                } catch (\Throwable $e) {
+                    // Silenciar errores de eventos para no interrumpir el enrutamiento
+                    // Idealmente, esto debería registrarse en caso de error
+                }
                 return $route;
             }
         }

@@ -151,23 +151,68 @@ Para más detalles sobre los providers de servicios, consulta la [documentación
 
 ## Eventos del Sistema
 
-LightWeight dispara automáticamente varios eventos del sistema:
+LightWeight implementa los siguientes eventos del sistema:
 
 - `app.bootstrapped`: Disparado cuando la aplicación termina de inicializarse
-- `app.shutdown`: Disparado cuando la aplicación está a punto de cerrarse
-- `router.matched`: Disparado cuando se ha encontrado una ruta coincidente
-- `view.rendering`: Disparado antes de renderizar una vista
-- `view.rendered`: Disparado después de que una vista ha sido renderizada
-- `session.started`: Disparado cuando se inicia una sesión
-- `auth.login`: Disparado cuando un usuario inicia sesión
-- `auth.logout`: Disparado cuando un usuario cierra sesión
-- `auth.attempt`: Disparado cuando se realiza un intento de inicio de sesión
-- `model.creating`: Disparado antes de crear un modelo
-- `model.created`: Disparado después de crear un modelo
-- `model.updating`: Disparado antes de actualizar un modelo
-- `model.updated`: Disparado después de actualizar un modelo
-- `model.deleting`: Disparado antes de eliminar un modelo
-- `model.deleted`: Disparado después de eliminar un modelo
+- `application.terminating`: Disparado cuando la aplicación está a punto de cerrarse
+- `router.matched`: Disparado cuando se encuentra una ruta coincidente con la solicitud actual
+
+> **Nota**: Otros eventos comunes como `view.rendering`, `auth.login`, `model.creating`, etc., podrían implementarse en versiones futuras del framework, pero actualmente no están disponibles como eventos integrados.
+
+## Ejemplos de Uso de Eventos del Sistema
+
+### Evento `router.matched`
+
+Puedes utilizar este evento para realizar acciones cuando una ruta específica es accedida:
+
+```php
+on('router.matched', function ($event) {
+    $route = $event->getRoute();
+    $uri = $event->getUri();
+    $method = $event->getMethod();
+    
+    // Registrar acceso a una ruta específica
+    if ($uri === '/admin/dashboard') {
+        app('log')->info("Acceso al panel de administración detectado. Método: {$method}");
+    }
+    
+    // También puedes hacer comprobaciones de seguridad adicionales
+    // o cualquier otra operación que necesites cuando se acceda a ciertas rutas
+});
+```
+
+### Evento `app.bootstrapped`
+
+Este evento es útil para ejecutar código después de que la aplicación ha terminado de inicializarse:
+
+```php
+on('app.bootstrapped', function ($event) {
+    // Inicializar servicios que deben estar disponibles durante toda la vida de la aplicación
+    app('cache')->warmUp();
+    
+    // O configurar valores globales
+    app('settings')->load();
+});
+```
+
+### Evento `application.terminating`
+
+Puedes usar este evento para realizar limpieza o acciones finales antes de que la aplicación termine:
+
+```php
+on('application.terminating', function ($event) {
+    // Obtener la respuesta que se enviará
+    $response = $event->getData()['response'];
+    
+    // Registrar el tiempo de respuesta
+    $startTime = app('timer')->getStartTime();
+    $endTime = microtime(true);
+    app('log')->info("Tiempo de respuesta: " . ($endTime - $startTime) . " segundos");
+    
+    // Guardar estadísticas o hacer limpieza final
+    app('stats')->save();
+});
+```
 
 ## Crear Eventos Personalizados
 

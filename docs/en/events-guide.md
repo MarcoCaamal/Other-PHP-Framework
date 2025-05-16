@@ -149,23 +149,68 @@ For more details on service providers, see the [Event Service Provider documenta
 
 ## System Events
 
-LightWeight fires several system events automatically:
+LightWeight implements the following system events:
 
 - `app.bootstrapped`: Fired when the application finishes bootstrapping
-- `app.shutdown`: Fired when the application is about to shut down
-- `router.matched`: Fired when a route has been matched
-- `view.rendering`: Fired before a view is rendered
-- `view.rendered`: Fired after a view has been rendered
-- `session.started`: Fired when a session is started
-- `auth.login`: Fired when a user logs in
-- `auth.logout`: Fired when a user logs out
-- `auth.attempt`: Fired when a login attempt is made
-- `model.creating`: Fired before a model is created
-- `model.created`: Fired after a model is created
-- `model.updating`: Fired before a model is updated
-- `model.updated`: Fired after a model is updated
-- `model.deleting`: Fired before a model is deleted
-- `model.deleted`: Fired after a model is deleted
+- `application.terminating`: Fired when the application is about to shut down
+- `router.matched`: Fired when a route has been matched with the current request
+
+> **Note**: Other common events like `view.rendering`, `auth.login`, `model.creating`, etc., might be implemented in future versions of the framework, but are currently not available as built-in events.
+
+## System Event Examples
+
+### `router.matched` Event
+
+You can use this event to perform actions when a specific route is accessed:
+
+```php
+on('router.matched', function ($event) {
+    $route = $event->getRoute();
+    $uri = $event->getUri();
+    $method = $event->getMethod();
+    
+    // Log access to a specific route
+    if ($uri === '/admin/dashboard') {
+        app('log')->info("Admin dashboard access detected. Method: {$method}");
+    }
+    
+    // You can also perform additional security checks
+    // or any other operations needed when certain routes are accessed
+});
+```
+
+### `app.bootstrapped` Event
+
+This event is useful for running code after the application has finished initializing:
+
+```php
+on('app.bootstrapped', function ($event) {
+    // Initialize services that should be available throughout the application lifecycle
+    app('cache')->warmUp();
+    
+    // Or configure global values
+    app('settings')->load();
+});
+```
+
+### `application.terminating` Event
+
+You can use this event to perform cleanup or final actions before the application terminates:
+
+```php
+on('application.terminating', function ($event) {
+    // Get the response being sent
+    $response = $event->getData()['response'];
+    
+    // Log response time
+    $startTime = app('timer')->getStartTime();
+    $endTime = microtime(true);
+    app('log')->info("Response time: " . ($endTime - $startTime) . " seconds");
+    
+    // Save statistics or perform final cleanup
+    app('stats')->save();
+});
+```
 
 ## Creating Custom Events
 

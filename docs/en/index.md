@@ -15,7 +15,9 @@ This documentation provides detailed information about the features and usage of
 - [Authentication](authentication-guide.md)
 - [Data Validation](validation-guide.md)
 - [Event System](events-guide.md)
-- [Event Service Provider](event-service-provider.md)
+  - [Event Service Provider](event-service-provider.md)
+  - [Router.Matched Event](router-matched-event.md)
+  - [Event Listener Best Practices](event-listener-best-practices.md)
 - [Email System](mail-system.md)
 - [Exception Handling](exception-handling.md)
 

@@ -232,16 +232,19 @@ Route::group(['middleware' => 'auth:jwt', 'prefix' => 'api'], function() {
 
 ## Eventos
 
-El sistema de autenticación dispara varios eventos a los que puedes escuchar:
+El sistema de autenticación podría integrarse con los siguientes eventos (nota: actualmente en desarrollo y no disponibles en la versión actual):
 
-- `auth.attempt`: Se dispara cuando se realiza un intento de autenticación
-- `auth.login`: Se dispara cuando un usuario inicia sesión
-- `auth.logout`: Se dispara cuando un usuario cierra sesión
-- `auth.failed`: Se dispara cuando falla la autenticación
+- `auth.attempt`: Se dispararía cuando se realiza un intento de autenticación
+- `auth.login`: Se dispararía cuando un usuario inicia sesión
+- `auth.logout`: Se dispararía cuando un usuario cierra sesión
+- `auth.failed`: Se dispararía cuando falla la autenticación
 
-Ejemplo:
+> **Nota importante**: Estos eventos están planificados para futuras versiones del framework, pero **no están implementados actualmente**. Si necesitas funcionalidad similar, puedes implementar tu propio sistema de eventos para la autenticación.
+
+Ejemplo de implementación futura:
 
 ```php
+// EJEMPLO SOLO PARA REFERENCIA - NO IMPLEMENTADO ACTUALMENTE
 on('auth.login', function($event) {
     $user = $event->getData()['user'];
     // Registrar la actividad de inicio de sesión
