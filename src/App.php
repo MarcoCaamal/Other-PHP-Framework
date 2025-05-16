@@ -5,6 +5,7 @@ namespace LightWeight;
 use Dotenv\Dotenv;
 use Exception;
 use LightWeight\Config\Config;
+use LightWeight\Container\Container;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\Exceptions\DatabaseException;
 use LightWeight\Database\ORM\Model;
@@ -84,6 +85,52 @@ class App
      * @var ExceptionHandlerContract
      */
     public ExceptionHandlerContract $exceptionHandler;
+    /**
+     * Check if the current request is an API request
+     *
+     * @return bool
+     */
+    protected function isApiRequest(): bool
+    {
+        return str_starts_with($this->request->uri(), '/api');
+    }
+    /**
+     * Safely close database connection
+     *
+     * @return void
+     */
+    protected function closeDatabaseConnection(): void
+    {
+        if (isset($this->database)) {
+            $this->database->close();
+        }
+    }
+    /**
+     * Load configuration files and environment variables
+     *
+     * @return self
+     */
+    protected function loadConfig(): self
+    {
+        Dotenv::createImmutable(self::$root)->load();
+        Config::load(self::$root . "/config");
+        return $this;
+    }
+
+    /**
+     * Run service providers of a specific type
+     *
+     * @param string $type The type of service provider to run ('boot' or 'runtime')
+     * @return self
+     */
+    protected function runServiceProviders(string $type): self
+    {
+        foreach (config("providers.$type", []) as $provider) {
+            $provider = new $provider();
+            $provider->registerServices(\LightWeight\Container\Container::getInstance());
+        }
+        return $this;
+    }
     
     /**
      * Prepare data for the next request
@@ -110,18 +157,6 @@ class App
         $this->server->sendResponse($response);
         $this->closeDatabaseConnection();
     }
-    
-    /**
-     * Safely close database connection
-     *
-     * @return void
-     */
-    protected function closeDatabaseConnection(): void
-    {
-        if (isset($this->database)) {
-            $this->database->close();
-        }
-    }
 
     /**
      * Bootstrap the application
@@ -140,33 +175,6 @@ class App
             ->setUpDatabaseConnection()
             ->setExceptionHandler()
             ->runServiceProviders('runtime');
-    }
-    
-    /**
-     * Load configuration files and environment variables
-     *
-     * @return self
-     */
-    protected function loadConfig(): self
-    {
-        Dotenv::createImmutable(self::$root)->load();
-        Config::load(self::$root . "/config");
-        return $this;
-    }
-    
-    /**
-     * Run service providers of a specific type
-     *
-     * @param string $type The type of service provider to run ('boot' or 'runtime')
-     * @return self
-     */
-    protected function runServiceProviders(string $type): self
-    {
-        foreach (config("providers.$type", []) as $provider) {
-            $provider = new $provider();
-            $provider->registerServices(\LightWeight\Container\Container::getInstance());
-        }
-        return $this;
     }
     
     /**
@@ -301,16 +309,6 @@ class App
     }
     
     /**
-     * Check if the current request is an API request
-     *
-     * @return bool
-     */
-    protected function isApiRequest(): bool
-    {
-        return str_starts_with($this->request->uri(), '/api');
-    }
-    
-    /**
      * Abort the application with a response
      *
      * @param ResponseContract $response
@@ -320,4 +318,71 @@ class App
     {
         $this->terminate($response);
     }
+    /**
+     * Bind a class or interface to a concrete implementation
+     *
+     * @param string $class
+     * @param \Closure|string $definition
+     * @return void
+     */
+    public function bind(string $class, \Closure|string $definition): void
+    {
+        Container::set($class, $definition);
+    }
+    /**
+     * Create a new instance of a class
+     *
+     * @param string $class
+     * @param array $parameters
+     * @return mixed
+     */
+    public function make(string $class, array $parameters = []): mixed
+    {
+        return Container::make($class, $parameters);
+    }
+    /**
+     * Create a singleton instance of a class
+     *
+     * @template T
+     * @param class-string<T> $class
+     * @param \Closure|class-string<T> $definition
+     * @return T
+     */
+    public function singleton(string $class, \Closure|string $definition): mixed
+    {
+        return Container::get($class) ?? Container::set($class, $definition);
+    }
+    /**
+     * Call a method on a class instance
+     *
+     * @param class-string $class
+     * @param array $parameters
+     * @return mixed
+     */
+    public function call(string $class, array $parameters = []): mixed
+    {
+        return Container::call($class, $parameters);
+    }
+    /**
+     * Get a class instance from the container
+     *
+     * @template T
+     * @param class-string<T> $class
+     * @return T
+     */
+    public function get(string $class)
+    {
+        return Container::get($class);
+    }
+    /**
+     * Check if a class is registered in the container
+     *
+     * @param string $class
+     * @return bool
+     */
+    public function has(string $class): bool
+    {
+        return Container::has($class);
+    }
+
 }

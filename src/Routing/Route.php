@@ -44,6 +44,13 @@ class Route
      */
     protected array $middlewares = [];
     /**
+     * HTTP Middleware groups
+     *
+     * @var array<string>
+     */
+    protected array $middlewareGroups = [];
+
+    /**
      * Create a new route with the given URI and action
      *
      * @param string $uri
@@ -89,18 +96,50 @@ class Route
         return $this;
     }
     /**
-     * Get HTTP Middlewares for this route
-     * @return array<\LightWeight\Http\Contracts\MiddlewareContract>
+     * Get all HTTP middlewares for this route.
+     *
+     * @return \LightWeight\Http\Contracts\MiddlewareContract[]
      */
     public function middlewares(): array
     {
         return $this->middlewares;
     }
+    /**
+     * Set middlewares for this route.
+     *
+     * @param array<class-string<\LightWeight\Http\Contracts\MiddlewareContract>|\LightWeight\Http\Contracts\MiddlewareContract> $middlewares
+     * @return self
+     */
     public function setMiddlewares(array $middlewares): self
     {
-        $this->middlewares = array_map(fn ($middleware) => new $middleware(), $middlewares);
+        $this->middlewares = array_map(function ($middleware) {
+            return is_string($middleware) ? new $middleware() : $middleware;
+        }, $middlewares);
         return $this;
     }
+    
+    /**
+     * Get all middleware groups for this route.
+     * 
+     * @return array<string>
+     */
+    public function middlewareGroups(): array
+    {
+        return $this->middlewareGroups;
+    }
+    
+    /**
+     * Set middleware groups for this route.
+     * 
+     * @param array<string> $groups
+     * @return self
+     */
+    public function setMiddlewareGroups(array $groups): self
+    {
+        $this->middlewareGroups = $groups;
+        return $this;
+    }
+    
     public function hasMiddlewares(): bool
     {
         return count($this->middlewares) > 0;

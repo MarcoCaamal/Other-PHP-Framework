@@ -2,6 +2,7 @@
 
 namespace LightWeight\Routing;
 
+use LightWeight\Container\Container;
 use LightWeight\Container\DependencyInjection;
 use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\Contracts\ResponseContract;
@@ -22,6 +23,20 @@ class Router
      * @var array<string, Route[]>
      */
     protected array $routes = [];
+    /**
+     * Global HTTP middlewares.
+     *
+     * @var array<class-string<\LightWeight\Http\Contracts\MiddlewareContract>>
+     */
+    protected array $globalMiddlewares = [];
+
+    /**
+     * Middleware groups.
+     *
+     * @var array<string, array<class-string<\LightWeight\Http\Contracts\MiddlewareContract>>>
+     */
+    protected array $middlewareGroups = [];
+
     /**
      * Create a new router
      */
@@ -63,30 +78,131 @@ class Router
         }
         throw new HttpNotFoundException();
     }
+
+    /**
+     * Set global middlewares for all routes.
+     *
+     * @param array<class-string<\LightWeight\Http\Contracts\MiddlewareContract>> $middlewares
+     * @return void
+     */
+    public function setGlobalMiddlewares(array $middlewares): void
+    {
+        $this->globalMiddlewares = $middlewares;
+    }
+
+    /**
+     * Get global middlewares.
+     *
+     * @return array<class-string<\LightWeight\Http\Contracts\MiddlewareContract>>
+     */
+    public function getGlobalMiddlewares(): array
+    {
+        return $this->globalMiddlewares;
+    }
+
+    /**
+     * Set middleware groups.
+     *
+     * @param array<string, array<class-string<\LightWeight\Http\Contracts\MiddlewareContract>>> $groups
+     * @return void
+     */
+    public function setMiddlewareGroups(array $groups): void
+    {
+        $this->middlewareGroups = $groups;
+    }
+
+    /**
+     * Get middleware groups.
+     *
+     * @return array<string, array<class-string<\LightWeight\Http\Contracts\MiddlewareContract>>>
+     */
+    public function getMiddlewareGroups(): array
+    {
+        return $this->middlewareGroups;
+    }
+
+    /**
+     * Get middlewares from a group.
+     *
+     * @param string $group
+     * @return array<class-string<\LightWeight\Http\Contracts\MiddlewareContract>>
+     */
+    public function getMiddlewareGroup(string $group): array
+    {
+        return $this->middlewareGroups[$group] ?? [];
+    }
+
     public function resolve(RequestContract $request): ResponseContract
     {
         $route = $this->resolveRoute($request);
         $request->setRoute($route);
         $action = $route->action();
 
-        $middlewares = $route->middlewares();
+        // Recopilar todos los middlewares aplicables
+        $middlewareInstances = array_map(
+            function($mw) {
+                return is_string($mw) ? app(\LightWeight\App::class)->make($mw) : $mw;
+            }, 
+            $this->globalMiddlewares
+        );
+
+        // Añadir los middlewares de la ruta
+        $middlewareInstances = array_merge($middlewareInstances, $route->middlewares());
+
+        // Si hay middleware groups definidos en la ruta, añadirlos también
+        if (method_exists($route, 'middlewareGroups') && !empty($route->middlewareGroups())) {
+            foreach ($route->middlewareGroups() as $groupName) {
+                $groupMiddlewares = array_map(
+                    function($mw) {
+                        return is_string($mw) ? app(\LightWeight\App::class)->make($mw) : $mw;
+                    },
+                    $this->getMiddlewareGroup($groupName)
+                );
+                $middlewareInstances = array_merge($middlewareInstances, $groupMiddlewares);
+            }
+        }
 
         if(is_array($action)) {
             $controller = singleton($action[0], \DI\autowire($action[0]));
             $action[0] = $controller;
-            $middlewares = array_merge($middlewares, $controller->middlewares());
+            $middlewareInstances = array_merge($middlewareInstances, $controller->middlewares());
         }
 
-        $params = DependencyInjection::resolveParameters($action, $request->routeParameters());
-
-        if (!empty($middlewares)) {
+        if (!empty($middlewareInstances)) {
             return $this->runMiddlewares(
                 $request,
-                $middlewares,
-                fn () => call_user_func($action, ...$params)
+                $middlewareInstances,
+                function () use ($action, $request) {
+                    // Usa PHP-DI call() directamente para invocar el controlador o función de cierre
+                    if (is_array($action)) {
+                        // Es un método de controlador [ControllerClass, 'method']
+                        return Container::call([$action[0], $action[1]], [
+                            'request' => $request,
+                            ...$request->routeParameters()
+                        ]);
+                    } else {
+                        // Es una función de cierre
+                        return Container::call($action, [
+                            'request' => $request,
+                            ...$request->routeParameters()
+                        ]);
+                    }
+                }
             );
         }
-        return $action(...$params);
+        
+        // Sin middlewares, usa call directamente
+        if (is_array($action)) {
+            return Container::call([$action[0], $action[1]], [
+                'request' => $request,
+                ...$request->routeParameters()
+            ]);
+        } else {
+            return Container::getContainer()->call($action, [
+                'request' => $request,
+                ...$request->routeParameters()
+            ]);
+        }
     }
     protected function runMiddlewares(RequestContract $request, array $middlewares, \Closure $target): ResponseContract
     {

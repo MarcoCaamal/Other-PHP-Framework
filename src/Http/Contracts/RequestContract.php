@@ -141,4 +141,37 @@ interface RequestContract
      * @return array Validated data
      */
     public function validate(array $rules, array $messages = []): array;
+    
+    /**
+     * Get an attribute value or default.
+     *
+     * @param string $key The attribute key
+     * @param mixed $default Default value to return if attribute doesn't exist
+     * @return mixed The attribute value or default
+     */
+    public function getAttribute(string $key, mixed $default = null): mixed;
+    
+    /**
+     * Add an attribute to the request.
+     *
+     * @param string $key The attribute key
+     * @param mixed $value The value to store
+     * @return self
+     */
+    public function addAttribute(string $key, mixed $value): self;
+    
+    /**
+     * Check if an attribute exists.
+     *
+     * @param string $key The attribute key
+     * @return bool True if the attribute exists
+     */
+    public function hasAttribute(string $key): bool;
+    
+    /**
+     * Get all attributes.
+     *
+     * @return array All request attributes
+     */
+    public function getAttributes(): array;
 }

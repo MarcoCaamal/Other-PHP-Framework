@@ -2,6 +2,7 @@
 
 namespace LightWeight\Tests\Routing;
 
+use LightWeight\Container\Container;
 use LightWeight\Http\Contracts\MiddlewareContract;
 use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\Contracts\ResponseContract;
@@ -15,6 +16,14 @@ use LightWeight\Routing\Router;
 
 class RouterTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        singleton(RequestContract::class, Request::class);
+    }
+    protected function tearDown(): void
+    {
+        Container::deleteInstance();
+    }
     private function createMockRequest(string $uri, HttpMethod $httpMethod): RequestContract
     {
         return (new Request())

@@ -53,9 +53,17 @@ class Request implements RequestContract
     /**
      * Uploaded files.
      *
-     * @var array<string, \LightWeight\Storage\File>
+     * @var array<string, File>
      */
     protected array $files = [];
+    
+    /**
+     * Request attributes.
+     *
+     * @var array
+     */
+    protected array $attributes = [];
+
     /**
      * Create a new **Request** from the given `$server`.
      */
@@ -240,10 +248,62 @@ class Request implements RequestContract
 
         return $parameters[$key] ?? null;
     }
+    /**
+     * Validate request data against rules
+     *
+     * @param array $rules Validation rules
+     * @param array $messages Custom error messages
+     * @return array Validated data
+     */
     public function validate(array $rules, array $messages = []): array
     {
         $validator = new Validator($this->data);
-
         return $validator->validate($rules, $messages);
+    }
+    
+    /**
+     * Get an attribute value or default.
+     *
+     * @param string $key The attribute key
+     * @param mixed $default Default value to return if attribute doesn't exist
+     * @return mixed The attribute value or default
+     */
+    public function getAttribute(string $key, mixed $default = null): mixed
+    {
+        return $this->attributes[$key] ?? $default;
+    }
+    
+    /**
+     * Add an attribute to the request.
+     *
+     * @param string $key The attribute key
+     * @param mixed $value The value to store
+     * @return self
+     */
+    public function addAttribute(string $key, mixed $value): self
+    {
+        $this->attributes[$key] = $value;
+        return $this;
+    }
+    
+    /**
+     * Check if an attribute exists.
+     *
+     * @param string $key The attribute key
+     * @return bool True if the attribute exists
+     */
+    public function hasAttribute(string $key): bool
+    {
+        return isset($this->attributes[$key]);
+    }
+    
+    /**
+     * Get all attributes.
+     *
+     * @return array All request attributes
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
     }
 }
