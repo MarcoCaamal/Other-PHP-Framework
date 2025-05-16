@@ -3,6 +3,7 @@
 namespace LightWeight\Providers;
 
 use DI\Container as DIContainer;
+use LightWeight\Container\Container;
 use LightWeight\Events\Contracts\EventDispatcherInterface;
 use LightWeight\Events\Contracts\EventSubscriberInterface;
 use LightWeight\Events\Contracts\ListenerInterface;
@@ -58,7 +59,16 @@ class EventServiceProvider implements ServiceProviderContract
     {
         foreach ($this->listen as $event => $listeners) {
             foreach ($listeners as $listener) {
-                $dispatcher->listen($event, $listener);
+                if (is_string($listener) && class_exists($listener)) {
+                    // Si es un nombre de clase, usamos el contenedor para instanciarla con sus dependencias
+                    $dispatcher->listen($event, function ($event) use ($listener) {
+                        $instance = Container::make($listener);
+                        return $instance->handle($event);
+                    });
+                } else {
+                    // Si es una función u otro tipo, lo registramos directamente
+                    $dispatcher->listen($event, $listener);
+                }
             }
         }
     }
@@ -75,7 +85,8 @@ class EventServiceProvider implements ServiceProviderContract
         
         foreach ($subscribers as $subscriber) {
             if (class_exists($subscriber)) {
-                $instance = new $subscriber();
+                // Usar el contenedor para instanciar el suscriptor
+                $instance = Container::make($subscriber);
                 
                 if ($instance instanceof EventSubscriberInterface) {
                     // Registrar oyentes mediante el método subscribe
@@ -86,6 +97,7 @@ class EventServiceProvider implements ServiceProviderContract
                     //     $dispatcher->listen($event, function (EventInterface $event) use ($instance, $method) {
                     //         $instance->{$method}($event);
                     //     });
+                    // }
                     // }
                 }
             }

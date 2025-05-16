@@ -13,7 +13,7 @@ return [
      * Each subscriber class must implement the EventSubscriberInterface.
      */
     'subscribers' => [
-        // Example: App\Events\Subscribers\UserEventSubscriber::class,
+        App\Events\Subscribers\UserEventSubscriber::class,
         // LightWeight\Events\Subscribers\ExampleSubscriber::class,
     ],
     

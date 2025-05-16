@@ -2,6 +2,7 @@
 
 namespace LightWeight\Events;
 
+use LightWeight\Container\Container;
 use LightWeight\Events\Contracts\EventDispatcherInterface;
 use LightWeight\Events\Contracts\EventInterface;
 use LightWeight\Events\Contracts\ListenerInterface;
@@ -22,10 +23,10 @@ class EventDispatcher implements EventDispatcherInterface
      * Register an event listener
      *
      * @param string $eventName The name of the event to listen for
-     * @param ListenerInterface|callable $listener The listener to register
+     * @param ListenerInterface|callable|string $listener The listener to register
      * @return void
      */
-    public function listen(string $eventName, ListenerInterface|callable $listener): void
+    public function listen(string $eventName, ListenerInterface|callable|string $listener): void
     {
         $this->listeners[$eventName][] = $listener;
     }
@@ -59,6 +60,13 @@ class EventDispatcher implements EventDispatcherInterface
                 $listener->handle($eventObj);
             } elseif (is_callable($listener)) {
                 call_user_func($listener, $eventObj);
+            } elseif (is_string($listener) && class_exists($listener)) {
+                // Instantiate listener class using dependency injection container
+                $instance = Container::make($listener);
+                
+                if ($instance instanceof ListenerInterface) {
+                    $instance->handle($eventObj);
+                }
             }
         }
     }

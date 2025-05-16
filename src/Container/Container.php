@@ -16,10 +16,10 @@ class Container
     {
         if(self::$instance === null) {
             $builder = new ContainerBuilder();
-            if(env('', 'dev') === 'prod') {
-                $builder->enableCompilation(__DIR__ . '/tmp');
-                $builder->writeProxiesToFile(true, __DIR__ . '/tmp/proxies');
-            }
+            // if(env('', 'dev') === 'prod') {
+            //     $builder->enableCompilation(__DIR__ . '/tmp');
+            //     $builder->writeProxiesToFile(true, __DIR__ . '/tmp/proxies');
+            // }
             self::$instance = $builder->build();
         }
         return self::$instance;
