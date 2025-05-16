@@ -15,7 +15,8 @@ Esta documentación proporciona información detallada sobre las característica
 - [Autenticación](authentication-guide.md)
 - [Validación de datos](validation-guide.md)
 - [Sistema de eventos](events-guide.md)
-  - [Proveedor de servicios de eventos](event-service-provider.md)
+- [Proveedor de servicios de eventos](event-service-provider.md)
+- [Sistema de correo electrónico](mail-system.md)
 - [Manejo de excepciones](exception-handling.md)
 
 ### Base de datos
@@ -30,6 +31,7 @@ Esta documentación proporciona información detallada sobre las característica
 ### Mayo 2025
 - [Mejoras del sistema de migraciones](migration-system-enhancements.md)
 - [Nuevo sistema de eventos](events-guide.md)
+- [Sistema de correo electrónico](mail-system.md)
 - [Manejo mejorado de excepciones](exception-handling.md)
 
 ## Contribuir

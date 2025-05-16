@@ -2,14 +2,76 @@
 
 namespace LightWeight\Tests\Events;
 
-use App\Events\Listeners\SendWelcomeEmailListener;
-use App\Services\EmailService;
 use LightWeight\Container\Container;
 use LightWeight\Events\GenericEvent;
 use LightWeight\Events\EventDispatcher;
 use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventInterface;
+use LightWeight\Events\Contracts\ListenerInterface;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+
+/**
+ * Clase de servicio de email para pruebas
+ */
+class TestEmailService
+{
+    private bool $testMode;
+    private array $lastSentEmail = [];
+    
+    public function __construct(bool $testMode = false)
+    {
+        $this->testMode = $testMode;
+    }
+    
+    public function sendWelcomeEmail(string $to, string $name): bool
+    {
+        $emailData = [
+            'to' => $to,
+            'subject' => 'Bienvenido a nuestra plataforma',
+            'template' => 'emails.welcome',
+            'data' => ['userName' => $name]
+        ];
+        
+        if ($this->testMode) {
+            $this->lastSentEmail = $emailData;
+            return true;
+        }
+        
+        // En un entorno real, aquí enviaríamos el email
+        return true;
+    }
+    
+    public function getLastSentEmail(): array
+    {
+        return $this->lastSentEmail;
+    }
+}
+
+/**
+ * Listener para eventos de registro de usuario
+ */
+class TestWelcomeEmailListener implements ListenerInterface
+{
+    private TestEmailService $emailService;
+    
+    public function __construct(TestEmailService $emailService)
+    {
+        $this->emailService = $emailService;
+    }
+    
+    public function handle(EventInterface $event): void
+    {
+        // Obtener datos del usuario desde el evento
+        $userData = $event->getData();
+        if (isset($userData['user'])) {
+            $user = $userData['user'];
+            if (isset($user->email, $user->name)) {
+                $this->emailService->sendWelcomeEmail($user->email, $user->name);
+            }
+        }
+    }
+}
 
 /**
  * Test para verificar la inyección de dependencias en listeners de eventos
@@ -17,7 +79,7 @@ use stdClass;
 class ListenerDependencyInjectionTest extends TestCase
 {
     private EventDispatcher $eventDispatcher;
-    private EmailService $emailService;
+    private TestEmailService $emailService;
     
     protected function setUp(): void
     {
@@ -26,8 +88,8 @@ class ListenerDependencyInjectionTest extends TestCase
         Container::getInstance();
         
         // Configurar servicios en el contenedor
-        $this->emailService = new EmailService(true); // Modo prueba activado
-        Container::set(EmailService::class, $this->emailService);
+        $this->emailService = new TestEmailService(true); // Modo prueba activado
+        Container::set(TestEmailService::class, $this->emailService);
         
         // Configurar dispatcher de eventos
         $this->eventDispatcher = new EventDispatcher();
@@ -45,7 +107,7 @@ class ListenerDependencyInjectionTest extends TestCase
     public function testListenerReceivesDependenciesThroughInjection(): void
     {
         // Registrar el listener usando la clase (que debería ser instanciada por el contenedor)
-        $this->eventDispatcher->listen('user.registered', SendWelcomeEmailListener::class);
+        $this->eventDispatcher->listen('user.registered', TestWelcomeEmailListener::class);
         
         // Crear un usuario de prueba
         $user = new stdClass();
@@ -78,7 +140,7 @@ class ListenerDependencyInjectionTest extends TestCase
         // Simular un AppEventServiceProvider que registra el listener a través de una propiedad $listen
         $listen = [
             'user.registered' => [
-                SendWelcomeEmailListener::class
+                TestWelcomeEmailListener::class
             ]
         ];
         

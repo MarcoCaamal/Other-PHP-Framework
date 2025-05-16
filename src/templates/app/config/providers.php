@@ -11,6 +11,7 @@ return [
         LightWeight\Providers\FileStorageDriverServiceProvider::class,
         LightWeight\Providers\ExceptionHandlerServiceProvider::class,
         LightWeight\Providers\EventServiceProvider::class,
+        LightWeight\Providers\MailServiceProvider::class,
         App\Providers\AppEventServiceProvider::class
     ],
     'runtime' => [

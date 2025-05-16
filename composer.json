@@ -15,7 +15,8 @@
             "src/Helpers/session.php",
             "src/Helpers/auth.php",
             "src/Helpers/class.php",
-            "src/Helpers/events.php"
+            "src/Helpers/events.php",
+            "src/Helpers/mail.php"
         ]
     },
     "scripts": {
@@ -45,7 +46,8 @@
         "vlucas/phpdotenv": "^5.6",
         "php-di/php-di": "^7.0",
         "symfony/console": "^6.4",
-        "adhocore/jwt": "^1.1"
+        "adhocore/jwt": "^1.1",
+        "phpmailer/phpmailer": "^6.10"
     },
     "bin": [
         "light.php"
