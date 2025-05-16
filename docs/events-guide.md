@@ -173,3 +173,7 @@ on('*', function ($event) {
 ```
 
 > Nota: El wildcard `*` no está implementado por defecto, pero puedes extender el EventDispatcher para soportarlo si fuera necesario.
+
+## Proveedor de Servicios para Eventos
+
+LightWeight incluye un `EventServiceProvider` que facilita la configuración y registro de listeners de forma centralizada. Para más información sobre cómo utilizar este proveedor, consulta la [guía del proveedor de servicios de eventos](event-service-provider.md).

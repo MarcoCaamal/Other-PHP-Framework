@@ -141,7 +141,10 @@ class Router
         // Recopilar todos los middlewares aplicables
         $middlewareInstances = array_map(
             function($mw) {
-                return is_string($mw) ? app(\LightWeight\App::class)->make($mw) : $mw;
+                if (is_string($mw)) {
+                    return Container::make($mw); // Usar Container::make para aprovechar la inyección de dependencias
+                }
+                return $mw;
             }, 
             $this->globalMiddlewares
         );
@@ -154,7 +157,10 @@ class Router
             foreach ($route->middlewareGroups() as $groupName) {
                 $groupMiddlewares = array_map(
                     function($mw) {
-                        return is_string($mw) ? app(\LightWeight\App::class)->make($mw) : $mw;
+                        if (is_string($mw)) {
+                            return Container::make($mw); // Usar Container::make para aprovechar la inyección de dependencias
+                        }
+                        return $mw;
                     },
                     $this->getMiddlewareGroup($groupName)
                 );

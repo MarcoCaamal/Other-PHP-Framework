@@ -67,7 +67,7 @@ class AppIntegrationTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         // Guardar la raíz original de la aplicación
-        self::$originalAppRoot = App::$root ?? null;
+        self::$originalAppRoot = App::$root ?? '';
         App::$root = __DIR__ . '/../../..';
     }
 

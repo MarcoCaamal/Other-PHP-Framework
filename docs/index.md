@@ -15,6 +15,7 @@ Esta documentación proporciona información detallada sobre las característica
 - [Autenticación](authentication-guide.md)
 - [Validación de datos](validation-guide.md)
 - [Sistema de eventos](events-guide.md)
+  - [Proveedor de servicios de eventos](event-service-provider.md)
 - [Manejo de excepciones](exception-handling.md)
 
 ### Base de datos

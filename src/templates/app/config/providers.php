@@ -9,7 +9,8 @@ return [
         LightWeight\Providers\AuthenticatorServiceProvider::class,
         LightWeight\Providers\HasherServiceProvider::class,
         LightWeight\Providers\FileStorageDriverServiceProvider::class,
-        LightWeight\Providers\ExceptionHandlerServiceProvider::class
+        LightWeight\Providers\ExceptionHandlerServiceProvider::class,
+        LightWeight\Providers\EventServiceProvider::class
     ],
     'runtime' => [
         App\Providers\RuleServiceProvider::class,

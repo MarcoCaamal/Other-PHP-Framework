@@ -323,7 +323,7 @@ class App
      */
     public function setUpEventSystem(): self
     {
-        $this->events = singleton(EventDispatcherInterface::class, EventDispatcher::class);
+        $this->events = app(EventDispatcherInterface::class);
         return $this;
     }
     /**
