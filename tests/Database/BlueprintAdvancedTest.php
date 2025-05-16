@@ -464,9 +464,9 @@ class BlueprintAdvancedTest extends TestCase
                 "El nombre de clave foránea debería comenzar con 'fk_'"
             );
             
-            echo "Original: table={$case['table']}, foreignTable={$case['foreignTable']}, columns=" . 
-                 implode(',', $case['columns']) . "\n";
-            echo "Generated FK name: $foreignKeyName (" . strlen($foreignKeyName) . " chars)\n\n";
+            // echo "Original: table={$case['table']}, foreignTable={$case['foreignTable']}, columns=" . 
+            //      implode(',', $case['columns']) . "\n";
+            // echo "Generated FK name: $foreignKeyName (" . strlen($foreignKeyName) . " chars)\n\n";
         }
     }
     

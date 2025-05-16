@@ -6,3 +6,4 @@ vendor/
 .phpunit.result.cache
 apache_access.log
 apache_error.log
+/storage/logs

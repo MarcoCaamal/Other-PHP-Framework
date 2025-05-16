@@ -20,6 +20,7 @@ use LightWeight\Session\Session;
 use LightWeight\Validation\Exceptions\ValidationException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 class AppTest extends TestCase
 {
@@ -30,6 +31,7 @@ class AppTest extends TestCase
     private MockObject $sessionMock;
     private MockObject $sessionStorageMock;
     private MockObject $databaseMock;
+    private MockObject $exceptionHandlerMock;
 
     /**
      * Helper method to create a Request object for testing
@@ -78,6 +80,9 @@ class AppTest extends TestCase
             
         $this->databaseMock = $this->createMock(DatabaseDriverContract::class);
         
+        // Create exception handler mock
+        $this->exceptionHandlerMock = $this->createMock(\LightWeight\Exceptions\Contracts\ExceptionHandlerContract::class);
+        
         // Configure the container to use our mocks
         Container::deleteInstance();
         $container = Container::getInstance();
@@ -88,6 +93,7 @@ class AppTest extends TestCase
         $container->set(RequestContract::class, $this->requestMock);
         $container->set(Session::class, $this->sessionMock);
         $container->set(DatabaseDriverContract::class, $this->databaseMock);
+        $container->set(\LightWeight\Exceptions\Contracts\ExceptionHandlerContract::class, $this->exceptionHandlerMock);
         
         // Configure app with our mocks
         $this->app = new App();
@@ -96,9 +102,37 @@ class AppTest extends TestCase
         $this->app->request = $this->requestMock;
         $this->app->session = $this->sessionMock;
         $this->app->database = $this->databaseMock;
+        $this->app->exceptionHandler = $this->exceptionHandlerMock;
         
         // Setup basic method responses
         $this->serverMock->method('getRequest')->willReturn($this->requestMock);
+        
+        // Setup default behavior for exception handler
+        // Don't set expectations for void methods
+        // $this->exceptionHandlerMock->method('report')->willReturn(null);
+        // $this->exceptionHandlerMock->method('register')->willReturn(null);
+        $this->exceptionHandlerMock->method('render')->willReturnCallback(function(RequestContract $request, Throwable $e) {
+            if ($e instanceof HttpNotFoundException) {
+                return Response::text('Not Found')->setStatus(404);
+            }
+            if ($e instanceof ValidationException) {
+                return Response::json([
+                    'message' => 'Validation Errors',
+                    'errors' => $e->errors()
+                ])->setStatus(422);
+            }
+            // Default error response
+            $responseData = [
+                'message' => $e->getMessage(),
+                'error' => get_class($e)
+            ];
+            
+            if (config('app.debug', false)) {
+                $responseData['trace'] = $e->getTraceAsString();
+            }
+            
+            return Response::json($responseData)->setStatus(500);
+        });
 
         // Setup default config values for testing
         $this->setupTestConfig();

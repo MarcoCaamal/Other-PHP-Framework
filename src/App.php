@@ -9,6 +9,7 @@ use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\Exceptions\DatabaseException;
 use LightWeight\Database\ORM\Model;
 use LightWeight\Database\QueryBuilder\Drivers\MySQLQueryBuilder;
+use LightWeight\Exceptions\Contracts\ExceptionHandlerContract;
 use LightWeight\Http\HttpMethod;
 use LightWeight\Http\HttpNotFoundException;
 use LightWeight\Http\Contracts\RequestContract;
@@ -78,6 +79,13 @@ class App
     public DatabaseDriverContract $database;
     
     /**
+     * Exception handler instance
+     *
+     * @var ExceptionHandlerContract
+     */
+    public ExceptionHandlerContract $exceptionHandler;
+    
+    /**
      * Prepare data for the next request
      * Stores current URI in session for use with back() helper
      *
@@ -130,6 +138,7 @@ class App
             ->runServiceProviders('boot')
             ->setHttpHandlers()
             ->setUpDatabaseConnection()
+            ->setExceptionHandler()
             ->runServiceProviders('runtime');
     }
     
@@ -256,6 +265,20 @@ class App
             throw new DatabaseException("Failed to connect to database: {$e->getMessage()}", 0, $e);
         }
     }
+
+    /**
+     * Set up exception handler
+     *
+     * @return self
+     */
+    public function setExceptionHandler(): self
+    {
+        $handlerClass = config('app.exception_handler', \App\Exceptions\Handler::class);
+        $this->exceptionHandler = singleton(ExceptionHandlerContract::class, $handlerClass);
+        $this->exceptionHandler->register();
+        
+        return $this;
+    }
     /**
      * Run the application
      *
@@ -265,94 +288,16 @@ class App
     {
         try {
             $this->terminate($this->router->resolve($this->request));
-        } catch (HttpNotFoundException $e) {
-            $this->handleHttpNotFound($e);
-        } catch (ValidationException $e) {
-            $this->handleValidationException($e);
-        } catch (DatabaseException $e) {
-            $this->handleDatabaseException($e);
         } catch (Throwable $e) {
-            $this->handleGenericException($e);
-        }
-    }
-    
-    /**
-     * Handle a not found exception
-     *
-     * @param HttpNotFoundException $e
-     * @return void
-     */
-    protected function handleHttpNotFound(HttpNotFoundException $e): void
-    {
-        $this->abort(Response::text("Not Found")->setStatus(404));
-    }
-    
-    /**
-     * Handle a validation exception
-     *
-     * @param ValidationException $e
-     * @return void
-     */
-    protected function handleValidationException(ValidationException $e): void
-    {
-        if ($this->isApiRequest()) {
-            $response = Response::json([
-                'errors' => $e->errors(),
-                'message' => "Validation Errors",
-            ])->setStatus(422);
+            // Report exception if needed
+            $this->exceptionHandler->report($e);
+
+            // Render appropriate response based on exception type
+            $response = $this->exceptionHandler->render($this->request, $e);
             
+            // Send the response
             $this->abort($response);
-        } else {
-            $this->abort(back()->withErrors($e->errors(), 422));
         }
-    }
-    
-    /**
-     * Handle a database exception
-     *
-     * @param DatabaseException $e
-     * @return void
-     */
-    protected function handleDatabaseException(DatabaseException $e): void
-    {
-        $response = $this->createExceptionResponse($e, 500, 'Database Error');
-        $this->abort($response);
-    }
-    
-    /**
-     * Handle a generic exception
-     *
-     * @param Throwable $e
-     * @return void
-     */
-    protected function handleGenericException(Throwable $e): void
-    {
-        $response = $this->createExceptionResponse($e, 500, 'Server Error');
-        $this->abort($response);
-    }
-    
-    /**
-     * Create a standardized error response for an exception
-     *
-     * @param Throwable $e The exception
-     * @param int $status HTTP status code
-     * @param string $message User-friendly message
-     * @return ResponseContract
-     */
-    protected function createExceptionResponse(Throwable $e, int $status, string $message): ResponseContract
-    {
-        $data = [
-            'error' => $e::class,
-            'message' => $e->getMessage()
-        ];
-        
-        if (env('APP_DEBUG', false) === true) {
-            $data['file'] = $e->getFile();
-            $data['line'] = $e->getLine();
-            $data['trace'] = $e->getTrace();
-        }
-        
-        return json($data)->setStatus($status);
     }
     
     /**

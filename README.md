@@ -7,6 +7,7 @@ LightWeight es un framework PHP ligero y elegante diseñado para facilitar el de
 - **Soporte para acciones en claves foráneas** - Ahora puedes especificar comportamientos `ON DELETE` y `ON UPDATE` (CASCADE, SET NULL, etc.) en las relaciones de clave foránea.
 - **Sistema mejorado de nombres de restricciones** - Mejor manejo de nombres de restricciones con soporte para evitar colisiones incluso con acciones referenciales.
 - **Validación integrada de acciones referenciales** - Validación automática de las acciones permitidas para mantener la integridad de la base de datos.
+- **Sistema avanzado de manejo de excepciones** - Manejo centralizado de excepciones con soporte para personalización, logging y notificaciones automáticas para errores críticos.
 
 ## Características principales
 
@@ -20,6 +21,8 @@ LightWeight es un framework PHP ligero y elegante diseñado para facilitar el de
 - **Sistema de plantillas** - Motor de vistas ligero y potente
 - **Gestión de sesiones** - Manejo sencillo de datos de sesión
 - **CLI incorporada** - Comandos para tareas comunes de desarrollo
+- **Manejo de excepciones centralizado** - Sistema modular para gestionar, reportar y mostrar errores
+- **Notificación de errores críticos** - Alertas automáticas por email, Slack u otros canales
 
 ## Requisitos
 
