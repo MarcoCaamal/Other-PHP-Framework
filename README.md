@@ -4,6 +4,7 @@ LightWeight es un framework PHP ligero y elegante diseñado para facilitar el de
 
 ## Nuevas funcionalidades (Mayo 2025)
 
+- **Sistema de eventos (Observer Pattern)** - Implementación del patrón observador para gestionar eventos en la aplicación, permitiendo desacoplar componentes y mejorar la extensibilidad.
 - **Soporte para acciones en claves foráneas** - Ahora puedes especificar comportamientos `ON DELETE` y `ON UPDATE` (CASCADE, SET NULL, etc.) en las relaciones de clave foránea.
 - **Sistema mejorado de nombres de restricciones** - Mejor manejo de nombres de restricciones con soporte para evitar colisiones incluso con acciones referenciales.
 - **Validación integrada de acciones referenciales** - Validación automática de las acciones permitidas para mantener la integridad de la base de datos.
@@ -20,9 +21,19 @@ LightWeight es un framework PHP ligero y elegante diseñado para facilitar el de
 - **Autenticación y autorización** - Sistema seguro con soporte para JWT
 - **Sistema de plantillas** - Motor de vistas ligero y potente
 - **Gestión de sesiones** - Manejo sencillo de datos de sesión
+- **Sistema de eventos** - Implementación del patrón observador para la comunicación desacoplada entre componentes
 - **CLI incorporada** - Comandos para tareas comunes de desarrollo
 - **Manejo de excepciones centralizado** - Sistema modular para gestionar, reportar y mostrar errores
 - **Notificación de errores críticos** - Alertas automáticas por email, Slack u otros canales
+
+## Documentación
+
+La documentación completa del framework está disponible en la carpeta `/docs`. Puedes comenzar en el [índice de documentación](docs/index.md) que contiene enlaces a todas las guías disponibles, incluyendo:
+
+- Arquitectura básica (rutas, controladores, middleware, vistas)
+- Características principales (peticiones/respuestas, autenticación, validación, eventos)
+- Base de datos (migraciones, transacciones, esquema, claves foráneas)
+- Actualizaciones recientes
 
 ## Requisitos
 
@@ -87,6 +98,30 @@ class UserController extends ControllerBase
     }
 }
 ```
+
+### Uso del sistema de eventos
+
+```php
+<?php
+// Registrar un listener para un evento
+on('user.created', function($event) {
+    $user = $event->getData()['user'];
+    // Enviar email de bienvenida
+    Mailer::send($user->email, 'Bienvenido a nuestra aplicación');
+});
+
+// Disparar el evento cuando se crea un usuario
+$user = new User();
+$user->fill($request->all());
+
+if ($user->save()) {
+    // Notificar a otros componentes del sistema
+    event('user.created', ['user' => $user]);
+    return redirect('/dashboard');
+}
+```
+
+Para una guía completa sobre el sistema de eventos, consulta la [documentación de eventos](docs/events-guide.md).
 
 ### Definición de un modelo
 
@@ -180,28 +215,3 @@ LightWeight es un software de código abierto bajo la licencia MIT.
 ## Créditos
 
 Desarrollado por Marco.
-
----
-
-## Documentación completa
-
-Para más información sobre cómo utilizar LightWeight, consulta la documentación disponible:
-
-### Sistema de base de datos y migraciones
-- [Guía de creación de migraciones](docs/create-migration-guide.md)
-- [Referencia de API para migraciones](docs/migration-api-reference.md)
-- [Acciones de claves foráneas](docs/foreign-key-actions.md) - Cómo usar las acciones ON DELETE y ON UPDATE
-- [Ejemplos de acciones de claves foráneas](docs/foreign-key-actions-examples.md) - Ejemplos prácticos del uso de acciones referenciales
-- [Mejoras del sistema de migraciones](docs/migration-system-enhancements.md)
-- [Documentación de mejoras en migraciones](docs/migration-enhancement-documentation.md)
-- [Mejores prácticas para migraciones](docs/migration-best-practices.md)
-- [Transacciones de base de datos](docs/database-transactions.md)
-
-### Componentes del framework
-- [Guía de controladores](docs/controllers-guide.md)
-- [Sistema de middleware](docs/middleware-guide.md)
-- [Sistema de enrutamiento](docs/routing-guide.md)
-- [Manejo de peticiones y respuestas](docs/request-response-handling.md)
-- [Vistas y sistema de plantillas](docs/views-templating.md)
-- [Sistema de autenticación](docs/authentication-guide.md)
-- [Sistema de validación](docs/validation-guide.md)

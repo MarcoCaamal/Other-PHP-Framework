@@ -14,7 +14,8 @@
             "src/Helpers/http.php",
             "src/Helpers/session.php",
             "src/Helpers/auth.php",
-            "src/Helpers/class.php"
+            "src/Helpers/class.php",
+            "src/Helpers/events.php"
         ]
     },
     "scripts": {

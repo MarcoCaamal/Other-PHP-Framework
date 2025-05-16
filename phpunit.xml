@@ -16,6 +16,9 @@
         <testsuite name="All">
             <directory>./tests</directory>
         </testsuite>
+        <testsuite name="Events">
+            <directory>./tests/Events</directory>
+        </testsuite>
         <testsuite name="Database">
             <directory>./tests/Database</directory>
             <exclude>./tests/Database/ORM</exclude>

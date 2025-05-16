@@ -8,8 +8,12 @@ use LightWeight\Config\Config;
 use LightWeight\Container\Container;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\Exceptions\DatabaseException;
+use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventInterface;
+use LightWeight\Events\EventDispatcher;
 use LightWeight\Exceptions\Contracts\ExceptionHandlerContract;
 use LightWeight\Http\HttpMethod;
+use LightWeight\Http\HttpNotFoundException;
 use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\Http\Request;
@@ -80,6 +84,13 @@ class App
      * @var ExceptionHandlerContract
      */
     public ExceptionHandlerContract $exceptionHandler;
+    
+    /**
+     * Event dispatcher instance
+     *
+     * @var EventDispatcherInterface
+     */
+    public EventDispatcherInterface $events;
     /**
      * Check if the current request is an API request
      *
@@ -147,6 +158,11 @@ class App
      */
     public function terminate(ResponseContract $response): void
     {
+        // Dispatch terminating event before termination
+        if (isset($this->events)) {
+            $this->events->dispatch(new \LightWeight\Events\System\ApplicationTerminating(['response' => $response]));
+        }
+        
         $this->prepareNextRequest();
         $this->setCors($response);
         $this->server->sendResponse($response);
@@ -165,13 +181,21 @@ class App
         
         try {
             $app = singleton(App::class);
-            return $app
+            $result = $app
                 ->loadConfig()
                 ->runServiceProviders('boot')
                 ->setHttpHandlers()
                 ->setUpDatabaseConnection()
                 ->setExceptionHandler()
+                ->setUpEventSystem()
                 ->runServiceProviders('runtime');
+            
+            // Dispatch bootstrap completed event
+            if (isset($app->events)) {
+                $app->events->dispatch(new \LightWeight\Events\System\ApplicationBootstrapped());
+            }
+            
+            return $result;
         } catch (Throwable $e) {
             // Use the bootstrap exception handler to handle any errors during startup
             $bootstrapHandler = new \LightWeight\Exceptions\BootstrapExceptionHandler();
@@ -290,6 +314,16 @@ class App
         $this->exceptionHandler = singleton(ExceptionHandlerContract::class, $handlerClass);
         $this->exceptionHandler->register();
         
+        return $this;
+    }
+    /**
+     * Set up the event system
+     *
+     * @return self
+     */
+    public function setUpEventSystem(): self
+    {
+        $this->events = singleton(EventDispatcherInterface::class, EventDispatcher::class);
         return $this;
     }
     /**
