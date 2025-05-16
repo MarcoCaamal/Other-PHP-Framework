@@ -39,7 +39,9 @@ class ViewServiceProvider implements ServiceProviderContract
         }
         
         // Configure cache
-        if (config('view.cache.enabled', false)) {
+        // Verify cache is enabled, properly handling string values like "false" from .env files
+        $cacheEnabled = filter_var(config('view.cache.enabled', false), FILTER_VALIDATE_BOOLEAN);
+        if ($cacheEnabled) {
             $viewEngine->setCache(
                 true, 
                 config('view.cache.path', storagePath('views/cache'))

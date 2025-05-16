@@ -365,6 +365,8 @@ return [
 ];
 ```
 
+Note that when reading from environment variables (through `env()`), all values are returned as strings. The framework automatically converts the string value "false" to a boolean `false` using `filter_var($value, FILTER_VALIDATE_BOOLEAN)`. This ensures proper handling of boolean values from environment files.
+
 ## Advanced Examples
 
 ### Form with Validation
@@ -693,6 +695,8 @@ return [
     ],
 ];
 ```
+
+Remember that when setting `enabled` to `false` in your `.env` file, the value is stored as the string "false", but the framework automatically converts it to a boolean value using `filter_var($value, FILTER_VALIDATE_BOOLEAN)`.
 
 ## Best Practices
 

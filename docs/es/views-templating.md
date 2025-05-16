@@ -365,6 +365,8 @@ return [
 ];
 ```
 
+Ten en cuenta que cuando se leen valores desde variables de entorno (a través de `env()`), todos los valores se devuelven como cadenas. El framework convierte automáticamente el valor de cadena "false" a un booleano `false` utilizando `filter_var($value, FILTER_VALIDATE_BOOLEAN)`. Esto asegura un manejo adecuado de los valores booleanos desde los archivos de entorno.
+
 ## Ejemplos Avanzados
 
 ### Formulario con Validación
@@ -693,6 +695,8 @@ return [
     ],
 ];
 ```
+
+Recuerda que cuando configuras `enabled` como `false` en tu archivo `.env`, el valor se almacena como la cadena "false", pero el framework lo convierte automáticamente a un valor booleano utilizando `filter_var($value, FILTER_VALIDATE_BOOLEAN)`.
 
 ## Buenas Prácticas
 
