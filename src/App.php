@@ -8,20 +8,15 @@ use LightWeight\Config\Config;
 use LightWeight\Container\Container;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\Exceptions\DatabaseException;
-use LightWeight\Database\ORM\Model;
-use LightWeight\Database\QueryBuilder\Drivers\MySQLQueryBuilder;
 use LightWeight\Exceptions\Contracts\ExceptionHandlerContract;
 use LightWeight\Http\HttpMethod;
-use LightWeight\Http\HttpNotFoundException;
 use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\Http\Request;
-use LightWeight\Http\Response;
 use LightWeight\Routing\Router;
 use LightWeight\Server\Contracts\ServerContract;
 use LightWeight\Session\Contracts\SessionStorageContract;
 use LightWeight\Session\Session;
-use LightWeight\Validation\Exceptions\ValidationException;
 use LightWeight\View\Contracts\ViewContract;
 use Throwable;
 
@@ -127,7 +122,7 @@ class App
     {
         foreach (config("providers.$type", []) as $provider) {
             $provider = new $provider();
-            $provider->registerServices(\LightWeight\Container\Container::getInstance());
+            $provider->registerServices(Container::getInstance());
         }
         return $this;
     }
@@ -167,14 +162,24 @@ class App
     public static function bootstrap(string $root): App
     {
         self::$root = $root;
-        $app = singleton(App::class);
-        return $app
-            ->loadConfig()
-            ->runServiceProviders('boot')
-            ->setHttpHandlers()
-            ->setUpDatabaseConnection()
-            ->setExceptionHandler()
-            ->runServiceProviders('runtime');
+        
+        try {
+            $app = singleton(App::class);
+            return $app
+                ->loadConfig()
+                ->runServiceProviders('boot')
+                ->setHttpHandlers()
+                ->setUpDatabaseConnection()
+                ->setExceptionHandler()
+                ->runServiceProviders('runtime');
+        } catch (Throwable $e) {
+            // Use the bootstrap exception handler to handle any errors during startup
+            $bootstrapHandler = new \LightWeight\Exceptions\BootstrapExceptionHandler();
+            $bootstrapHandler->handleException($e);
+            
+            // This line won't be reached because handleException calls exit(1)
+            exit(1);
+        }
     }
     
     /**
