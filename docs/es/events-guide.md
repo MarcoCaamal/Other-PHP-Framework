@@ -158,6 +158,7 @@ LightWeight implementa los siguientes eventos del sistema:
 - `router.matched`: Disparado cuando se encuentra una ruta coincidente con la solicitud actual
 - `view.rendering`: Disparado antes de que se renderice una vista
 - `view.rendered`: Disparado después de que una vista ha sido renderizada
+- `session.started`: Disparado cuando se inicia una sesión
 
 ## Ejemplos de Uso de Eventos del Sistema
 
@@ -263,6 +264,39 @@ on('view.rendered', function ($event) {
     // Sin embargo, puedes capturar métricas o analizar el contenido renderizado
     if (config('app.debug') && strlen($content) > 1000000) {
         app('log')->warning("Vista grande renderizada: {$view} - Tamaño: " . strlen($content) . " bytes");
+    }
+});
+```
+
+### Evento `session.started`
+
+Este evento te permite realizar acciones cuando se inicia una sesión de usuario:
+
+```php
+on('session.started', function ($event) {
+    $sessionId = $event->getSessionId();
+    $isNew = $event->isNew();
+    $sessionData = $event->getSessionData();
+    
+    // Seguimiento de métricas de sesión
+    app('stats')->incrementCounter('sesiones_activas');
+    
+    // Registrar la creación de nuevas sesiones
+    if ($isNew) {
+        app('log')->info("Nueva sesión iniciada: {$sessionId}");
+    }
+    
+    // Implementar verificaciones de seguridad personalizadas
+    if (isset($sessionData['user_id'])) {
+        $user = app('db')->table('usuarios')->find($sessionData['user_id']);
+        
+        // Verificar actividad sospechosa
+        if ($user && $user->bandera_actividad_sospechosa) {
+            app('log')->warning("Usuario con marca de actividad sospechosa ha iniciado sesión: ID de usuario {$user->id}");
+            
+            // También podrías invalidar la sesión o añadir verificaciones de seguridad adicionales
+            // session()->invalidate();
+        }
     }
 });
 ```

@@ -2,14 +2,31 @@
 
 namespace LightWeight\Session;
 
+use LightWeight\Events\SessionStartedEvent;
 use LightWeight\Session\Contracts\SessionStorageContract;
 
 class PhpNativeSessionStorage implements SessionStorageContract
 {
     public function start()
     {
+        $isNew = !isset($_SESSION);
+        
         if (!session_start()) {
             throw new \RuntimeException("Failed starting session");
+        }
+        
+        // Dispatch session.started event
+        try {
+            if (function_exists('event')) {
+                event(new SessionStartedEvent([
+                    'session_id' => $this->id(),
+                    'is_new' => $isNew,
+                    'session_data' => $_SESSION ?? []
+                ]));
+            }
+        } catch (\Throwable $e) {
+            // Log error but don't break session functionality
+            error_log("Error dispatching session.started event: " . $e->getMessage());
         }
     }
     public function id(): string

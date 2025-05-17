@@ -156,6 +156,7 @@ LightWeight implements the following system events:
 - `router.matched`: Fired when a route has been matched with the current request
 - `view.rendering`: Fired before a view is rendered
 - `view.rendered`: Fired after a view has been rendered
+- `session.started`: Fired when a session is started
 
 ## System Event Examples
 
@@ -261,6 +262,39 @@ on('view.rendered', function ($event) {
     // However, you can capture metrics or analyze the rendered content
     if (config('app.debug') && strlen($content) > 1000000) {
         app('log')->warning("Large view rendered: {$view} - Size: " . strlen($content) . " bytes");
+    }
+});
+```
+
+### `session.started` Event
+
+This event allows you to perform actions when a user session is started:
+
+```php
+on('session.started', function ($event) {
+    $sessionId = $event->getSessionId();
+    $isNew = $event->isNew();
+    $sessionData = $event->getSessionData();
+    
+    // Track session metrics
+    app('stats')->incrementCounter('active_sessions');
+    
+    // Log new session creation
+    if ($isNew) {
+        app('log')->info("New session started: {$sessionId}");
+    }
+    
+    // Implement custom session security checks
+    if (isset($sessionData['user_id'])) {
+        $user = app('db')->table('users')->find($sessionData['user_id']);
+        
+        // Check for suspicious activity
+        if ($user && $user->suspicious_activity_flag) {
+            app('log')->warning("User with suspicious activity flag logged in: User ID {$user->id}");
+            
+            // You could also invalidate the session or add additional security checks
+            // session()->invalidate();
+        }
     }
 });
 ```
