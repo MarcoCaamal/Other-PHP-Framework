@@ -127,7 +127,7 @@ class EventsIntegrationTest extends TestCase
         $this->assertTrue($this->app->events->hasListeners('event.to.keep'));
         
         // Olvidar uno específico
-        forget_listeners('event.to.forget');
+        forgetListeners('event.to.forget');
         
         // Verificar que solo se olvidó el correcto
         $this->assertFalse($this->app->events->hasListeners('event.to.forget'));

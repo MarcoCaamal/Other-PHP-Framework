@@ -31,6 +31,7 @@ Esta documentación proporciona información detallada sobre las característica
   - [Resumen de acciones de claves foráneas](foreign-key-actions-summary.md)
 - [Mejoras de migraciones](migration-enhancement-documentation.md)
   - [Resumen de mejoras de migraciones](migration-enhancement-summary.md)
+- [Eventos de Modelo](model-events.md)
 
 ## Actualizaciones recientes
 
@@ -39,6 +40,7 @@ Esta documentación proporciona información detallada sobre las característica
 - [Acciones de claves foráneas](foreign-key-actions.md)
 - [Nuevo sistema de eventos](events-guide.md)
 - [Eventos de autenticación](auth-events.md)
+- [Eventos de Modelo](model-events.md)
 - [Sistema de correo electrónico](mail-system.md)
 - [Manejo mejorado de excepciones](exception-handling.md)
 

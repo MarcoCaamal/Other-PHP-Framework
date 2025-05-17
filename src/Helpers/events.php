@@ -34,7 +34,7 @@ function event(EventInterface|string $event, array $payload = []): void
  * @param string|null $eventName The event name or null to remove all listeners
  * @return void
  */
-function forget_listeners(?string $eventName = null): void
+function forgetListeners(?string $eventName = null): void
 {
     app(EventDispatcherInterface::class)->forget($eventName);
 }

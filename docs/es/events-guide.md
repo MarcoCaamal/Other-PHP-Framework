@@ -151,19 +151,51 @@ Para más detalles sobre los providers de servicios, consulta la [documentación
 
 ## Eventos del Sistema
 
-LightWeight implementa los siguientes eventos del sistema:
+El framework incluye varios eventos incorporados:
 
-- `app.bootstrapped`: Disparado cuando la aplicación termina de inicializarse
-- `application.terminating`: Disparado cuando la aplicación está a punto de cerrarse
-- `router.matched`: Disparado cuando se encuentra una ruta coincidente con la solicitud actual
-- `view.rendering`: Disparado antes de que se renderice una vista
-- `view.rendered`: Disparado después de que una vista ha sido renderizada
-- `session.started`: Disparado cuando se inicia una sesión
-- `auth.attempt`: Disparado cuando un usuario intenta autenticarse
-- `auth.login`: Disparado cuando un usuario inicia sesión exitosamente
-- `auth.logout`: Disparado cuando un usuario cierra sesión
+### Eventos de Aplicación
 
-Para más detalles sobre los eventos de autenticación, consulta la [documentación de eventos de autenticación](auth-events.md).
+- `app.booting`: Se dispara cuando la aplicación está iniciando pero antes del bootstrap
+- `app.bootstrapped`: Se dispara cuando la aplicación ha completado el bootstrap
+- `app.error`: Se dispara cuando ocurre un error no manejado
+
+### Eventos HTTP
+
+- `request.received`: Se dispara cuando se recibe una nueva petición HTTP
+- `response.before`: Se dispara antes de enviar una respuesta HTTP
+- `response.after`: Se dispara después de enviar una respuesta HTTP
+
+### Eventos del Router
+
+- `router.matched`: Se dispara cuando el router encuentra una ruta para la petición actual
+- `route.not_found`: Se dispara cuando no se encuentra una ruta para la petición actual
+- `route.unauthorized`: Se dispara cuando se deniega la autorización a una ruta
+
+### Eventos de Vista
+
+- `view.rendering`: Se dispara antes de renderizar una vista
+- `view.rendered`: Se dispara después de renderizar una vista
+
+### Eventos de Sesión
+
+- `session.started`: Se dispara cuando se inicia una nueva sesión
+
+### Eventos de Autenticación
+
+- `auth.attempt`: Se dispara cuando se realiza un intento de inicio de sesión
+- `auth.login`: Se dispara cuando un usuario inicia sesión exitosamente
+- `auth.logout`: Se dispara cuando un usuario cierra sesión
+
+### Eventos de Modelo
+
+- `model.creating`: Se dispara antes de crear un modelo
+- `model.created`: Se dispara después de crear un modelo
+- `model.updating`: Se dispara antes de actualizar un modelo
+- `model.updated`: Se dispara después de actualizar un modelo
+- `model.deleting`: Se dispara antes de eliminar un modelo
+- `model.deleted`: Se dispara después de eliminar un modelo
+
+Para más información sobre los eventos de modelo, consulta la guía de [Eventos de Modelo](model-events.md).
 
 ## Ejemplos de Uso de Eventos del Sistema
 

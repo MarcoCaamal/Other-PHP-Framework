@@ -356,3 +356,51 @@ on(OrderShipped::class, function(OrderShipped $event) {
 4. **Don't rely on execution order**: Don't assume that listeners will be executed in a specific order.
 5. **Be careful with performance**: If you have many event listeners, be mindful of the performance impact.
 6. **Use events for decoupling**: Events are great for decoupling components, but don't overuse them.
+
+## System Events
+
+The framework includes several built-in events:
+
+### Application Events
+
+- `app.booting`: Fired when the application is starting but before bootstrapping
+- `app.bootstrapped`: Fired when the application is fully bootstrapped
+- `app.error`: Fired when an unhandled error occurs
+
+### HTTP Events
+
+- `request.received`: Fired when a new HTTP request is received
+- `response.before`: Fired before sending an HTTP response
+- `response.after`: Fired after sending an HTTP response
+
+### Router Events
+
+- `router.matched`: Fired when the router matches a route to the current request
+- `route.not_found`: Fired when no route matches the current request
+- `route.unauthorized`: Fired when authorization to a route is denied
+
+### View Events
+
+- `view.rendering`: Fired before a view is rendered
+- `view.rendered`: Fired after a view is rendered
+
+### Session Events
+
+- `session.started`: Fired when a new session is started
+
+### Authentication Events
+
+- `auth.attempt`: Fired when a login attempt is made
+- `auth.login`: Fired when a user is logged in successfully
+- `auth.logout`: Fired when a user logs out
+
+### Model Events
+
+- `model.creating`: Fired before a model is created
+- `model.created`: Fired after a model is created
+- `model.updating`: Fired before a model is updated
+- `model.updated`: Fired after a model is updated
+- `model.deleting`: Fired before a model is deleted
+- `model.deleted`: Fired after a model is deleted
+
+For more information about model events, see the [Model Events](model-events.md) guide.

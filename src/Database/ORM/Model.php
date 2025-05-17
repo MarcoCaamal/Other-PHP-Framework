@@ -12,6 +12,12 @@ use LightWeight\Database\ORM\Relations\Relation;
 use LightWeight\Database\QueryBuilder\Builder;
 use LightWeight\Database\QueryBuilder\Contracts\QueryBuilderContract;
 use LightWeight\Database\QueryBuilder\Exceptions\QueryBuilderException;
+use LightWeight\Events\Model\ModelCreatedEvent;
+use LightWeight\Events\Model\ModelCreatingEvent;
+use LightWeight\Events\Model\ModelDeletedEvent;
+use LightWeight\Events\Model\ModelDeletingEvent;
+use LightWeight\Events\Model\ModelUpdatedEvent;
+use LightWeight\Events\Model\ModelUpdatingEvent;
 
 /**
  * Model Class
@@ -267,6 +273,11 @@ abstract class Model implements JsonSerializable
     }
     public function save(): static
     {
+        // Dispatch model.creating event
+        if(function_exists('event')) {
+            event(new ModelCreatingEvent(['model' => $this]));
+        }
+        
         // Make a copy of the attributes before we modify them
         $attributesToSave = $this->attributes;
         
@@ -307,6 +318,11 @@ abstract class Model implements JsonSerializable
                 $this->{$this->primaryKey} = $builder->lastInsertId();
             }
             
+            // Dispatch model.created event
+            if(function_exists('event')) {
+                event(new ModelCreatedEvent(['model' => $this]));
+            }
+            
             return $this;
         } catch (\Exception $e) {
             throw new DatabaseException("Error saving model: {$e->getMessage()}", 0, $e);
@@ -315,6 +331,11 @@ abstract class Model implements JsonSerializable
     
     public function update(): static
     {
+        // Dispatch model.updating event
+        if(function_exists('event')) {
+            event(new ModelUpdatingEvent(['model' => $this]));
+        }
+        
         if ($this->insertTimestamps) {
             $this->attributes["updated_at"] = date("Y-m-d H:i:s");
         }
@@ -354,6 +375,11 @@ abstract class Model implements JsonSerializable
                     ->where($this->primaryKey, '=', $primaryKey)
                     ->update($attributesToUpdate);
             
+            // Dispatch model.updated event
+            if(function_exists('event')) {
+                event(new ModelUpdatedEvent(['model' => $this]));
+            }
+            
             return $this;
         } catch (\Exception $e) {
             throw new DatabaseException("Error updating model: {$e->getMessage()}", 0, $e);
@@ -362,6 +388,11 @@ abstract class Model implements JsonSerializable
     
     public function delete(): static
     {
+        // Dispatch model.deleting event
+        if(function_exists('event')) {
+            event(new ModelDeletingEvent(['model' => $this]));
+        }
+        
         $primaryKey = $this->attributes[$this->primaryKey] ?? null;
         if ($primaryKey === null) {
             throw new \RuntimeException("Cannot delete a model without a primary key value");
@@ -374,6 +405,11 @@ abstract class Model implements JsonSerializable
                     ->where($this->primaryKey, '=', $primaryKey)
                     ->delete();
             
+            // Dispatch model.deleted event
+            if(function_exists('event')) {
+                event(new ModelDeletedEvent(['model' => $this]));
+            }
+            
             return $this;
         } catch (\Exception $e) {
             throw new DatabaseException("Error deleting model: {$e->getMessage()}", 0, $e);
@@ -381,7 +417,13 @@ abstract class Model implements JsonSerializable
     }
     public static function create(array $attributes): static
     {
-        return (new static())->fill($attributes)->save();
+        $instance = new static();
+        $instance->fill($attributes);
+        
+        // Al usar save(), los eventos model.creating y model.created se dispararán automáticamente
+        $instance->save();
+        
+        return $instance;
     }
     /**
      *

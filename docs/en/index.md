@@ -31,6 +31,7 @@ This documentation provides detailed information about the features and usage of
   - [Foreign Key Actions Summary](foreign-key-actions-summary.md)
 - [Migration Enhancements](migration-enhancement-documentation.md)
   - [Migration Enhancement Summary](migration-enhancement-summary.md)
+- [Model Events](model-events.md)
 
 ## Recent Updates
 
@@ -39,6 +40,7 @@ This documentation provides detailed information about the features and usage of
 - [Foreign Key Actions](foreign-key-actions.md)
 - [New Event System](events-guide.md)
 - [Authentication Events](auth-events.md)
+- [Model Events](model-events.md)
 - [Email System](mail-system.md)
 - [Improved Exception Handling](exception-handling.md)
 
