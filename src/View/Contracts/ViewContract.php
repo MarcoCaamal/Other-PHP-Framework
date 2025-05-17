@@ -9,10 +9,10 @@ interface ViewContract
      *
      * @param string $view View name (with dot notation)
      * @param array $params Parameters to pass to the view
-     * @param string|null $layout Layout to use (null for default)
+     * @param string|bool|null $layout Layout to use (null for default, false for no layout)
      * @return string Rendered content
      */
-    public function render(string $view, array $params = [], ?string $layout = null): string;
+    public function render(string $view, array $params = [], $layout = null): string;
     
     /**
      * Render a view file

@@ -91,11 +91,11 @@ class LightEngine implements ViewContract
      *
      * @param string $view View name (with dot notation)
      * @param array $params Parameters to pass to the view
-     * @param string|null $layout Layout to use (null for default)
+     * @param string|bool|null $layout Layout to use (null for default, false for no layout)
      * @return string Rendered content
      * @throws \RuntimeException If view or layout file doesn't exist
      */
-    public function render(string $view, array $params = [], ?string $layout = null): string
+    public function render(string $view, array $params = [], $layout = null): string
     {
         // Reset sections
         $this->sections = [];
@@ -114,8 +114,9 @@ class LightEngine implements ViewContract
             return $viewContent;
         }
         
-        // With layout
-        $layoutContent = $this->renderLayout($layout ?? $this->defaultLayout);
+        // With layout - only use defaultLayout if layout is null (not false or empty string)
+        $layoutName = $layout === null ? $this->defaultLayout : $layout;
+        $layoutContent = $this->renderLayout($layoutName);
         return str_replace($this->contentAnotation, $viewContent, $layoutContent);
     }
     

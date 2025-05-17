@@ -183,7 +183,15 @@ class Response implements ResponseContract
             ->setStatus(302)
             ->setHeader('Location', $uri);
     }
-    public static function view(string $view, array $params = [], ?string $layout = null): self
+    /**
+     * Create a new view response.
+     *
+     * @param string $view The view to render
+     * @param array $params Parameters to pass to the view
+     * @param string|bool|null $layout Layout to use (null for default, false for no layout)
+     * @return \LightWeight\Http\Response
+     */
+    public static function view(string $view, array $params = [], $layout = null): self
     {
         $content = app(ViewContract::class)->render($view, $params, $layout);
 
