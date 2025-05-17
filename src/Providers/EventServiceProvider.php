@@ -5,9 +5,11 @@ namespace LightWeight\Providers;
 use DI\Container as DIContainer;
 use LightWeight\Container\Container;
 use LightWeight\Events\Contracts\EventDispatcherContract;
-use LightWeight\Events\Contracts\EventSubscriberInterface;
-use LightWeight\Events\Contracts\ListenerInterface;
+use LightWeight\Events\Contracts\EventSubscriberContract;
+use LightWeight\Events\Contracts\ListenerContract;
 use LightWeight\Events\EventDispatcher;
+use LightWeight\Log\Contracts\LoggerContract;
+use LightWeight\Log\Handlers\EventLogHandler;
 use LightWeight\Providers\Contracts\ServiceProviderContract;
 
 /**
@@ -20,7 +22,7 @@ class EventServiceProvider implements ServiceProviderContract
      * 
      * Override this property in child classes to register app-specific listeners
      *
-     * @var array<string, array<ListenerInterface|callable>>
+     * @var array<string, array<ListenerContract|callable>>
      */
     protected array $listen = [];
 
@@ -35,7 +37,7 @@ class EventServiceProvider implements ServiceProviderContract
         // Register the event dispatcher
         $serviceContainer->set(
             EventDispatcherContract::class,
-            function () {
+            function () use ($serviceContainer) {
                 $dispatcher = new EventDispatcher();
                 
                 // Register default listeners
@@ -43,6 +45,9 @@ class EventServiceProvider implements ServiceProviderContract
                 
                 // Register subscribers from config
                 $this->registerConfigSubscribers($dispatcher);
+                
+                // Configure event logging
+                $this->configureEventLogging($dispatcher, $serviceContainer);
                 
                 return $dispatcher;
             }
@@ -88,19 +93,55 @@ class EventServiceProvider implements ServiceProviderContract
                 // Usar el contenedor para instanciar el suscriptor
                 $instance = Container::make($subscriber);
                 
-                if ($instance instanceof EventSubscriberInterface) {
+                if ($instance instanceof EventSubscriberContract) {
                     // Registrar oyentes mediante el método subscribe
                     $instance->subscribe($dispatcher);
-                    
-                    // Alternativamente, se podría implementar para usar getSubscribedEvents:
-                    // foreach ($subscriber::getSubscribedEvents() as $event => $method) {
-                    //     $dispatcher->listen($event, function (EventInterface $event) use ($instance, $method) {
-                    //         $instance->{$method}($event);
-                    //     });
-                    // }
-                    // }
                 }
             }
         }
+    }
+
+    /**
+     * Configure event logging if enabled
+     *  
+     * @param EventDispatcherContract $dispatcher
+     * @param DIContainer $container
+     * @return void
+     */
+    protected function configureEventLogging(EventDispatcherContract $dispatcher, DIContainer $container): void
+    {
+        $enableEventLogging = filter_var(
+            config('logging.event_logging.enabled', config('events.log_events', false)),
+            FILTER_VALIDATE_BOOLEAN
+        );
+        // Check if event logging is enabled
+        if (!$enableEventLogging) {
+            return;
+        }
+        
+        // Get excluded events from config
+        $excludedEvents = config('logging.event_logging.excluded_events', config('events.log_exclude', []));
+        
+        // Create the event log handler
+        $eventLogHandler = new EventLogHandler($excludedEvents);
+        
+        // Get the logger
+        $logger = $container->get(LoggerContract::class);
+        
+        // Register a listener for all events
+        $dispatcher->listen('*', function ($event, ?string $eventName = null) use ($eventLogHandler, $logger) {
+            // If event name is not provided as second argument, it might be in the first parameter
+            if ($eventName === null && is_string($event)) {
+                $eventName = $event;
+                $event = null;
+            }
+            
+            if (!is_string($eventName)) {
+                $logger->warning('Invalid event format received in event logger');
+                return;
+            }
+            
+            $eventLogHandler->handleEvent($eventName, $event, $logger);
+        });
     }
 }

@@ -2,7 +2,7 @@
 
 The LightWeight framework provides a robust exception handling system that allows you to:
 
-- Centrally manage and log exceptions
+- Centrally manage and log exceptions through Monolog
 - Customize how different types of exceptions are handled
 - Provide user-friendly error responses
 - Separate API and web error handling logic
@@ -11,7 +11,7 @@ The LightWeight framework provides a robust exception handling system that allow
 
 When an exception is thrown in your application, the exception handler will:
 
-1. Report the exception to the log system (unless configured not to)
+1. Report the exception to the Monolog logging system (unless configured not to)
 2. Render an appropriate response based on the exception type
 3. Send the response to the client
 
@@ -103,6 +103,9 @@ return [
     'log' => [
         'channel' => 'daily',
         'max_files' => 30,
+        'path' => 'logs/exceptions.log',
+        'critical_path' => 'logs/critical.log',
+        'level' => 'error',
     ],
 ];
 ```
@@ -213,6 +216,24 @@ This middleware will:
 1. Catch any exceptions in the API routes
 2. Log the exceptions
 3. Return consistent JSON responses with appropriate status codes
+
+## Monolog Integration
+
+The LightWeight framework now uses Monolog for robust exception logging. When an exception occurs, the following information is captured:
+
+- Exception class and message
+- File and line where the exception occurred
+- Stack trace
+- Additional context relevant to the exception
+
+The integration with Monolog provides several benefits:
+
+- Structured logging with standardized format
+- Multiple output handlers (file, database, external services)
+- Configurable log levels for different types of exceptions
+- Advanced filtering and processing capabilities
+
+For more details on the Monolog integration, see [Exception Handling with Monolog](exception-handling-with-monolog.md).
 
 ## Best Practices
 

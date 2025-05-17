@@ -3,12 +3,11 @@
 namespace App\Providers;
 
 use LightWeight\Events\Contracts\EventDispatcherContract;
-use LightWeight\Providers\EventServiceProvider as BaseEventServiceProvider;
 
 /**
  * Proveedor de servicios para el sistema de eventos específico de la aplicación
  */
-class AppEventServiceProvider extends BaseEventServiceProvider
+class AppEventServiceProvider implements \LightWeight\Providers\Contracts\ServiceProviderContract
 {
     /**
      * Lista de listeners a registrar para cada evento
@@ -28,7 +27,6 @@ class AppEventServiceProvider extends BaseEventServiceProvider
      */
     public function registerServices($container)
     {
-        parent::registerServices($container);
         
         // Registramos los listeners que usan closures
         $dispatcher = $container->get(EventDispatcherContract::class);

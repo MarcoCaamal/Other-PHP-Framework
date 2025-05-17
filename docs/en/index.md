@@ -19,8 +19,10 @@ This documentation provides detailed information about the features and usage of
   - [Event Service Provider](event-service-provider.md)
   - [Router.Matched Event](router-matched-event.md)
   - [Event Listener Best Practices](event-listener-best-practices.md)
+- [Logging System](logging-system.md)
 - [Email System](mail-system.md)
 - [Exception Handling](exception-handling.md)
+  - [Exception Handling with Monolog](exception-handling-with-monolog.md)
 
 ### Database
 - [Migrations](create-migration-guide.md)
@@ -32,6 +34,8 @@ This documentation provides detailed information about the features and usage of
 - [Migration Enhancements](migration-enhancement-documentation.md)
   - [Migration Enhancement Summary](migration-enhancement-summary.md)
 - [Model Events](model-events.md)
+- [Logging System](logging-system.md)
+- [Exception Handling with Monolog](exception-handling-with-monolog.md)
 
 ## Recent Updates
 

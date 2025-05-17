@@ -5,13 +5,13 @@ namespace LightWeight\Events\Contracts;
 /**
  * Interface for event listeners in the system.
  */
-interface ListenerInterface
+interface ListenerContract
 {
     /**
      * Handle the event
      *
-     * @param EventInterface $event The event to handle
+     * @param EventContract $event The event to handle
      * @return void
      */
-    public function handle(EventInterface $event): void;
+    public function handle(EventContract $event): void;
 }

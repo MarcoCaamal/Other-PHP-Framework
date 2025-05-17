@@ -42,6 +42,16 @@ return [
          * Options: debug, info, notice, warning, error, critical, alert, emergency
          */
         'level' => env('LOG_EXCEPTION_LEVEL', 'error'),
+        
+        /**
+         * Path to the exception log file
+         */
+        'path' => env('LOG_EXCEPTION_PATH', 'logs/exceptions.log'),
+        
+        /**
+         * Separate log file for critical exceptions
+         */
+        'critical_path' => env('LOG_CRITICAL_PATH', 'logs/critical.log'),
     ],
     
     /**

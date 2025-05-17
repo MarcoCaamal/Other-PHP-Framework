@@ -2,7 +2,7 @@
 
 > 🌐 [Documentación en Español](../es/event-service-provider.md)
 
-The LightWeight framework now includes a dedicated service provider for the event system. This provider simplifies the configuration and registration of global listeners for your application.
+The LightWeight framework includes a dedicated service provider for the event system. This provider simplifies the configuration and registration of global listeners for your application, and also handles event logging if enabled.
 
 ## EventServiceProvider
 
@@ -10,8 +10,11 @@ The `EventServiceProvider` is responsible for:
 - Registering the implementation of the `EventDispatcherContract` in the container
 - Facilitating the registration of default listeners
 - Automatically loading subscribers from the configuration
+- Configuring event logging based on your application settings
 
 ## Configuration
+
+### Events Configuration
 
 The `config/events.php` configuration file allows you to configure aspects of the event system:
 
@@ -27,19 +30,36 @@ return [
     'subscribers' => [
         App\Events\Subscribers\UserEventSubscriber::class,
     ],
+];
+```
+
+### Event Logging Configuration
+
+Event logging is configured in the `config/logging.php` file:
+
+```php
+return [
+    // ... other logging settings
     
     /**
-     * Event logging
-     * 
-     * When enabled, all events will be logged for debugging purposes.
+     * Event Logging Configuration
+     *
+     * Settings for automatic logging of events dispatched in the application.
      */
-    'log_events' => env('LOG_EVENTS', false),
-    
-    /**
-     * Events that should not be logged even when event logging is enabled
-     */
-    'log_exclude' => [
-        'application.bootstrapped',
+    'event_logging' => [
+        /**
+         * Enable event logging.
+         */
+        'enabled' => env('LOG_EVENTS', false),
+        
+        /**
+         * Events that should not be logged even when event logging is enabled.
+         */
+        'excluded_events' => [
+            'application.bootstrapped',
+            'router.matched',
+            // Other events to exclude...
+        ],
     ],
 ];
 ```

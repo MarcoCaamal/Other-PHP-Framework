@@ -3,7 +3,7 @@
 namespace Tests\Events;
 
 use LightWeight\Events\Contracts\EventDispatcherContract;
-use LightWeight\Events\Contracts\EventSubscriberInterface;
+use LightWeight\Events\Contracts\EventSubscriberContract;
 use LightWeight\Events\EventDispatcher;
 use LightWeight\Events\GenericEvent;
 use LightWeight\Events\Subscribers\ExampleSubscriber;
@@ -44,6 +44,6 @@ class EventSubscriberTest extends TestCase
     public function testSubscriberInterface()
     {
         $subscriber = new ExampleSubscriber();
-        $this->assertInstanceOf(EventSubscriberInterface::class, $subscriber);
+        $this->assertInstanceOf(EventSubscriberContract::class, $subscriber);
     }
 }

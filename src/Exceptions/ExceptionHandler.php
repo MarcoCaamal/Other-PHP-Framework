@@ -10,7 +10,6 @@ use LightWeight\Http\Response;
 use LightWeight\Validation\Exceptions\ValidationException;
 use LightWeight\Database\Exceptions\DatabaseException;
 use LightWeight\Exceptions\Contracts\ExceptionHandlerContract;
-use LightWeight\Exceptions\ExceptionLogger;
 
 /**
  * Base exception handler class for the application
@@ -49,8 +48,28 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
         // Determine log level based on exception type
         $level = $this->getLogLevel($e);
         
-        // Log the exception
-        ExceptionLogger::log($e, $level);
+        // Create context for the log
+        $context = [
+            'exception' => get_class($e),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'code' => $e->getCode(),
+            'trace' => $e->getTraceAsString(),
+        ];
+        
+        // Log the exception using the logger
+        try {
+            if (function_exists('logMessage')) {
+                logMessage($e->getMessage(), $context, $level);
+            } else {
+                // Fallback for early bootstrap when logger might not be available
+                $this->fallbackLog($e, $level);
+            }
+        } catch (\Throwable $logException) {
+            // If logging itself fails, write to error_log as last resort
+            error_log("Failed to log exception: {$logException->getMessage()}");
+            error_log("Original exception: {$e->getMessage()} in {$e->getFile()} on line {$e->getLine()}");
+        }
         
         // Check if this is a critical exception that needs notification
         if ($this->isCriticalException($e)) {
@@ -67,23 +86,23 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
     protected function getLogLevel(Throwable $e): string
     {
         if ($e instanceof DatabaseException) {
-            return ExceptionLogger::ERROR;
+            return 'error';
         }
         
         if ($e instanceof HttpNotFoundException) {
-            return ExceptionLogger::NOTICE;
+            return 'notice';
         }
         
         if ($e instanceof ValidationException) {
-            return ExceptionLogger::WARNING;
+            return 'warning';
         }
         
         // Check for critical exceptions (using string comparison to avoid direct dependency)
         if (strpos(get_class($e), 'CriticalException') !== false) {
-            return ExceptionLogger::CRITICAL;
+            return 'critical';
         }
         
-        return ExceptionLogger::ERROR;
+        return 'error';
     }
     
     /**
@@ -117,14 +136,107 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
      */
     protected function notifyCriticalException(Throwable $e): void
     {
-        // If this is a special critical exception with channels specified
-        if (method_exists($e, 'getNotificationChannels')) {
-            ExceptionNotifier::notify($e, $e->getNotificationChannels());
-        } else {
-            // Use default notification channels from config
-            $channels = config('exceptions.notifications.channels', ['log', 'email']);
-            ExceptionNotifier::notify($e, $channels);
+        // Get channels from exception or config
+        $channels = method_exists($e, 'getNotificationChannels')
+            ? $e->getNotificationChannels()
+            : config('exceptions.notifications.channels', ['log', 'email']);
+            
+        // Format exception for notification
+        $context = $this->formatExceptionForNotification($e);
+        
+        // Process each notification channel
+        foreach ($channels as $channel) {
+            $this->sendNotification($channel, $context, $e);
         }
+    }
+    
+    /**
+     * Format exception data for notifications
+     * 
+     * @param Throwable $e
+     * @return array
+     */
+    protected function formatExceptionForNotification(Throwable $e): array
+    {
+        $env = env('APP_ENV', 'production');
+        $appName = config('app.name', 'LightWeight Application');
+        
+        return [
+            'subject' => "[{$appName}] [{$env}] Exception: " . get_class($e),
+            'message' => $e->getMessage(),
+            'exception' => get_class($e),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'code' => $e->getCode(),
+            'trace' => $e->getTraceAsString(),
+            'timestamp' => date('Y-m-d H:i:s'),
+            'environment' => $env,
+            'application' => $appName,
+            'server' => $_SERVER['SERVER_NAME'] ?? 'unknown',
+            'request_uri' => $_SERVER['REQUEST_URI'] ?? 'unknown',
+            'request_method' => $_SERVER['REQUEST_METHOD'] ?? 'unknown',
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+        ];
+    }
+    
+    /**
+     * Send a notification through the specified channel
+     * 
+     * @param string $channel
+     * @param array $context
+     * @param Throwable $e
+     * @return void
+     */
+    protected function sendNotification(string $channel, array $context, Throwable $e): void
+    {
+        // Critical exceptions should always be logged regardless of other channels
+        if ($channel === 'log') {
+            if (function_exists('logMessage')) {
+                logMessage(
+                    "Critical Exception: " . $context['exception'] . " - " . $context['message'],
+                    [
+                        'exception' => $context['exception'],
+                        'file' => $context['file'],
+                        'line' => $context['line'],
+                        'trace' => $context['trace'],
+                        'request_uri' => $context['request_uri'],
+                        'request_method' => $context['request_method'],
+                    ],
+                    'critical'
+                );
+            } else {
+                $this->fallbackLog($e, 'critical');
+            }
+            return;
+        }
+        
+        // Email notifications
+        if ($channel === 'email') {
+            $to = config('exceptions.notifications.email.to', '');
+            
+            if (empty($to)) {
+                return;
+            }
+            
+            $subject = $context['subject'];
+            
+            // Build email body
+            $body = "An exception occurred in your application.\n\n";
+            $body .= "Exception: {$context['exception']}\n";
+            $body .= "Message: {$context['message']}\n";
+            $body .= "File: {$context['file']} (line {$context['line']})\n";
+            $body .= "URL: {$context['request_uri']}\n";
+            $body .= "Environment: {$context['environment']}\n";
+            $body .= "Time: {$context['timestamp']}\n\n";
+            $body .= "Stack Trace:\n{$context['trace']}\n";
+            
+            // Send email
+            mail($to, $subject, $body);
+        }
+        
+        // Other notification methods can be added here
+        // as needed for slack, sms, etc.
     }
     
     /**
@@ -335,5 +447,44 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
         }
         
         return Response::json($data)->setStatus($status);
+    }
+    
+    /**
+     * Fallback logging when logger is not available
+     *
+     * @param Throwable $e
+     * @param string $level
+     * @return void
+     */
+    protected function fallbackLog(Throwable $e, string $level): void
+    {
+        try {
+            $logPath = function_exists('storagePath') 
+                ? storagePath('logs/exceptions.log')
+                : (dirname(__DIR__, 3) . '/storage/logs/exceptions.log');
+                
+            $logDir = dirname($logPath);
+            
+            // Create log directory if it doesn't exist
+            if (!is_dir($logDir)) {
+                mkdir($logDir, 0755, true);
+            }
+            
+            $timestamp = date('Y-m-d H:i:s');
+            $message = sprintf(
+                "[%s] %s: %s in %s on line %d\n%s\n\n",
+                $timestamp,
+                strtoupper($level),
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine(),
+                $e->getTraceAsString()
+            );
+            
+            file_put_contents($logPath, $message, FILE_APPEND);
+        } catch (\Throwable $fallbackException) {
+            // Last resort - use PHP's error_log if everything else fails
+            error_log("Exception: {$e->getMessage()} in {$e->getFile()} on line {$e->getLine()}");
+        }
     }
 }

@@ -4,8 +4,8 @@ namespace LightWeight\Tests\Events;
 
 use LightWeight\App;
 use LightWeight\Events\Contracts\EventDispatcherContract;
-use LightWeight\Events\Contracts\EventInterface;
-use LightWeight\Events\Contracts\ListenerInterface;
+use LightWeight\Events\Contracts\EventContract;
+use LightWeight\Events\Contracts\ListenerContract;
 use LightWeight\Events\EventDispatcher;
 use LightWeight\Events\System\ApplicationBootstrapped;
 use LightWeight\Events\System\ApplicationTerminating;
@@ -32,7 +32,7 @@ class EventsIntegrationTest extends TestCase
         $data = null;
 
         // Registrar un listener usando la función helper "on"
-        on('test.helper.event', function (EventInterface $event) use (&$wasCalled, &$data) {
+        on('test.helper.event', function (EventContract $event) use (&$wasCalled, &$data) {
             $wasCalled = true;
             $data = $event->getData();
         });
@@ -52,7 +52,7 @@ class EventsIntegrationTest extends TestCase
         // Registrar listener para el evento de bootstrap
         $this->app->events->listen(
             'application.bootstrapped', 
-            function (EventInterface $event) use (&$eventReceived) {
+            function (EventContract $event) use (&$eventReceived) {
                 $eventReceived = true;
                 $this->assertInstanceOf(ApplicationBootstrapped::class, $event);
             }
@@ -77,7 +77,7 @@ class EventsIntegrationTest extends TestCase
         // Registrar listener para el evento de terminación
         $this->app->events->listen(
             'application.terminating', 
-            function (EventInterface $event) use (&$eventReceived, &$responseData) {
+            function (EventContract $event) use (&$eventReceived, &$responseData) {
                 $eventReceived = true;
                 $responseData = $event->getData()['response'] ?? null;
             }
@@ -94,10 +94,10 @@ class EventsIntegrationTest extends TestCase
     public function testListenerClassIntegration(): void
     {
         // Crear una clase listener
-        $listener = new class implements ListenerInterface {
+        $listener = new class implements ListenerContract {
             public static $wasCalled = false;
             
-            public function handle(EventInterface $event): void
+            public function handle(EventContract $event): void
             {
                 self::$wasCalled = true;
             }

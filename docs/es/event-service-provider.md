@@ -2,7 +2,7 @@
 
 > 🌐 [English Documentation](../en/event-service-provider.md)
 
-El framework LightWeight ahora incluye un proveedor de servicios dedicado para el sistema de eventos. Este proveedor simplifica la configuración y el registro de listeners globales para tu aplicación.
+El framework LightWeight incluye un proveedor de servicios dedicado para el sistema de eventos. Este proveedor simplifica la configuración y el registro de listeners globales para tu aplicación, y también gestiona el registro de eventos si está habilitado.
 
 ## EventServiceProvider
 
@@ -10,8 +10,11 @@ El `EventServiceProvider` es responsable de:
 - Registrar la implementación del `EventDispatcherContract` en el contenedor
 - Facilitar el registro de listeners predeterminados
 - Cargar automáticamente suscriptores desde la configuración
+- Configurar el registro de eventos según los ajustes de tu aplicación
 
 ## Configuración
+
+### Configuración de Eventos
 
 El archivo de configuración `config/events.php` permite configurar aspectos del sistema de eventos:
 
@@ -20,26 +23,43 @@ return [
     /**
      * Event subscribers
      * 
-     * List of subscriber classes that will be automatically registered with the event dispatcher.
-     * Each subscriber class must have a subscribe method that accepts an EventDispatcherContract
-     * instance as its only parameter.
+     * Lista de clases suscriptoras que se registrarán automáticamente con el despachador de eventos.
+     * Cada clase suscriptora debe tener un método subscribe que acepte una instancia de EventDispatcherContract
+     * como su único parámetro.
      */
     'subscribers' => [
         App\Events\Subscribers\UserEventSubscriber::class,
     ],
+];
+```
+
+### Configuración de Registro de Eventos
+
+El registro de eventos se configura en el archivo `config/logging.php`:
+
+```php
+return [
+    // ... otras configuraciones de logging
     
     /**
-     * Event logging
-     * 
-     * When enabled, all events will be logged for debugging purposes.
+     * Configuración de Logging de Eventos
+     *
+     * Ajustes para el registro automático de eventos despachados en la aplicación.
      */
-    'log_events' => env('LOG_EVENTS', false),
-    
-    /**
-     * Events that should not be logged even when event logging is enabled
-     */
-    'log_exclude' => [
-        'application.bootstrapped',
+    'event_logging' => [
+        /**
+         * Habilitar el logging de eventos.
+         */
+        'enabled' => env('LOG_EVENTS', false),
+        
+        /**
+         * Eventos que no deben ser registrados incluso cuando el logging de eventos está habilitado.
+         */
+        'excluded_events' => [
+            'application.bootstrapped',
+            'router.matched',
+            // Otros eventos a excluir...
+        ],
     ],
 ];
 ```

@@ -3,13 +3,13 @@
 namespace App\Events\Subscribers;
 
 use LightWeight\Events\Contracts\EventDispatcherContract;
-use LightWeight\Events\Contracts\EventInterface;
-use LightWeight\Events\Contracts\EventSubscriberInterface;
+use LightWeight\Events\Contracts\EventContract;
+use LightWeight\Events\Contracts\EventSubscriberContract;
 
 /**
  * Suscriptor de eventos para gestionar eventos relacionados con usuarios
  */
-class UserEventSubscriber implements EventSubscriberInterface
+class UserEventSubscriber implements EventSubscriberContract
 {
     /**
      * Obtiene los eventos manejados por este suscriptor
@@ -33,15 +33,15 @@ class UserEventSubscriber implements EventSubscriberInterface
      */
     public function subscribe(EventDispatcherContract $dispatcher): void
     {
-        $dispatcher->listen('user.registered', function (EventInterface $event) {
+        $dispatcher->listen('user.registered', function (EventContract $event) {
             $this->onUserRegistered($event);
         });
         
-        $dispatcher->listen('user.login', function (EventInterface $event) {
+        $dispatcher->listen('user.login', function (EventContract $event) {
             $this->onUserLogin($event);
         });
         
-        $dispatcher->listen('user.logout', function (EventInterface $event) {
+        $dispatcher->listen('user.logout', function (EventContract $event) {
             $this->onUserLogout($event);
         });
     }
@@ -49,10 +49,10 @@ class UserEventSubscriber implements EventSubscriberInterface
     /**
      * Manejar el evento de registro de usuario
      * 
-     * @param EventInterface $event
+     * @param EventContract $event
      * @return void
      */
-    public function onUserRegistered(EventInterface $event): void
+    public function onUserRegistered(EventContract $event): void
     {
         // Implementación para el registro de usuario
         $user = $event->getData()['user'] ?? null;
@@ -65,10 +65,10 @@ class UserEventSubscriber implements EventSubscriberInterface
     /**
      * Manejar el evento de inicio de sesión
      * 
-     * @param EventInterface $event
+     * @param EventContract $event
      * @return void
      */
-    public function onUserLogin(EventInterface $event): void
+    public function onUserLogin(EventContract $event): void
     {
         // Implementación para el login de usuario
         $user = $event->getData()['user'] ?? null;
@@ -81,10 +81,10 @@ class UserEventSubscriber implements EventSubscriberInterface
     /**
      * Manejar el evento de cierre de sesión
      * 
-     * @param EventInterface $event
+     * @param EventContract $event
      * @return void
      */
-    public function onUserLogout(EventInterface $event): void
+    public function onUserLogout(EventContract $event): void
     {
         // Implementación para el logout de usuario
         $user = $event->getData()['user'] ?? null;

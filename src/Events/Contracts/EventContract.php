@@ -5,7 +5,7 @@ namespace LightWeight\Events\Contracts;
 /**
  * Interface for all events in the system.
  */
-interface EventInterface
+interface EventContract
 {
     /**
      * Get the name of the event.

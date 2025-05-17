@@ -19,8 +19,10 @@ Esta documentación proporciona información detallada sobre las característica
   - [Proveedor de servicios de eventos](event-service-provider.md)
   - [Evento Router.Matched](router-matched-event.md)
   - [Mejores prácticas para Listeners de eventos](event-listener-best-practices.md)
+- [Sistema de logging](logging-system.md)
 - [Sistema de correo electrónico](mail-system.md)
 - [Manejo de excepciones](exception-handling.md)
+  - [Manejo de excepciones con Monolog](exception-handling-with-monolog.md)
 
 ### Base de datos
 - [Migraciones](create-migration-guide.md)
@@ -32,6 +34,7 @@ Esta documentación proporciona información detallada sobre las característica
 - [Mejoras de migraciones](migration-enhancement-documentation.md)
   - [Resumen de mejoras de migraciones](migration-enhancement-summary.md)
 - [Eventos de Modelo](model-events.md)
+- [Sistema de logging](logging-system.md)
 
 ## Actualizaciones recientes
 

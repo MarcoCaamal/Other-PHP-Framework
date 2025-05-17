@@ -6,8 +6,8 @@ use LightWeight\Container\Container;
 use LightWeight\Events\GenericEvent;
 use LightWeight\Events\EventDispatcher;
 use LightWeight\Events\Contracts\EventDispatcherContract;
-use LightWeight\Events\Contracts\EventInterface;
-use LightWeight\Events\Contracts\ListenerInterface;
+use LightWeight\Events\Contracts\EventContract;
+use LightWeight\Events\Contracts\ListenerContract;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -51,7 +51,7 @@ class TestEmailService
 /**
  * Listener para eventos de registro de usuario
  */
-class TestWelcomeEmailListener implements ListenerInterface
+class TestWelcomeEmailListener implements ListenerContract
 {
     private TestEmailService $emailService;
     
@@ -60,7 +60,7 @@ class TestWelcomeEmailListener implements ListenerInterface
         $this->emailService = $emailService;
     }
     
-    public function handle(EventInterface $event): void
+    public function handle(EventContract $event): void
     {
         // Obtener datos del usuario desde el evento
         $userData = $event->getData();

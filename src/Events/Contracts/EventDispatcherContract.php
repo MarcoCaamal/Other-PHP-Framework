@@ -11,19 +11,19 @@ interface EventDispatcherContract
      * Register an event listener
      *
      * @param string $eventName The name of the event to listen for
-     * @param ListenerInterface|callable $listener The listener to register
+     * @param ListenerContract|callable $listener The listener to register
      * @return void
      */
-    public function listen(string $eventName, ListenerInterface|callable $listener): void;
+    public function listen(string $eventName, ListenerContract|callable $listener): void;
     
     /**
      * Dispatch an event
      *
-     * @param EventInterface|string $event The event object or event name
+     * @param EventContract|string $event The event object or event name
      * @param array $payload Optional payload if event name is provided instead of object
      * @return void
      */
-    public function dispatch(EventInterface|string $event, array $payload = []): void;
+    public function dispatch(EventContract|string $event, array $payload = []): void;
     
     /**
      * Remove all listeners for a specific event

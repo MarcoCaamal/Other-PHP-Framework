@@ -4,8 +4,8 @@ namespace LightWeight\Events;
 
 use LightWeight\Container\Container;
 use LightWeight\Events\Contracts\EventDispatcherContract;
-use LightWeight\Events\Contracts\EventInterface;
-use LightWeight\Events\Contracts\ListenerInterface;
+use LightWeight\Events\Contracts\EventContract;
+use LightWeight\Events\Contracts\ListenerContract;
 
 /**
  * Event dispatcher implementation
@@ -23,10 +23,10 @@ class EventDispatcher implements EventDispatcherContract
      * Register an event listener
      *
      * @param string $eventName The name of the event to listen for
-     * @param ListenerInterface|callable|string $listener The listener to register
+     * @param ListenerContract|callable|string $listener The listener to register
      * @return void
      */
-    public function listen(string $eventName, ListenerInterface|callable|string $listener): void
+    public function listen(string $eventName, ListenerContract|callable|string $listener): void
     {
         $this->listeners[$eventName][] = $listener;
     }
@@ -34,11 +34,11 @@ class EventDispatcher implements EventDispatcherContract
     /**
      * Dispatch an event to all registered listeners
      *
-     * @param EventInterface|string $event The event object or event name
+     * @param EventContract|string $event The event object or event name
      * @param array $payload Optional payload if event name is provided instead of object
      * @return void
      */
-    public function dispatch(EventInterface|string $event, array $payload = []): void
+    public function dispatch(EventContract|string $event, array $payload = []): void
     {
         // Convert event name to an Event object if needed
         if (is_string($event)) {
@@ -49,22 +49,42 @@ class EventDispatcher implements EventDispatcherContract
         
         $eventName = $eventObj->getName();
         
-        // No listeners for this event
-        if (!$this->hasListeners($eventName)) {
-            return;
+        // Call specific event listeners
+        if ($this->hasListeners($eventName)) {
+            $this->callListeners($eventName, $eventObj);
         }
         
-        // Call each listener
+        // Call wildcard listeners
+        if ($this->hasListeners('*')) {
+            $this->callListeners('*', $eventObj, $eventName);
+        }
+    }
+    
+    /**
+     * Call listeners for a specific event
+     *
+     * @param string $eventName The event name
+     * @param EventContract $eventObj The event object
+     * @param string|null $originalEventName Original event name for wildcard listeners
+     * @return void
+     */
+    protected function callListeners(string $eventName, EventContract $eventObj, ?string $originalEventName = null): void
+    {
         foreach ($this->listeners[$eventName] as $listener) {
-            if ($listener instanceof ListenerInterface) {
+            if ($listener instanceof ListenerContract) {
                 $listener->handle($eventObj);
             } elseif (is_callable($listener)) {
-                call_user_func($listener, $eventObj);
+                if ($eventName === '*' && $originalEventName !== null) {
+                    // For wildcard listeners, pass the event object and original event name
+                    call_user_func($listener, $eventObj, $originalEventName);
+                } else {
+                    call_user_func($listener, $eventObj);
+                }
             } elseif (is_string($listener) && class_exists($listener)) {
                 // Instantiate listener class using dependency injection container
                 $instance = Container::make($listener);
                 
-                if ($instance instanceof ListenerInterface) {
+                if ($instance instanceof ListenerContract) {
                     $instance->handle($eventObj);
                 }
             }

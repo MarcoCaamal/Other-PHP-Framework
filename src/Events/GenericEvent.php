@@ -2,12 +2,12 @@
 
 namespace LightWeight\Events;
 
-use LightWeight\Events\Contracts\EventInterface;
+use LightWeight\Events\Contracts\EventContract;
 
 /**
  * Generic event class for simple string-based events
  */
-class GenericEvent implements EventInterface
+class GenericEvent implements EventContract
 {
     /**
      * Event name

@@ -15,6 +15,7 @@ use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\Http\Request;
 use LightWeight\Http\Response;
+use LightWeight\Log\Contracts\LoggerContract;
 use LightWeight\Routing\Router;
 use LightWeight\Server\Contracts\ServerContract;
 use LightWeight\Session\Contracts\SessionStorageContract;
@@ -89,6 +90,14 @@ class App
      * @var EventDispatcherContract
      */
     public EventDispatcherContract $events;
+
+    /**
+     * Logger instance
+     *
+     * @var LoggerContract
+     */
+    public LoggerContract $logger;
+    
     /**
      * Check if the current request is an API request
      *
@@ -182,6 +191,7 @@ class App
             $result = $app
                 ->loadConfig()
                 ->runServiceProviders('boot')
+                ->setUpLogging()
                 ->setHttpHandlers()
                 ->setUpDatabaseConnection()
                 ->setExceptionHandler()
@@ -322,6 +332,19 @@ class App
     public function setUpEventSystem(): self
     {
         $this->events = app(EventDispatcherContract::class);
+        
+        return $this;
+    }
+    /**
+     * Set up the logging system
+     *
+     * @return self
+     */
+    public function setUpLogging(): self
+    {
+        // Set the logger instance
+        $this->logger = app(LoggerContract::class);
+        
         return $this;
     }
     /**
@@ -426,6 +449,16 @@ class App
     public function has(string $class): bool
     {
         return Container::has($class);
+    }
+
+    /**
+     * Get the logger instance
+     *
+     * @return LoggerContract
+     */
+    public function log(): LoggerContract
+    {
+        return $this->logger;
     }
 
     /**

@@ -8,7 +8,7 @@ namespace LightWeight\Events\Contracts;
  * Los suscriptores de eventos son clases que pueden registrar múltiples oyentes (listeners)
  * para diferentes eventos, agrupando la funcionalidad relacionada en una sola clase.
  */
-interface EventSubscriberInterface
+interface EventSubscriberContract
 {
     /**
      * Obtiene los eventos manejados por este suscriptor

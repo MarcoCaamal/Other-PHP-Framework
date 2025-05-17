@@ -2,8 +2,8 @@
 
 namespace LightWeight\Tests\Events;
 
-use LightWeight\Events\Contracts\EventInterface;
-use LightWeight\Events\Contracts\ListenerInterface;
+use LightWeight\Events\Contracts\EventContract;
+use LightWeight\Events\Contracts\ListenerContract;
 use LightWeight\Events\Event;
 use LightWeight\Events\EventDispatcher;
 use LightWeight\Events\GenericEvent;
@@ -36,7 +36,7 @@ class EventDispatcherTest extends TestCase
         $receivedData = null;
 
         // Registramos un listener
-        $this->dispatcher->listen('test.event', function (EventInterface $event) use (&$wasCalled, &$receivedData) {
+        $this->dispatcher->listen('test.event', function (EventContract $event) use (&$wasCalled, &$receivedData) {
             $wasCalled = true;
             $receivedData = $event->getData();
         });
@@ -63,7 +63,7 @@ class EventDispatcherTest extends TestCase
         };
 
         // Registramos un listener
-        $this->dispatcher->listen('custom.event', function (EventInterface $event) use (&$wasCalled, &$receivedData) {
+        $this->dispatcher->listen('custom.event', function (EventContract $event) use (&$wasCalled, &$receivedData) {
             $wasCalled = true;
             $receivedData = $event->getData();
         });
@@ -79,11 +79,11 @@ class EventDispatcherTest extends TestCase
     public function testCanRegisterAndExecuteListenerClass(): void
     {
         // Creamos una clase listener
-        $listener = new class implements ListenerInterface {
+        $listener = new class implements ListenerContract {
             public $wasCalled = false;
             public $eventData = null;
 
-            public function handle(EventInterface $event): void
+            public function handle(EventContract $event): void
             {
                 $this->wasCalled = true;
                 $this->eventData = $event->getData();

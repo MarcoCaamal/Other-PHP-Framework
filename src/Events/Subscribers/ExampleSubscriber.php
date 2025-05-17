@@ -3,8 +3,8 @@
 namespace LightWeight\Events\Subscribers;
 
 use LightWeight\Events\Contracts\EventDispatcherContract;
-use LightWeight\Events\Contracts\EventInterface;
-use LightWeight\Events\Contracts\EventSubscriberInterface;
+use LightWeight\Events\Contracts\EventContract;
+use LightWeight\Events\Contracts\EventSubscriberContract;
 
 /**
  * Ejemplo de suscriptor de eventos
@@ -12,7 +12,7 @@ use LightWeight\Events\Contracts\EventSubscriberInterface;
  * Esta clase proporciona un ejemplo de cómo crear un suscriptor de eventos
  * que agrupa varios oyentes (listeners) relacionados.
  */
-class ExampleSubscriber implements EventSubscriberInterface
+class ExampleSubscriber implements EventSubscriberContract
 {
     /**
      * Obtiene los eventos manejados por este suscriptor
@@ -37,7 +37,7 @@ class ExampleSubscriber implements EventSubscriberInterface
     {
         // Utiliza el método getSubscribedEvents para registrar los listeners
         foreach (static::getSubscribedEvents() as $event => $method) {
-            $dispatcher->listen($event, function (EventInterface $event) use ($method) {
+            $dispatcher->listen($event, function (EventContract $event) use ($method) {
                 $this->{$method}($event);
             });
         }
@@ -46,10 +46,10 @@ class ExampleSubscriber implements EventSubscriberInterface
     /**
      * Manejador para cuando la aplicación termina de inicializarse
      *
-     * @param EventInterface $event
+     * @param EventContract $event
      * @return void
      */
-    public function onApplicationBootstrapped(EventInterface $event): void
+    public function onApplicationBootstrapped(EventContract $event): void
     {
         // Por ejemplo, podríamos inicializar caches de aplicación aquí
         // o registrar recursos adicionales después del bootstrap
@@ -60,10 +60,10 @@ class ExampleSubscriber implements EventSubscriberInterface
     /**
      * Manejador para cuando la aplicación está terminando
      *
-     * @param EventInterface $event
+     * @param EventContract $event
      * @return void
      */
-    public function onApplicationTerminating(EventInterface $event): void
+    public function onApplicationTerminating(EventContract $event): void
     {
         // Por ejemplo, podríamos realizar limpiezas finales aquí
         // o guardar estadísticas de la solicitud actual

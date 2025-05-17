@@ -2,12 +2,12 @@
 
 namespace LightWeight\Events;
 
-use LightWeight\Events\Contracts\EventInterface;
+use LightWeight\Events\Contracts\EventContract;
 
 /**
  * Base class for all events in the system
  */
-abstract class Event implements EventInterface
+abstract class Event implements EventContract
 {
     /**
      * Event data
