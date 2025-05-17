@@ -68,11 +68,9 @@ class InitApp extends Command
         // Copy template files
         $this->copyTemplateFiles($this->templatesDir, $targetDir, $io, $force);
         
-        // Create .env file
-        $this->createEnvFile($targetDir, $io, $force);
-        
         // Success message
         $io->success("Application initialized successfully!");
+        
         
         if ($appName !== '.') {
             $io->text("Run 'cd {$appName} && composer install' to install dependencies");
@@ -122,34 +120,5 @@ class InitApp extends Command
         }
         
         closedir($dir);
-    }
-    
-    private function createEnvFile(string $targetDir, SymfonyStyle $io, bool $force)
-    {
-        $envFile = $targetDir . '/.env';
-        $envExampleFile = $targetDir . '/.env.example';
-        
-        if (!file_exists($envFile) || $force) {
-            $envContent = "APP_NAME=LightWeightApp\n";
-            $envContent .= "APP_ENV=development\n";
-            $envContent .= "APP_DEBUG=true\n";
-            $envContent .= "APP_URL=http://localhost:8000\n\n";
-            $envContent .= "DB_CONNECTION=mysql\n";
-            $envContent .= "DB_HOST=127.0.0.1\n";
-            $envContent .= "DB_PORT=3306\n";
-            $envContent .= "DB_DATABASE=lightweight\n";
-            $envContent .= "DB_USERNAME=root\n";
-            $envContent .= "DB_PASSWORD=\n";
-            
-            if (file_put_contents($envFile, $envContent)) {
-                $io->text("Created .env file");
-            }
-            
-            // Also create .env.example
-            file_put_contents($envExampleFile, $envContent);
-            $io->text("Created .env.example file");
-        } else {
-            $io->text("Skipped existing .env file");
-        }
     }
 }
