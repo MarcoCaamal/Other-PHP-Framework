@@ -6,7 +6,6 @@ return [
         LightWeight\Providers\ServerServiceProvider::class,
         LightWeight\Providers\ExceptionHandlerServiceProvider::class,
         LightWeight\Providers\LogServiceProvider::class,
-        LightWeight\Providers\ExceptionServiceProvider::class,
         LightWeight\Providers\EventServiceProvider::class,
         LightWeight\Providers\DatabaseDriverServiceProvider::class,
     ],
