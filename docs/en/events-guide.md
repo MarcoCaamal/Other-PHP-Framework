@@ -154,8 +154,8 @@ LightWeight implements the following system events:
 - `app.bootstrapped`: Fired when the application finishes bootstrapping
 - `application.terminating`: Fired when the application is about to shut down
 - `router.matched`: Fired when a route has been matched with the current request
-
-> **Note**: Other common events like `view.rendering`, `auth.login`, `model.creating`, etc., might be implemented in future versions of the framework, but are currently not available as built-in events.
+- `view.rendering`: Fired before a view is rendered
+- `view.rendered`: Fired after a view has been rendered
 
 ## System Event Examples
 
@@ -209,6 +209,59 @@ on('application.terminating', function ($event) {
     
     // Save statistics or perform final cleanup
     app('stats')->save();
+});
+```
+
+### `view.rendering` Event
+
+You can use this event to modify view parameters or perform actions before a view is rendered:
+
+```php
+on('view.rendering', function ($event) {
+    $view = $event->getView();
+    $params = $event->getParams();
+    $layout = $event->getLayout();
+    
+    // Add global data to all views
+    if (!isset($params['user']) && auth()->check()) {
+        $params['user'] = auth()->user();
+        
+        // You can modify parameters by accessing them through the $event->getData() array
+        $event->getData()['params'] = $params;
+    }
+    
+    // Log view rendering for debugging
+    app('log')->debug("Rendering view: {$view}");
+    
+    // Perform custom actions for specific views
+    if ($view === 'admin/dashboard') {
+        // Log admin access or perform security checks
+    }
+});
+```
+
+### `view.rendered` Event
+
+This event is useful for post-processing rendered content or logging view performance:
+
+```php
+on('view.rendered', function ($event) {
+    $view = $event->getView();
+    $content = $event->getContent();
+    
+    // Measure and log rendering time for specific views
+    if (str_starts_with($view, 'reports/')) {
+        app('log')->info("Report view {$view} rendered in " . (microtime(true) - FRAMEWORK_START_TIME) . " seconds");
+    }
+    
+    // You could also perform content manipulation after rendering if needed
+    // Note: At this point, the content has already been sent to the output buffer
+    // so modifications won't affect the current response
+    
+    // However, you can capture metrics or analyze the rendered content
+    if (config('app.debug') && strlen($content) > 1000000) {
+        app('log')->warning("Large view rendered: {$view} - Size: " . strlen($content) . " bytes");
+    }
 });
 ```
 

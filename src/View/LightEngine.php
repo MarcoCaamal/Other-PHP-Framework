@@ -2,6 +2,10 @@
 
 namespace LightWeight\View;
 
+use LightWeight\App;
+use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\ViewRenderedEvent;
+use LightWeight\Events\ViewRenderingEvent;
 use LightWeight\View\Contracts\ViewContract;
 
 class LightEngine implements ViewContract
@@ -125,6 +129,48 @@ class LightEngine implements ViewContract
     }
     
     /**
+     * Dispatch the view.rendering event
+     *
+     * @param string $view View name
+     * @param array $params View parameters
+     * @param string|bool|null $layout Layout
+     * @return void
+     */
+    protected function dispatchViewRenderingEvent(string $view, array $params, $layout): void
+    {
+        // Use the global 'event' helper function if available
+        if (function_exists('event')) {
+            event(new ViewRenderingEvent([
+                'view' => $view,
+                'params' => $params,
+                'layout' => $layout
+            ]));
+        }
+    }
+    
+    /**
+     * Dispatch the view.rendered event
+     *
+     * @param string $view View name
+     * @param array $params View parameters
+     * @param string|bool|null $layout Layout
+     * @param string $content Rendered content
+     * @return void
+     */
+    protected function dispatchViewRenderedEvent(string $view, array $params, $layout, string $content): void
+    {
+        // Use the global 'event' helper function if available
+        if (function_exists('event')) {
+            event(new ViewRenderedEvent([
+                'view' => $view,
+                'params' => $params,
+                'layout' => $layout,
+                'content' => $content
+            ]));
+        }
+    }
+    
+    /**
      * Render a view with the given parameters
      *
      * @param string $view View name (with dot notation)
@@ -145,17 +191,28 @@ class LightEngine implements ViewContract
             throw new \RuntimeException("View file not found: $view.php");
         }
         
+        // Dispatch view.rendering event
+        $this->dispatchViewRenderingEvent($view, $params, $layout);
+        
         $viewContent = $this->renderView($view, $params);
         
         // No layout
         if ($layout === false) {
+            // Dispatch view.rendered event
+            $this->dispatchViewRenderedEvent($view, $params, $layout, $viewContent);
+            
             return $viewContent;
         }
         
         // With layout - only use defaultLayout if layout is null (not false or empty string)
         $layoutName = $layout === null ? $this->defaultLayout : $layout;
         $layoutContent = $this->renderLayout($layoutName);
-        return str_replace($this->contentAnotation, $viewContent, $layoutContent);
+        $finalContent = str_replace($this->contentAnotation, $viewContent, $layoutContent);
+        
+        // Dispatch view.rendered event
+        $this->dispatchViewRenderedEvent($view, $params, $layout, $finalContent);
+        
+        return $finalContent;
     }
     
     /**

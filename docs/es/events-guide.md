@@ -156,8 +156,8 @@ LightWeight implementa los siguientes eventos del sistema:
 - `app.bootstrapped`: Disparado cuando la aplicación termina de inicializarse
 - `application.terminating`: Disparado cuando la aplicación está a punto de cerrarse
 - `router.matched`: Disparado cuando se encuentra una ruta coincidente con la solicitud actual
-
-> **Nota**: Otros eventos comunes como `view.rendering`, `auth.login`, `model.creating`, etc., podrían implementarse en versiones futuras del framework, pero actualmente no están disponibles como eventos integrados.
+- `view.rendering`: Disparado antes de que se renderice una vista
+- `view.rendered`: Disparado después de que una vista ha sido renderizada
 
 ## Ejemplos de Uso de Eventos del Sistema
 
@@ -211,6 +211,59 @@ on('application.terminating', function ($event) {
     
     // Guardar estadísticas o hacer limpieza final
     app('stats')->save();
+});
+```
+
+### Evento `view.rendering`
+
+Puedes utilizar este evento para modificar parámetros de vista o realizar acciones antes de que una vista sea renderizada:
+
+```php
+on('view.rendering', function ($event) {
+    $view = $event->getView();
+    $params = $event->getParams();
+    $layout = $event->getLayout();
+    
+    // Añadir datos globales a todas las vistas
+    if (!isset($params['user']) && auth()->check()) {
+        $params['user'] = auth()->user();
+        
+        // Puedes modificar parámetros accediendo a ellos a través del array $event->getData()
+        $event->getData()['params'] = $params;
+    }
+    
+    // Registrar la renderización de vistas para depuración
+    app('log')->debug("Renderizando vista: {$view}");
+    
+    // Realizar acciones personalizadas para vistas específicas
+    if ($view === 'admin/dashboard') {
+        // Registrar acceso de administrador o realizar comprobaciones de seguridad
+    }
+});
+```
+
+### Evento `view.rendered`
+
+Este evento es útil para el post-procesamiento del contenido renderizado o para registrar el rendimiento de las vistas:
+
+```php
+on('view.rendered', function ($event) {
+    $view = $event->getView();
+    $content = $event->getContent();
+    
+    // Medir y registrar el tiempo de renderizado para vistas específicas
+    if (str_starts_with($view, 'informes/')) {
+        app('log')->info("Vista de informe {$view} renderizada en " . (microtime(true) - FRAMEWORK_START_TIME) . " segundos");
+    }
+    
+    // También podrías realizar manipulación de contenido después del renderizado si es necesario
+    // Nota: En este punto, el contenido ya ha sido enviado al buffer de salida
+    // por lo que las modificaciones no afectarán a la respuesta actual
+    
+    // Sin embargo, puedes capturar métricas o analizar el contenido renderizado
+    if (config('app.debug') && strlen($content) > 1000000) {
+        app('log')->warning("Vista grande renderizada: {$view} - Tamaño: " . strlen($content) . " bytes");
+    }
 });
 ```
 
