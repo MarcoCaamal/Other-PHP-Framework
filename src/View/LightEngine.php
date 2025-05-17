@@ -87,13 +87,15 @@ class LightEngine implements ViewContract
     }
     
     /**
-     * Get the default templates directory
-     * 
-     * @return string
+     * Set views directory
+     *
+     * @param string $directory The directory containing views
+     * @return self
      */
-    protected function getDefaultTemplatesDirectory(): string
+    public function setViewsDirectory(string $directory): self
     {
-        return rtrim(dirname(dirname(dirname(__FILE__))), '/') . '/templates/default/views';
+        $this->viewsDirectory = rtrim($directory, '/');
+        return $this;
     }
     
     /**
@@ -104,18 +106,19 @@ class LightEngine implements ViewContract
      */
     protected function findViewFile(string $path): ?string
     {
-        // Try user views directory first
-        $userViewPath = "{$this->viewsDirectory}/$path.php";
+        // Check if the file exists in the configured views directory
+        $viewPath = "{$this->viewsDirectory}/$path.php";
         
-        if (file_exists($userViewPath)) {
-            return $userViewPath;
+        if (file_exists($viewPath)) {
+            return $viewPath;
         }
         
-        // If not found, try default templates
-        $defaultViewPath = $this->getDefaultTemplatesDirectory() . "/$path.php";
+        // Check in resources/views as a fallback
+        $resourcesViewsPath = __DIR__ . '/../../templates/default/views';
+        $resourceViewPath = "$resourcesViewsPath/$path.php";
         
-        if (file_exists($defaultViewPath)) {
-            return $defaultViewPath;
+        if (is_dir($resourcesViewsPath) && file_exists($resourceViewPath)) {
+            return $resourceViewPath;
         }
         
         return null;
@@ -167,7 +170,9 @@ class LightEngine implements ViewContract
         $viewPath = $this->findViewFile($view);
         
         if (!$viewPath) {
-            throw new \RuntimeException("View file not found: $view.php");
+            throw new \RuntimeException(
+                "View file not found: $view.php"
+            );
         }
         
         if ($this->cacheEnabled && $this->cachePath) {
@@ -211,14 +216,20 @@ class LightEngine implements ViewContract
             return $this->phpFileOutput($userLayoutPath);
         }
         
-        // If not found, try default templates
-        $defaultLayoutPath = $this->getDefaultTemplatesDirectory() . "/layouts/$layout.php";
+        // Check in resources/views as a fallback
+        $resourcesViewsPath = rtrim(dirname(dirname(dirname(__DIR__))), '/') . '/resources/views';
+        $resourceLayoutPath = "$resourcesViewsPath/layouts/$layout.php";
         
-        if (file_exists($defaultLayoutPath)) {
-            return $this->phpFileOutput($defaultLayoutPath);
+        if (is_dir($resourcesViewsPath) && file_exists($resourceLayoutPath)) {
+            return $this->phpFileOutput($resourceLayoutPath);
         }
         
-        throw new \RuntimeException("Layout file not found: $layout.php");
+        throw new \RuntimeException(
+            "Layout file not found: $layout.php\n" .
+            "Searched locations:\n" .
+            "- $userLayoutPath\n" .
+            "- $resourceLayoutPath"
+        );
     }
     
     /**

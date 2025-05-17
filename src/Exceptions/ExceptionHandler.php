@@ -213,10 +213,10 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
         try {
             $view = config('exceptions.views.not_found', 'errors.404');
             // Pass false as layout to avoid layout rendering (prevents layout not found errors)
-            return Response::view($view, [], false)->setStatus(404);
+            return Response::view($view, ['exception' => $e], false)->setStatus(404);
         } catch (Throwable $viewError) {
-            // Fallback to text response if view rendering fails
-            return Response::text('404 Not Found: ' . $e->getMessage())->setStatus(404);
+            // If no template can be found, throw an exception
+            throw new \RuntimeException("404 error template not found. Please make sure template files exist in templates/default/views/errors directory.");
         }
     }
     
@@ -247,11 +247,8 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
                     'errors' => $e->errors()
                 ], false)->setStatus(422);
             } catch (Throwable $viewError) {
-                // Fallback to JSON response if view rendering fails
-                return Response::json([
-                    'errors' => $e->errors(),
-                    'message' => "Validation Errors",
-                ])->setStatus(422);
+                // If no template can be found, throw an exception
+                throw new \RuntimeException("Validation error template not found. Please make sure template files exist in templates/default/views/errors directory.");
             }
         }
     }
@@ -281,8 +278,8 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
                 'message' => 'A database error has occurred.'
             ], false)->setStatus(500);
         } catch (Throwable $viewError) {
-            // Fallback to text response if view rendering fails
-            return Response::text('Database Error: ' . (config('exceptions.debug', false) ? $e->getMessage() : 'A database error has occurred.'))->setStatus(500);
+            // If no template can be found, throw an exception
+            throw new \RuntimeException("Database error template not found. Please make sure template files exist in templates/default/views/errors directory.");
         }
     }
     
@@ -311,11 +308,8 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
                 'message' => 'An unexpected error occurred.'
             ], false)->setStatus(500);
         } catch (Throwable $viewError) {
-            // Fallback to text response if view rendering fails
-            $message = config('exceptions.debug', false) ? 
-                $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine() : 
-                'An unexpected error occurred.';
-            return Response::text('Error: ' . $message)->setStatus(500);
+            // If no template can be found, throw an exception
+            throw new \RuntimeException("Application error template not found. Please make sure template files exist in templates/default/views/errors directory.");
         }
     }
     

@@ -199,4 +199,17 @@ class Response implements ResponseContract
             ->setContentType('text/html')
             ->setContent($content);
     }
+    
+    /**
+     * Create a new HTML response.
+     *
+     * @param string $html
+     * @return \LightWeight\Http\Response
+     */
+    public static function html(string $html): self
+    {
+        return (new self())
+            ->setContentType('text/html')
+            ->setContent($html);
+    }
 }

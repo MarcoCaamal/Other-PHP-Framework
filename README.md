@@ -224,6 +224,20 @@ php light migrate
 php light routes:list
 ```
 
+## Troubleshooting
+
+### View Rendering Problems
+
+If you see errors like `View file not found: errors/404.php`, you may need to verify:
+
+1. That view folders exist in the expected locations
+2. That view paths are properly configured
+
+Possible solutions:
+- Ensure your `.env` file has the correct path settings
+- Check your `config/view.php` configuration file for correct paths
+- Use the `setViewsDirectory()` method to change view location at runtime if needed
+
 ## Testing
 
 LightWeight has integration with PHPUnit for unit and integration tests:

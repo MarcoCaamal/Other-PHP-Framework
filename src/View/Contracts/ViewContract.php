@@ -104,4 +104,12 @@ interface ViewContract
      * @return string Escaped string
      */
     public function e($value): string;
+
+    /**
+     * Set views directory
+     *
+     * @param string $directory The directory containing views
+     * @return self
+     */
+    public function setViewsDirectory(string $directory): self;
 }
