@@ -19,7 +19,7 @@ class InitApp extends Command
     public function __construct(string $templatesDir = null)
     {
         parent::__construct();
-        $this->templatesDir = $templatesDir ?? __DIR__ . '/../../templates/app';
+        $this->templatesDir = $templatesDir ?? dirname(dirname(dirname(__DIR__))) . '/templates/app';
     }
     
     protected function configure()

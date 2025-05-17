@@ -65,7 +65,7 @@ class CLI
                     Migrator::class,
                     fn () => new Migrator(
                         $migrationsDir,
-                        __DIR__ . "/../templates",
+                        null, // Usar el path por defecto
                         app(DatabaseDriverContract::class),
                     )
                 );

@@ -47,8 +47,10 @@ class RouterMatchedEventTest extends TestCase
             ];
         });
         
-        // Crear una solicitud de prueba
-        $this->request = new Request(HttpMethod::GET, '/test', [], [], []);
+        // Crear una solicitud de prueba correctamente
+        $this->request = new Request();
+        $this->request->setUri('/test')
+                      ->setMethod(HttpMethod::GET);
     }
 
     public function testRouterMatchedEventIsFired(): void
@@ -77,8 +79,10 @@ class RouterMatchedEventTest extends TestCase
             return "User $id";
         });
         
-        // Crear una solicitud para esa ruta
-        $userRequest = new Request(HttpMethod::GET, '/users/123', [], [], []);
+        // Crear una solicitud para esa ruta correctamente
+        $userRequest = new Request();
+        $userRequest->setUri('/users/123')
+                    ->setMethod(HttpMethod::GET);
         
         // Resolver la ruta
         $route = $this->router->resolveRoute($userRequest);

@@ -5,7 +5,7 @@
 $possibleAutoloadPaths = [
     __DIR__ . '/vendor/autoload.php',          // when executed from framework directory
     __DIR__ . '/../autoload.php',              // when executed as a Composer bin script
-    __DIR__ . '/../../../autoload.php',        // when installed as a dependency
+    __DIR__ . '/../../autoload.php',        // when installed as a dependency
 ];
 
 foreach ($possibleAutoloadPaths as $path) {

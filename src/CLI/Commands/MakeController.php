@@ -19,7 +19,7 @@ class MakeController extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $name = $input->getArgument("name");
-        $template = file_get_contents(resourcesDirectory() . "/templates/controller.php");
+        $template = file_get_contents(dirname(dirname(dirname(__DIR__))) . "/templates/controller.php");
         $template = str_replace("ControllerName", $name, $template);
         file_put_contents(App::$root . "/app/Controllers/$name.php", $template);
         $output->writeln("<info>Controller created => $name.php</info>");

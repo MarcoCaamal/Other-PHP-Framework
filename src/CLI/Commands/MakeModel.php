@@ -24,7 +24,7 @@ class MakeModel extends Command
     {
         $name = $input->getArgument("name");
         $migration = $input->getOption("migration");
-        $template = file_get_contents(resourcesDirectory() . "/templates/model.php");
+        $template = file_get_contents(dirname(dirname(dirname(__DIR__))) . "/templates/model.php");
         $template = str_replace("ModelName", $name, $template);
         file_put_contents(App::$root . "/app/Models/$name.php", $template);
         $output->writeln("<info>Model created => $name.php</info>");

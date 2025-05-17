@@ -4,6 +4,20 @@
 
 El sistema de vistas y plantillas de LightWeight permite separar la lógica de presentación de tu aplicación de la lógica de negocio. LightWeight utiliza el motor de plantillas "LightEngine", una implementación ligera y eficiente diseñada específicamente para este framework, que ofrece un equilibrio perfecto entre simplicidad y potencia.
 
+## Sistema de Respaldo de Plantillas
+
+LightWeight incluye un sistema de respaldo de plantillas que permite al framework buscar automáticamente vistas en múltiples ubicaciones. Cuando solicitas una vista, el motor:
+
+1. Primero verifica el directorio de vistas configurado (típicamente `resources/views`)
+2. Si la vista no se encuentra, buscará en el directorio de plantillas predeterminado (`/templates/default/views`)
+
+Este mecanismo de respaldo se aplica tanto a vistas estándar como a layouts, asegurando que tu aplicación siempre tenga acceso a plantillas esenciales para páginas de error, pantallas de bienvenida y otros componentes comunes.
+
+El sistema de respaldo es especialmente útil para:
+- Mostrar páginas de error pulidas sin tener que crearlas tú mismo
+- Proporcionar una página de bienvenida para nuevos proyectos
+- Asegurar que los mensajes y notificaciones del sistema tengan un estilo consistente
+
 ## Conceptos Básicos
 
 ### Estructura de Directorios
@@ -14,18 +28,34 @@ Las vistas en LightWeight normalmente se organizan en el directorio `resources/v
 resources/
   views/
     layouts/
-      main.light.php
+      main.php
     partials/
-      header.light.php
-      footer.light.php
+      header.php
+      footer.php
     users/
-      index.light.php
-      show.light.php
-      edit.light.php
+      index.php
+      show.php
+      edit.php
     errors/
-      404.light.php
-      500.light.php
+      404.php
+      500.php
 ```
+
+Adicionalmente, el framework incluye plantillas predeterminadas en la siguiente ubicación:
+
+```
+templates/
+  default/
+    views/
+      layouts/
+        main.php
+      errors/
+        404.php
+        500.php
+      welcome.php
+```
+
+Estas plantillas predeterminadas sirven como respaldo cuando tu aplicación no define vistas específicas.
 
 ### Renderización Básica de Vistas
 
@@ -696,7 +726,19 @@ return [
 ];
 ```
 
-Recuerda que cuando configuras `enabled` como `false` en tu archivo `.env`, el valor se almacena como la cadena "false", pero el framework lo convierte automáticamente a un valor booleano utilizando `filter_var($value, FILTER_VALIDATE_BOOLEAN)`.
+### Conversión de Booleanos desde Variables de Entorno
+
+Cuando configuras `enabled` como `false` en tu archivo `.env`, el valor se almacena como la cadena "false", pero el framework lo convierte automáticamente a un valor booleano utilizando `filter_var($value, FILTER_VALIDATE_BOOLEAN)`:
+
+```php
+// En ViewServiceProvider.php
+$cacheEnabled = filter_var(config('view.cache.enabled', false), FILTER_VALIDATE_BOOLEAN);
+if ($cacheEnabled) {
+    // Inicializar sistema de caché...
+}
+```
+
+Esto asegura un manejo adecuado de tipos independientemente de cómo se proporcione la configuración. El mismo principio se aplica a otras configuraciones booleanas en el framework.
 
 ## Buenas Prácticas
 
@@ -718,4 +760,137 @@ Recuerda que cuando configuras `enabled` como `false` en tu archivo `.env`, el v
 
 El sistema de vistas y plantillas de LightWeight proporciona una forma potente y flexible de crear interfaces de usuario dinámicas y reutilizables. Con su sintaxis limpia y sus características avanzadas, LightEngine te permite separar claramente la lógica de presentación del resto de tu aplicación, lo que facilita el mantenimiento y la colaboración en proyectos de cualquier tamaño.
 
+### Renderización Avanzada de Vistas
+
+**Usando un layout específico:**
+
+```php
+// Usar un layout específico
+return view('users.profile', ['user' => $user], 'user_layout');
+```
+
+**Renderizar sin layout:**
+
+```php
+// Desactivar completamente la renderización del layout (útil para respuestas AJAX o páginas de error)
+return view('users.partial', ['user' => $user], false);
+```
+
+**Usando un layout condicionalmente:**
+
+```php
+// Determinar el layout basado en el tipo de solicitud
+$layout = $request->ajax() ? false : 'main';
+return view('content', $data, $layout);
+```
+
+La función `view()` internamente llama a `Response::view()` que puede aceptar:
+- Nombre de layout como `string` - para usar un layout específico
+- `false` (booleano) - para desactivar completamente el layout
+- `null` - para usar el layout predeterminado
+
+Esta flexibilidad es particularmente útil al renderizar páginas de error o respuestas AJAX.
+
 > 🌐 [English Documentation](../en/views-templating.md)
+
+## Estructura Interna del Motor de Vistas
+
+### Proceso de Resolución de Plantillas
+
+Al renderizar una vista, LightWeight sigue este proceso de resolución:
+
+1. Convierte la notación de puntos a rutas de directorios (p.ej., `users.profile` → `users/profile`)
+2. Busca el archivo de vista en el directorio de vistas del usuario
+3. Si no lo encuentra, busca en el directorio de plantillas predeterminado
+4. Si lo encuentra, renderiza el contenido de la vista
+5. Si se especifica un layout (y no es `false`), renderiza el layout
+6. Reemplaza la anotación de contenido en el layout con el contenido de la vista
+
+Este proceso es manejado por el método `findViewFile()` que busca en ambas ubicaciones de plantillas, del usuario y predeterminadas:
+
+```php
+protected function findViewFile(string $path): ?string
+{
+    // Primero intenta en el directorio de vistas del usuario
+    $userViewPath = "{$this->viewsDirectory}/$path.php";
+    
+    if (file_exists($userViewPath)) {
+        return $userViewPath;
+    }
+    
+    // Si no se encuentra, intenta en las plantillas predeterminadas
+    $defaultViewPath = $this->getDefaultTemplatesDirectory() . "/$path.php";
+    
+    if (file_exists($defaultViewPath)) {
+        return $defaultViewPath;
+    }
+    
+    return null;
+}
+```
+
+### Manejo de Excepciones
+
+El motor de plantillas está diseñado para proporcionar mensajes de error útiles cuando no se pueden encontrar plantillas o layouts:
+
+```php
+if (!$viewPath) {
+    throw new \RuntimeException("Vista no encontrada: $view.php");
+}
+```
+
+El manejador de excepciones del framework convertirá estos errores en páginas de error amigables para el usuario.
+
+## Manejo de Errores y Vistas
+
+### Plantillas de Páginas de Error
+
+LightWeight incluye plantillas de error predeterminadas para errores HTTP comunes. Estas plantillas se almacenan en el directorio de plantillas predeterminado y se utilizan cuando:
+
+1. Ocurre una excepción o error en tu aplicación
+2. El manejador de excepciones renderiza una respuesta de error
+3. Tu aplicación no tiene una vista de error personalizada definida
+
+El framework incluye plantillas para:
+- Errores 404 Not Found (No encontrado)
+- Errores 500 Internal Server (Error interno del servidor)
+- Errores 403 Forbidden (Prohibido)
+- Visualización general de errores
+
+### Personalización de Páginas de Error
+
+Puedes personalizar las páginas de error creando tus propias plantillas de vistas de error:
+
+```
+resources/
+  views/
+    errors/
+      404.light.php
+      500.light.php
+      403.light.php
+```
+
+El manejador de excepciones buscará vistas en este orden:
+1. Una ruta de vista personalizada especificada en la configuración de excepciones
+2. La vista de error predeterminada para el tipo específico de excepción
+3. Un respaldo a las plantillas de error predeterminadas
+
+### Renderizado de Páginas de Error Sin Layouts
+
+Las páginas de error se renderizan sin layouts por defecto para prevenir excepciones anidadas (donde el propio layout podría estar causando errores):
+
+```php
+protected function renderHttpNotFound(HttpNotFoundException $e): ResponseContract
+{
+    try {
+        $view = config('exceptions.views.not_found', 'errors.404');
+        // Pasar false como layout para evitar la renderización del layout
+        return Response::view($view, [], false)->setStatus(404);
+    } catch (\Throwable $viewError) {
+        // Respaldo a respuesta de texto si falla la renderización de la vista
+        return Response::text('404 No Encontrado: ' . $e->getMessage())->setStatus(404);
+    }
+}
+```
+
+Esto asegura que incluso si hay un problema con tus vistas o plantillas, el usuario seguirá recibiendo una respuesta de error apropiada.

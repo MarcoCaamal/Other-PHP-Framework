@@ -87,6 +87,41 @@ class LightEngine implements ViewContract
     }
     
     /**
+     * Get the default templates directory
+     * 
+     * @return string
+     */
+    protected function getDefaultTemplatesDirectory(): string
+    {
+        return rtrim(dirname(dirname(dirname(__FILE__))), '/') . '/templates/default/views';
+    }
+    
+    /**
+     * Find a view file in either user directory or default templates
+     * 
+     * @param string $path Relative path to the view
+     * @return string Full path to the found view file or null if not found
+     */
+    protected function findViewFile(string $path): ?string
+    {
+        // Try user views directory first
+        $userViewPath = "{$this->viewsDirectory}/$path.php";
+        
+        if (file_exists($userViewPath)) {
+            return $userViewPath;
+        }
+        
+        // If not found, try default templates
+        $defaultViewPath = $this->getDefaultTemplatesDirectory() . "/$path.php";
+        
+        if (file_exists($defaultViewPath)) {
+            return $defaultViewPath;
+        }
+        
+        return null;
+    }
+    
+    /**
      * Render a view with the given parameters
      *
      * @param string $view View name (with dot notation)
@@ -101,10 +136,10 @@ class LightEngine implements ViewContract
         $this->sections = [];
         
         $view = str_replace('.', '/', $view);
-        $viewPath = "{$this->viewsDirectory}/$view.php";
+        $viewPath = $this->findViewFile($view);
         
-        if (!file_exists($viewPath)) {
-            throw new \RuntimeException("View file not found: $viewPath");
+        if (!$viewPath) {
+            throw new \RuntimeException("View file not found: $view.php");
         }
         
         $viewContent = $this->renderView($view, $params);
@@ -129,7 +164,11 @@ class LightEngine implements ViewContract
      */
     public function renderView(string $view, array $params = [])
     {
-        $viewPath = "{$this->viewsDirectory}/$view.php";
+        $viewPath = $this->findViewFile($view);
+        
+        if (!$viewPath) {
+            throw new \RuntimeException("View file not found: $view.php");
+        }
         
         if ($this->cacheEnabled && $this->cachePath) {
             $cacheKey = md5($view . serialize($params));
@@ -165,13 +204,21 @@ class LightEngine implements ViewContract
      */
     public function renderLayout(string $layout): string
     {
-        $layoutPath = "{$this->viewsDirectory}/layouts/$layout.php";
+        // Try user layouts directory first
+        $userLayoutPath = "{$this->viewsDirectory}/layouts/$layout.php";
         
-        if (!file_exists($layoutPath)) {
-            throw new \RuntimeException("Layout file not found: $layoutPath");
+        if (file_exists($userLayoutPath)) {
+            return $this->phpFileOutput($userLayoutPath);
         }
         
-        return $this->phpFileOutput($layoutPath);
+        // If not found, try default templates
+        $defaultLayoutPath = $this->getDefaultTemplatesDirectory() . "/layouts/$layout.php";
+        
+        if (file_exists($defaultLayoutPath)) {
+            return $this->phpFileOutput($defaultLayoutPath);
+        }
+        
+        throw new \RuntimeException("Layout file not found: $layout.php");
     }
     
     /**

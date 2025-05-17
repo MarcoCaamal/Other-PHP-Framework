@@ -9,14 +9,12 @@ use LightWeight\Container\Container;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\Exceptions\DatabaseException;
 use LightWeight\Events\Contracts\EventDispatcherInterface;
-use LightWeight\Events\Contracts\EventInterface;
-use LightWeight\Events\EventDispatcher;
 use LightWeight\Exceptions\Contracts\ExceptionHandlerContract;
 use LightWeight\Http\HttpMethod;
-use LightWeight\Http\HttpNotFoundException;
 use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\Http\Request;
+use LightWeight\Http\Response;
 use LightWeight\Routing\Router;
 use LightWeight\Server\Contracts\ServerContract;
 use LightWeight\Session\Contracts\SessionStorageContract;
@@ -334,6 +332,12 @@ class App
     public function run(): void
     {
         try {
+            // No routes defined and this is the homepage
+            if ($this->router->isEmpty() && $this->request->uri() === '/') {
+                $this->terminate($this->showWelcomePage());
+                return;
+            }
+            
             $this->terminate($this->router->resolve($this->request));
         } catch (Throwable $e) {
             // Report exception if needed
@@ -424,4 +428,21 @@ class App
         return Container::has($class);
     }
 
+    /**
+     * Show welcome page when no routes are defined
+     *
+     * @return ResponseContract
+     */
+    private function showWelcomePage(): ResponseContract
+    {
+        try {
+            // Try to show the welcome page
+            return Response::view('welcome', [], false)
+                ->setStatus(200);
+        } catch (Throwable $e) {
+            // Fallback to a simple text response if view can't be loaded
+            return Response::text("LightWeight Framework installed successfully!")
+                ->setStatus(200);
+        }
+    }
 }

@@ -10,15 +10,25 @@ class Migrator
     private ConsoleOutput $output;
     public function __construct(
         private string $migrationsDirectory,
-        private string $templatesDirectory,
-        private DatabaseDriverContract $driver,
+        private ?string $templatesDirectory = null,
+        private ?DatabaseDriverContract $driver = null,
         private bool $logProgress = true
     ) {
         $this->migrationsDirectory = $migrationsDirectory;
-        $this->templatesDirectory = $templatesDirectory;
+        $this->templatesDirectory = $templatesDirectory ?? $this->getDefaultTemplatesPath();
         $this->driver = $driver;
         $this->logProgress = $logProgress;
         $this->output = new ConsoleOutput();
+    }
+
+    /**
+     * Get the default templates directory path
+     * 
+     * @return string
+     */
+    private function getDefaultTemplatesPath(): string
+    {
+        return dirname(dirname(dirname(__DIR__))) . '/templates';
     }
 
     private function log(string $message)

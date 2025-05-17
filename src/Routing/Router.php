@@ -146,6 +146,22 @@ class Router
         return $this->middlewareGroups[$group] ?? [];
     }
 
+    /**
+     * Check if the router has any defined routes
+     * 
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+        foreach ($this->routes as $methodRoutes) {
+            if (!empty($methodRoutes)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
     public function resolve(RequestContract $request): ResponseContract
     {
         $route = $this->resolveRoute($request);

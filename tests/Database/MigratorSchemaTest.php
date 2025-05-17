@@ -28,7 +28,7 @@ class MigratorSchemaTest extends TestCase
         // Asegurarse de que existe la plantilla de migración para pruebas
         if (!file_exists("$this->templatesDirectory/migration.template")) {
             copy(
-                "/home/marco/public_html/LightWeight/src/templates/migration.template",
+                "/home/marco/public_html/LightWeight/templates/migration.template",
                 "$this->templatesDirectory/migration.template"
             );
         }

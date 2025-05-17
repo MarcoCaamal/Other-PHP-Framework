@@ -4,6 +4,20 @@
 
 The LightWeight views and templates system allows you to separate your application's presentation logic from business logic. LightWeight uses the "LightEngine" template engine, a lightweight and efficient implementation designed specifically for this framework, offering a perfect balance between simplicity and power.
 
+## Template Fallback System
+
+LightWeight includes a template fallback system that allows the framework to automatically search for views in multiple locations. When you request a view, the engine will:
+
+1. First check the configured views directory (typically `resources/views`)
+2. If the view is not found, it will look in the default templates directory (`/templates/default/views`)
+
+This fallback mechanism applies to both standard views and layouts, ensuring that your application always has access to essential templates for error pages, welcome screens, and other common components.
+
+The fallback system is especially useful for:
+- Displaying polished error pages without having to create them yourself
+- Providing a welcome page for new projects
+- Ensuring that system messages and notifications have consistent styling
+
 ## Basic Concepts
 
 ### Directory Structure
@@ -14,18 +28,34 @@ Views in LightWeight are typically organized in the `resources/views` directory.
 resources/
   views/
     layouts/
-      main.light.php
+      main.php
     partials/
-      header.light.php
-      footer.light.php
+      header.php
+      footer.php
     users/
-      index.light.php
-      show.light.php
-      edit.light.php
+      index.php
+      show.php
+      edit.php
     errors/
-      404.light.php
-      500.light.php
+      404.php
+      500.php
 ```
+
+Additionally, the framework includes default templates in the following location:
+
+```
+templates/
+  default/
+    views/
+      layouts/
+        main.php
+      errors/
+        404.php
+        500.php
+      welcome.php
+```
+
+These default templates serve as fallbacks when your application doesn't define specific views.
 
 ### Basic View Rendering
 
@@ -654,6 +684,85 @@ Note that when reading from environment variables (through `env()`), all values 
 @endsection
 ```
 
+### Advanced View Rendering
+
+**Using a specific layout:**
+
+```php
+// Use a specific layout
+return view('users.profile', ['user' => $user], 'user_layout');
+```
+
+**Rendering without a layout:**
+
+```php
+// Disable layout rendering completely (useful for AJAX responses or error pages)
+return view('users.partial', ['user' => $user], false);
+```
+
+**Using a layout conditionally:**
+
+```php
+// Determine layout based on request type
+$layout = $request->ajax() ? false : 'main';
+return view('content', $data, $layout);
+```
+
+The `view()` function internally calls `Response::view()` which can accept:
+- `string` layout name - to use a specific layout
+- `false` (boolean) - to disable layout completely 
+- `null` - to use the default layout
+
+This flexibility is particularly useful when rendering error pages or AJAX responses.
+
+## Internal View Engine Structure
+
+### Template Resolution Process
+
+When rendering a view, LightWeight follows this resolution process:
+
+1. Convert dot notation to directory paths (e.g., `users.profile` → `users/profile`)
+2. Look for the view file in the user's views directory
+3. If not found, look in the default templates directory
+4. If found, render the view content
+5. If a layout is specified (and not `false`), render the layout
+6. Replace the content annotation in the layout with the view content
+
+This process is handled by the `findViewFile()` method which searches both user and default template locations:
+
+```php
+protected function findViewFile(string $path): ?string
+{
+    // Try user views directory first
+    $userViewPath = "{$this->viewsDirectory}/$path.php";
+    
+    if (file_exists($userViewPath)) {
+        return $userViewPath;
+    }
+    
+    // If not found, try default templates
+    $defaultViewPath = $this->getDefaultTemplatesDirectory() . "/$path.php";
+    
+    if (file_exists($defaultViewPath)) {
+        return $defaultViewPath;
+    }
+    
+    return null;
+}
+```
+
+### Exception Handling
+
+The template engine is designed to provide useful error messages when templates or layouts can't be found:
+
+```php
+if (!$viewPath) {
+    throw new \RuntimeException("View file not found: $view.php");
+}
+```
+
+The framework's exception handler will convert these errors into user-friendly error pages.
+
 ## Security
 
 ### Automatic Escaping
@@ -696,7 +805,19 @@ return [
 ];
 ```
 
-Remember that when setting `enabled` to `false` in your `.env` file, the value is stored as the string "false", but the framework automatically converts it to a boolean value using `filter_var($value, FILTER_VALIDATE_BOOLEAN)`.
+### Boolean Conversion from Environment Variables
+
+When setting `enabled` to `false` in your `.env` file, the value is stored as the string "false", but the framework automatically converts it to a boolean value using `filter_var($value, FILTER_VALIDATE_BOOLEAN)`:
+
+```php
+// In ViewServiceProvider.php
+$cacheEnabled = filter_var(config('view.cache.enabled', false), FILTER_VALIDATE_BOOLEAN);
+if ($cacheEnabled) {
+    // Initialize cache system...
+}
+```
+
+This ensures proper type handling regardless of how the configuration is provided. The same principle applies to other boolean settings in the framework.
 
 ## Best Practices
 
@@ -719,3 +840,57 @@ Remember that when setting `enabled` to `false` in your `.env` file, the value i
 The LightWeight views and templates system provides a powerful and flexible way to create dynamic and reusable user interfaces. With its clean syntax and advanced features, LightEngine allows you to clearly separate presentation logic from the rest of your application, making it easier to maintain and collaborate on projects of any size.
 
 > 🌐 [Documentación en Español](../es/views-templating.md)
+
+## Error Handling and Views
+
+### Error Page Templates
+
+LightWeight includes default error templates for common HTTP errors. These templates are stored in the default templates directory and are used when:
+
+1. An exception or error occurs in your application
+2. The exception handler renders an error response
+3. Your application doesn't have a custom error view defined
+
+The framework includes templates for:
+- 404 Not Found errors
+- 500 Internal Server errors
+- 403 Forbidden errors
+- General error display
+
+### Customizing Error Pages
+
+You can customize error pages by creating your own error view templates:
+
+```
+resources/
+  views/
+    errors/
+      404.light.php
+      500.light.php
+      403.light.php
+```
+
+The exception handler will look for views in this order:
+1. A custom view path specified in the exceptions configuration
+2. The default error view for the specific exception type
+3. A fallback to the default error templates
+
+### Rendering Error Pages Without Layouts
+
+Error pages are rendered without layouts by default to prevent nested exceptions (where the layout itself might be causing errors):
+
+```php
+protected function renderHttpNotFound(HttpNotFoundException $e): ResponseContract
+{
+    try {
+        $view = config('exceptions.views.not_found', 'errors.404');
+        // Pass false as layout to avoid layout rendering
+        return Response::view($view, [], false)->setStatus(404);
+    } catch (\Throwable $viewError) {
+        // Fallback to text response if view rendering fails
+        return Response::text('404 Not Found: ' . $e->getMessage())->setStatus(404);
+    }
+}
+```
+
+This ensures that even if there's an issue with your views or templates, the user will still receive an appropriate error response.

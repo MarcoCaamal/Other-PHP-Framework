@@ -210,8 +210,14 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
      */
     protected function renderHttpNotFound(HttpNotFoundException $e): ResponseContract
     {
-        $view = config('exceptions.views.not_found', 'errors.404');
-        return Response::view($view)->setStatus(404);
+        try {
+            $view = config('exceptions.views.not_found', 'errors.404');
+            // Pass false as layout to avoid layout rendering (prevents layout not found errors)
+            return Response::view($view, [], false)->setStatus(404);
+        } catch (Throwable $viewError) {
+            // Fallback to text response if view rendering fails
+            return Response::text('404 Not Found: ' . $e->getMessage())->setStatus(404);
+        }
     }
     
     /**
@@ -235,10 +241,18 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
             session()->set('_errors', $e->errors());
             session()->set('_old', $request->data() ?? []);
             
-            $view = config('exceptions.views.validation', 'errors.validation');
-            return Response::view($view, [
-                'errors' => $e->errors()
-            ])->setStatus(422);
+            try {
+                $view = config('exceptions.views.validation', 'errors.validation');
+                return Response::view($view, [
+                    'errors' => $e->errors()
+                ], false)->setStatus(422);
+            } catch (Throwable $viewError) {
+                // Fallback to JSON response if view rendering fails
+                return Response::json([
+                    'errors' => $e->errors(),
+                    'message' => "Validation Errors",
+                ])->setStatus(422);
+            }
         }
     }
     
@@ -250,21 +264,26 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
      */
     protected function renderDatabaseException(DatabaseException $e): ResponseContract
     {
-        $view = config('exceptions.views.database', 'errors.database');
-        
-        if (config('exceptions.debug', false) === true) {
+        try {
+            $view = config('exceptions.views.database', 'errors.database');
+            
+            if (config('exceptions.debug', false) == true) {
+                return Response::view($view, [
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTrace()
+                ], false)->setStatus(500);
+            }
+            
             return Response::view($view, [
-                'message' => $e->getMessage(),
-                'code' => $e->getCode(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTrace()
-            ])->setStatus(500);
+                'message' => 'A database error has occurred.'
+            ], false)->setStatus(500);
+        } catch (Throwable $viewError) {
+            // Fallback to text response if view rendering fails
+            return Response::text('Database Error: ' . (config('exceptions.debug', false) ? $e->getMessage() : 'A database error has occurred.'))->setStatus(500);
         }
-        
-        return Response::view($view, [
-            'message' => 'A database error has occurred.'
-        ])->setStatus(500);
     }
     
     /**
@@ -275,21 +294,29 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
      */
     protected function renderGenericException(Throwable $e): ResponseContract
     {
-        $view = config('exceptions.views.general', 'errors.application');
-        
-        if (config('exceptions.debug', false) === true) {
+        try {
+            $view = config('exceptions.views.general', 'errors.application');
+            
+            if (config('exceptions.debug', false) == true) {
+                return Response::view($view, [
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTrace()
+                ], false)->setStatus(500);
+            }
+            
             return Response::view($view, [
-                'message' => $e->getMessage(),
-                'code' => $e->getCode(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTrace()
-            ])->setStatus(500);
+                'message' => 'An unexpected error occurred.'
+            ], false)->setStatus(500);
+        } catch (Throwable $viewError) {
+            // Fallback to text response if view rendering fails
+            $message = config('exceptions.debug', false) ? 
+                $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine() : 
+                'An unexpected error occurred.';
+            return Response::text('Error: ' . $message)->setStatus(500);
         }
-        
-        return Response::view($view, [
-            'message' => 'An unexpected error occurred.'
-        ])->setStatus(500);
     }
     
     /**
