@@ -1,5 +1,0 @@
-vendor/
-/.vscode
-.php-cs-fixer.cache
-/tests/Database/migrations
-.env
