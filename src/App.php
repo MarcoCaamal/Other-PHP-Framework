@@ -192,11 +192,11 @@ class App
                 ->loadConfig()
                 ->runServiceProviders('boot')
                 ->setUpLogging()
-                ->setHttpHandlers()
                 ->setUpDatabaseConnection()
                 ->setExceptionHandler()
                 ->setUpEventSystem()
-                ->runServiceProviders('runtime');
+                ->runServiceProviders('runtime')
+                ->setHttpHandlers();
             
             // Dispatch bootstrap completed event
             if (isset($app->events)) {
