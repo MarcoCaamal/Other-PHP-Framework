@@ -5,7 +5,7 @@ namespace LightWeight\Events\Contracts;
 /**
  * Interface for the event dispatcher
  */
-interface EventDispatcherInterface
+interface EventDispatcherContract
 {
     /**
      * Register an event listener

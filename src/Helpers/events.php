@@ -1,6 +1,6 @@
 <?php
 
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\Contracts\EventInterface;
 use LightWeight\Events\Contracts\ListenerInterface;
 
@@ -13,7 +13,7 @@ use LightWeight\Events\Contracts\ListenerInterface;
  */
 function on(string $eventName, ListenerInterface|callable $listener): void
 {
-    app(EventDispatcherInterface::class)->listen($eventName, $listener);
+    app(EventDispatcherContract::class)->listen($eventName, $listener);
 }
 
 /**
@@ -25,7 +25,7 @@ function on(string $eventName, ListenerInterface|callable $listener): void
  */
 function event(EventInterface|string $event, array $payload = []): void
 {
-    app(EventDispatcherInterface::class)->dispatch($event, $payload);
+    app(EventDispatcherContract::class)->dispatch($event, $payload);
 }
 
 /**
@@ -36,5 +36,5 @@ function event(EventInterface|string $event, array $payload = []): void
  */
 function forgetListeners(?string $eventName = null): void
 {
-    app(EventDispatcherInterface::class)->forget($eventName);
+    app(EventDispatcherContract::class)->forget($eventName);
 }

@@ -2,6 +2,9 @@
 
 namespace LightWeight\Tests\Database;
 
+use LightWeight\Container\Container;
+use LightWeight\Events\Contracts\EventDispatcherContract;
+use LightWeight\Events\EventDispatcher;
 use PHPUnit\Framework\TestCase;
 use LightWeight\Tests\Database\RefreshDatabase;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
@@ -16,7 +19,20 @@ class TransactionModel extends \LightWeight\Database\ORM\Model
 
 class DatabaseTransactionTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase {
+        setUp as refreshDatabaseSetUp;
+        tearDown as refreshDatabaseTearDown;
+    }
+    protected function setUp(): void
+    {
+        $this->refreshDatabaseSetUp();
+        singleton(EventDispatcherContract::class, EventDispatcher::class);
+    }
+    protected function tearDown(): void
+    {
+        $this->refreshDatabaseTearDown();
+        Container::deleteInstance();
+    }
 
     protected ?DatabaseDriverContract $driver = null;
 

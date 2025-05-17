@@ -26,7 +26,7 @@ event($event);
 ### 2. Usando el dispatcher de eventos directamente
 
 ```php
-app(EventDispatcherInterface::class)->dispatch('user.registered', ['user' => $user]);
+app(EventDispatcherContract::class)->dispatch('user.registered', ['user' => $user]);
 
 // O usando la instancia de App
 app()->events()->dispatch('user.registered', ['user' => $user]);
@@ -53,7 +53,7 @@ on('user.registered', [UserNotifier::class, 'sendWelcomeEmail']);
 ### 2. Usando el dispatcher de eventos directamente
 
 ```php
-app(EventDispatcherInterface::class)->addListener('user.registered', function($event) {
+app(EventDispatcherContract::class)->addListener('user.registered', function($event) {
     // Manejar el evento
 });
 ```
@@ -91,7 +91,7 @@ class UserEventSubscriber implements SubscriberInterface
 }
 
 // Registrar el suscriptor
-app(EventDispatcherInterface::class)->addSubscriber(new UserEventSubscriber());
+app(EventDispatcherContract::class)->addSubscriber(new UserEventSubscriber());
 ```
 
 ## Provider de Servicios de Eventos

@@ -8,7 +8,7 @@ use LightWeight\Config\Config;
 use LightWeight\Container\Container;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
 use LightWeight\Database\Exceptions\DatabaseException;
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Exceptions\Contracts\ExceptionHandlerContract;
 use LightWeight\Http\HttpMethod;
 use LightWeight\Http\Contracts\RequestContract;
@@ -86,9 +86,9 @@ class App
     /**
      * Event dispatcher instance
      *
-     * @var EventDispatcherInterface
+     * @var EventDispatcherContract
      */
-    public EventDispatcherInterface $events;
+    public EventDispatcherContract $events;
     /**
      * Check if the current request is an API request
      *
@@ -321,7 +321,7 @@ class App
      */
     public function setUpEventSystem(): self
     {
-        $this->events = app(EventDispatcherInterface::class);
+        $this->events = app(EventDispatcherContract::class);
         return $this;
     }
     /**

@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Providers\EventServiceProvider as BaseEventServiceProvider;
 
 /**
@@ -31,7 +31,7 @@ class AppEventServiceProvider extends BaseEventServiceProvider
         parent::registerServices($container);
         
         // Registramos los listeners que usan closures
-        $dispatcher = $container->get(EventDispatcherInterface::class);
+        $dispatcher = $container->get(EventDispatcherContract::class);
         
         $dispatcher->listen('user.login', function ($event) {
             // Lógica para manejar el inicio de sesión

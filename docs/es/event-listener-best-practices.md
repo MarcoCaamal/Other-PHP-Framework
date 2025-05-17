@@ -38,7 +38,7 @@ public function registerServices($container)
     parent::registerServices($container);
     
     // Luego registra los listeners basados en closures
-    $dispatcher = $container->get(EventDispatcherInterface::class);
+    $dispatcher = $container->get(EventDispatcherContract::class);
     
     $dispatcher->listen('user.login', function ($event) {
         // Manejar inicio de sesión de usuario
@@ -107,7 +107,7 @@ public function registerServices($container)
     parent::registerServices($container);
     
     // Obtener el dispatcher de eventos
-    $dispatcher = $container->get(EventDispatcherInterface::class);
+    $dispatcher = $container->get(EventDispatcherContract::class);
     
     // Registrar los listeners basados en closures
     $dispatcher->listen('user.login', function ($event) {

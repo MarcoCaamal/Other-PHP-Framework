@@ -4,7 +4,7 @@ namespace LightWeight\Providers;
 
 use DI\Container as DIContainer;
 use LightWeight\Container\Container;
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\Contracts\EventSubscriberInterface;
 use LightWeight\Events\Contracts\ListenerInterface;
 use LightWeight\Events\EventDispatcher;
@@ -34,7 +34,7 @@ class EventServiceProvider implements ServiceProviderContract
     {
         // Register the event dispatcher
         $serviceContainer->set(
-            EventDispatcherInterface::class,
+            EventDispatcherContract::class,
             function () {
                 $dispatcher = new EventDispatcher();
                 
@@ -52,10 +52,10 @@ class EventServiceProvider implements ServiceProviderContract
     /**
      * Register default event listeners
      *
-     * @param EventDispatcherInterface $dispatcher
+     * @param EventDispatcherContract $dispatcher
      * @return void
      */
-    protected function registerEventListeners(EventDispatcherInterface $dispatcher): void
+    protected function registerEventListeners(EventDispatcherContract $dispatcher): void
     {
         foreach ($this->listen as $event => $listeners) {
             foreach ($listeners as $listener) {
@@ -76,10 +76,10 @@ class EventServiceProvider implements ServiceProviderContract
     /**
      * Register the default subscribers specified in the configuration file
      * 
-     * @param EventDispatcherInterface $dispatcher
+     * @param EventDispatcherContract $dispatcher
      * @return void
      */
-    protected function registerConfigSubscribers(EventDispatcherInterface $dispatcher): void
+    protected function registerConfigSubscribers(EventDispatcherContract $dispatcher): void
     {
         $subscribers = config('events.subscribers', []);
         

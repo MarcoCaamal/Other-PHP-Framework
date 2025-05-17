@@ -2,7 +2,7 @@
 
 namespace LightWeight\Tests\View;
 
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\EventDispatcher;
 use LightWeight\Events\ViewRenderedEvent;
 use LightWeight\Events\ViewRenderingEvent;
@@ -42,7 +42,7 @@ class ViewEventsTest extends TestCase
         singleton(ViewContract::class, $this->engine);
         
         // Create a mock event dispatcher
-        $this->dispatcher = singleton(EventDispatcherInterface::class, EventDispatcher::class);
+        $this->dispatcher = singleton(EventDispatcherContract::class, EventDispatcher::class);
         
         // Define the global event function for testing purposes
         if (!function_exists('event')) {

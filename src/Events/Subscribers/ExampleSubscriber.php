@@ -2,7 +2,7 @@
 
 namespace LightWeight\Events\Subscribers;
 
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\Contracts\EventInterface;
 use LightWeight\Events\Contracts\EventSubscriberInterface;
 
@@ -30,10 +30,10 @@ class ExampleSubscriber implements EventSubscriberInterface
     /**
      * Registra los oyentes para este suscriptor
      *
-     * @param EventDispatcherInterface $dispatcher
+     * @param EventDispatcherContract $dispatcher
      * @return void
      */
-    public function subscribe(EventDispatcherInterface $dispatcher): void
+    public function subscribe(EventDispatcherContract $dispatcher): void
     {
         // Utiliza el método getSubscribedEvents para registrar los listeners
         foreach (static::getSubscribedEvents() as $event => $method) {

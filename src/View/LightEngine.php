@@ -3,7 +3,7 @@
 namespace LightWeight\View;
 
 use LightWeight\App;
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\ViewRenderedEvent;
 use LightWeight\Events\ViewRenderingEvent;
 use LightWeight\View\Contracts\ViewContract;

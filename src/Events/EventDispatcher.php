@@ -3,14 +3,14 @@
 namespace LightWeight\Events;
 
 use LightWeight\Container\Container;
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\Contracts\EventInterface;
 use LightWeight\Events\Contracts\ListenerInterface;
 
 /**
  * Event dispatcher implementation
  */
-class EventDispatcher implements EventDispatcherInterface
+class EventDispatcher implements EventDispatcherContract
 {
     /**
      * Array of registered listeners

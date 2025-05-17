@@ -3,7 +3,7 @@
 namespace Tests\Routing;
 
 use LightWeight\Container\Container;
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\EventDispatcher;
 use LightWeight\Events\System\RouterMatched;
 use LightWeight\Http\HttpMethod;
@@ -27,7 +27,7 @@ class RouterMatchedEventTest extends TestCase
 
         // Registrar el dispatcher de eventos
         $this->eventDispatcher = new EventDispatcher();
-        $container->set(EventDispatcherInterface::class, $this->eventDispatcher);
+        $container->set(EventDispatcherContract::class, $this->eventDispatcher);
         
         // Configurar la aplicación para que tenga una propiedad 'events'
         $app = new \LightWeight\App();

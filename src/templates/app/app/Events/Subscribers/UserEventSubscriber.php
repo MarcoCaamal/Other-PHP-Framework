@@ -2,7 +2,7 @@
 
 namespace App\Events\Subscribers;
 
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\Contracts\EventInterface;
 use LightWeight\Events\Contracts\EventSubscriberInterface;
 
@@ -28,10 +28,10 @@ class UserEventSubscriber implements EventSubscriberInterface
     /**
      * Registrar los listeners para el suscriptor
      * 
-     * @param EventDispatcherInterface $dispatcher
+     * @param EventDispatcherContract $dispatcher
      * @return void
      */
-    public function subscribe(EventDispatcherInterface $dispatcher): void
+    public function subscribe(EventDispatcherContract $dispatcher): void
     {
         $dispatcher->listen('user.registered', function (EventInterface $event) {
             $this->onUserRegistered($event);

@@ -2,7 +2,7 @@
 
 namespace LightWeight\Tests\Session;
 
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\EventDispatcher;
 use LightWeight\Events\SessionStartedEvent;
 use LightWeight\Session\Contracts\SessionStorageContract;
@@ -17,7 +17,7 @@ class DispatcherAwareSessionStorage implements SessionStorageContract
     private $sessionId = 'test_session_id';
     private $dispatcher;
     
-    public function __construct(EventDispatcherInterface $dispatcher) 
+    public function __construct(EventDispatcherContract $dispatcher) 
     {
         $this->dispatcher = $dispatcher;
     }

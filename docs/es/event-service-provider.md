@@ -7,7 +7,7 @@ El framework LightWeight ahora incluye un proveedor de servicios dedicado para e
 ## EventServiceProvider
 
 El `EventServiceProvider` es responsable de:
-- Registrar la implementación del `EventDispatcherInterface` en el contenedor
+- Registrar la implementación del `EventDispatcherContract` en el contenedor
 - Facilitar el registro de listeners predeterminados
 - Cargar automáticamente suscriptores desde la configuración
 
@@ -21,7 +21,7 @@ return [
      * Event subscribers
      * 
      * List of subscriber classes that will be automatically registered with the event dispatcher.
-     * Each subscriber class must have a subscribe method that accepts an EventDispatcherInterface
+     * Each subscriber class must have a subscribe method that accepts an EventDispatcherContract
      * instance as its only parameter.
      */
     'subscribers' => [
@@ -54,7 +54,7 @@ Puedes extender el `EventServiceProvider` para registrar listeners específicos 
 namespace App\Providers;
 
 use App\Events\Listeners\SendWelcomeEmailListener;
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Providers\EventServiceProvider as BaseEventServiceProvider;
 
 class AppEventServiceProvider extends BaseEventServiceProvider
@@ -85,7 +85,7 @@ class AppEventServiceProvider extends BaseEventServiceProvider
         parent::registerServices($container);
         
         // Obtiene el dispatcher de eventos para registrar listeners basados en closures
-        $dispatcher = $container->get(EventDispatcherInterface::class);
+        $dispatcher = $container->get(EventDispatcherContract::class);
         
         // Registra listeners basados en closures
         $dispatcher->listen('user.login', function ($event) {
@@ -125,7 +125,7 @@ Los suscriptores de eventos son clases que permiten agrupar múltiples listeners
 
 namespace App\Events\Subscribers;
 
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\Contracts\EventInterface;
 use LightWeight\Events\Contracts\EventSubscriberInterface;
 
@@ -145,7 +145,7 @@ class UserEventSubscriber implements EventSubscriberInterface
     /**
      * Registrar los listeners para el suscriptor
      */
-    public function subscribe(EventDispatcherInterface $dispatcher): void
+    public function subscribe(EventDispatcherContract $dispatcher): void
     {
         $dispatcher->listen('user.registered', function (EventInterface $event) {
             $this->onUserRegistered($event);
@@ -202,7 +202,7 @@ public function registerServices($container)
     parent::registerServices($container);
     
     // Luego registrar los closures
-    $dispatcher = $container->get(EventDispatcherInterface::class);
+    $dispatcher = $container->get(EventDispatcherContract::class);
     
     $dispatcher->listen('user.login', function ($event) {
         // Lógica para el evento...

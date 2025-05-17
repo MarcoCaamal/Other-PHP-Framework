@@ -2,6 +2,9 @@
 
 namespace LightWeight\Tests\Database\ORM;
 
+use LightWeight\Container\Container;
+use LightWeight\Events\Contracts\EventDispatcherContract;
+use LightWeight\Events\EventDispatcher;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use LightWeight\Tests\Database\RefreshDatabase;
@@ -32,7 +35,21 @@ class HiddenAttributesModel extends Model
 
 class ModelExtendedTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase {
+        setUp as refreshDatabaseSetUp;
+        tearDown as refreshDatabaseTearDown;
+    }
+
+    protected function setUp(): void
+    {
+        $this->refreshDatabaseSetUp();
+        singleton(EventDispatcherContract::class, EventDispatcher::class);
+    }
+    protected function tearDown(): void
+    {
+        $this->refreshDatabaseTearDown();
+        Container::deleteInstance();
+    }
 
     protected ?DatabaseDriverContract $driver = null;
 

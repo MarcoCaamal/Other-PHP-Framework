@@ -2,6 +2,9 @@
 
 namespace LightWeight\Tests\Database\ORM;
 
+use LightWeight\Container\Container;
+use LightWeight\Events\Contracts\EventDispatcherContract;
+use LightWeight\Events\EventDispatcher;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
@@ -89,7 +92,20 @@ class CommentModel extends Model
 
 class RelationsTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase {
+        setUp as refreshDatabaseSetUp;
+        tearDown as refreshDatabaseTearDown;
+    }
+    protected function setUp(): void
+    {
+        $this->refreshDatabaseSetUp();
+        singleton(EventDispatcherContract::class, EventDispatcher::class);
+    }
+    protected function tearDown(): void
+    {
+        $this->refreshDatabaseTearDown();
+        Container::deleteInstance();
+    }
     
     protected ?DatabaseDriverContract $driver = null;
     
@@ -508,21 +524,5 @@ class RelationsTest extends TestCase
         $customRelation = $user->hasOne(ProfileModel::class, 'custom_foreign', 'custom_local');
         $this->assertEquals('custom_foreign', $customRelation->getForeignKey());
         $this->assertEquals('custom_local', $customRelation->getLocalKey());
-    }
-    
-    /**
-     * Drop test tables after each test
-     */
-    protected function tearDown(): void
-    {
-        if ($this->driver) {
-            // Drop tables in reverse order of creation to avoid foreign key constraints
-            $this->driver->statement("DROP TABLE IF EXISTS comments");
-            $this->driver->statement("DROP TABLE IF EXISTS posts");
-            $this->driver->statement("DROP TABLE IF EXISTS profiles");
-            $this->driver->statement("DROP TABLE IF EXISTS users");
-        }
-        
-        parent::tearDown();
     }
 }

@@ -2,6 +2,9 @@
 
 namespace LightWeight\Tests\View;
 
+use LightWeight\Container\Container;
+use LightWeight\Events\Contracts\EventDispatcherContract;
+use LightWeight\Events\EventDispatcher;
 use LightWeight\View\LightEngine;
 use PHPUnit\Framework\TestCase;
 
@@ -34,6 +37,7 @@ class ViewEngineTest extends TestCase
         
         // Configurar el motor de vista con el directorio existente de pruebas
         $this->engine = new LightEngine(__DIR__ . '/views');
+        singleton(EventDispatcherContract::class, EventDispatcher::class);
     }
     
     protected function tearDown(): void
@@ -42,6 +46,7 @@ class ViewEngineTest extends TestCase
         if (is_dir($this->tempDir)) {
             $this->removeDirectory($this->tempDir);
         }
+        Container::deleteInstance();
     }
     
     private function removeDirectory($dir)

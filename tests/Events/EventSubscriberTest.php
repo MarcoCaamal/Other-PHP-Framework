@@ -2,7 +2,7 @@
 
 namespace Tests\Events;
 
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\Contracts\EventSubscriberInterface;
 use LightWeight\Events\EventDispatcher;
 use LightWeight\Events\GenericEvent;
@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class EventSubscriberTest extends TestCase
 {
-    protected EventDispatcherInterface $dispatcher;
+    protected EventDispatcherContract $dispatcher;
     
     protected function setUp(): void
     {

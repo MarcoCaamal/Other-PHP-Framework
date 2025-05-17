@@ -3,7 +3,7 @@
 namespace LightWeight\Tests\Events;
 
 use LightWeight\App;
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\Contracts\EventInterface;
 use LightWeight\Events\Contracts\ListenerInterface;
 use LightWeight\Events\EventDispatcher;
@@ -20,7 +20,7 @@ class EventsIntegrationTest extends TestCase
     {
         // Mock App class para probar la integración
         $this->app = $this->createMock(App::class);
-        $this->app->events = singleton(EventDispatcherInterface::class, EventDispatcher::class);
+        $this->app->events = singleton(EventDispatcherContract::class, EventDispatcher::class);
         
         // Registrar la app en el contenedor para las funciones helper
         \LightWeight\Container\Container::getInstance()->set(App::class, $this->app);

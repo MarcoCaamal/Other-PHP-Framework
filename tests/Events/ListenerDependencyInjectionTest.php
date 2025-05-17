@@ -5,7 +5,7 @@ namespace LightWeight\Tests\Events;
 use LightWeight\Container\Container;
 use LightWeight\Events\GenericEvent;
 use LightWeight\Events\EventDispatcher;
-use LightWeight\Events\Contracts\EventDispatcherInterface;
+use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\Contracts\EventInterface;
 use LightWeight\Events\Contracts\ListenerInterface;
 use PHPUnit\Framework\TestCase;
@@ -93,7 +93,7 @@ class ListenerDependencyInjectionTest extends TestCase
         
         // Configurar dispatcher de eventos
         $this->eventDispatcher = new EventDispatcher();
-        Container::set(EventDispatcherInterface::class, $this->eventDispatcher);
+        Container::set(EventDispatcherContract::class, $this->eventDispatcher);
     }
     
     protected function tearDown(): void

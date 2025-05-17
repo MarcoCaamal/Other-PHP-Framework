@@ -20,8 +20,8 @@ interface EventSubscriberInterface
     /**
      * Registrar los oyentes para este suscriptor
      *
-     * @param EventDispatcherInterface $dispatcher
+     * @param EventDispatcherContract $dispatcher
      * @return void
      */
-    public function subscribe(EventDispatcherInterface $dispatcher): void;
+    public function subscribe(EventDispatcherContract $dispatcher): void;
 }
