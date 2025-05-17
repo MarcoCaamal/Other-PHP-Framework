@@ -224,7 +224,11 @@ class App
         $this->router = singleton(Router::class);
         $this->server = app(ServerContract::class);
         $this->request = singleton(Request::class, fn () => $this->server->getRequest());
-        $this->session = singleton(Session::class, fn (SessionStorageContract $sessionStorage) => new Session($sessionStorage));
+        $this->session = singleton(Session::class, function(\DI\Container $container) {
+            return new Session(
+                $container->get(SessionStorageContract::class)
+            );
+        });
         return $this;
     }
     /**
