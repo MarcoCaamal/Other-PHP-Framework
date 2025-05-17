@@ -157,6 +157,11 @@ LightWeight implements the following system events:
 - `view.rendering`: Fired before a view is rendered
 - `view.rendered`: Fired after a view has been rendered
 - `session.started`: Fired when a session is started
+- `auth.attempt`: Fired when a user attempts to authenticate
+- `auth.login`: Fired when a user successfully logs in
+- `auth.logout`: Fired when a user logs out
+
+For more details about authentication events, see the [Authentication Events documentation](auth-events.md).
 
 ## System Event Examples
 

@@ -12,14 +12,27 @@ class Authenticatable extends Model
         return $this->{$this->primaryKey};
     }
 
-    public function login()
+    /**
+     * Log the user in
+     *
+     * @param bool $remember Whether to "remember" the login
+     * @return void
+     */
+    public function login(bool $remember = false)
     {
-        app(AuthenticatorContract::class)->login($this);
+        app(AuthenticatorContract::class)->login($this, $remember);
     }
+    
+    /**
+     * Log the user out
+     *
+     * @return void
+     */
     public function logout()
     {
         app(AuthenticatorContract::class)->logout($this);
     }
+    
     public function isAuthenticated()
     {
         app(AuthenticatorContract::class)->isAuthenticated($this);

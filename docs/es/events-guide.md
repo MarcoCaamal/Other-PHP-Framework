@@ -159,6 +159,11 @@ LightWeight implementa los siguientes eventos del sistema:
 - `view.rendering`: Disparado antes de que se renderice una vista
 - `view.rendered`: Disparado después de que una vista ha sido renderizada
 - `session.started`: Disparado cuando se inicia una sesión
+- `auth.attempt`: Disparado cuando un usuario intenta autenticarse
+- `auth.login`: Disparado cuando un usuario inicia sesión exitosamente
+- `auth.logout`: Disparado cuando un usuario cierra sesión
+
+Para más detalles sobre los eventos de autenticación, consulta la [documentación de eventos de autenticación](auth-events.md).
 
 ## Ejemplos de Uso de Eventos del Sistema
 

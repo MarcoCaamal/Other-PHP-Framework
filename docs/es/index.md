@@ -13,6 +13,7 @@ Esta documentación proporciona información detallada sobre las característica
 ### Características principales
 - [Manejo de peticiones y respuestas](request-response-handling.md)
 - [Autenticación](authentication-guide.md)
+  - [Eventos de autenticación](auth-events.md)
 - [Validación de datos](validation-guide.md)
 - [Sistema de eventos](events-guide.md)
   - [Proveedor de servicios de eventos](event-service-provider.md)
@@ -37,6 +38,7 @@ Esta documentación proporciona información detallada sobre las característica
 - [Mejoras del sistema de migraciones](migration-enhancement-documentation.md)
 - [Acciones de claves foráneas](foreign-key-actions.md)
 - [Nuevo sistema de eventos](events-guide.md)
+- [Eventos de autenticación](auth-events.md)
 - [Sistema de correo electrónico](mail-system.md)
 - [Manejo mejorado de excepciones](exception-handling.md)
 

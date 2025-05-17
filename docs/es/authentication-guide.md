@@ -4,6 +4,16 @@
 
 El sistema de autenticación de LightWeight proporciona un mecanismo simple pero flexible para gestionar la autenticación de usuarios en tu aplicación. Está diseñado para ser fácil de implementar y personalizar según tus necesidades específicas.
 
+## Eventos de Autenticación
+
+El sistema de autenticación dispara varios eventos que puedes utilizar para reaccionar a acciones de usuario:
+
+- `auth.attempt`: Disparado cuando un usuario intenta autenticarse
+- `auth.login`: Disparado cuando un usuario inicia sesión exitosamente
+- `auth.logout`: Disparado cuando un usuario cierra sesión
+
+Para más información, consulta la guía detallada sobre [Eventos de Autenticación](auth-events.md).
+
 ## Estructura de Autenticación
 
 El sistema de autenticación de LightWeight se compone de los siguientes elementos clave:

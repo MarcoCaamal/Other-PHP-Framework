@@ -13,6 +13,7 @@ This documentation provides detailed information about the features and usage of
 ### Core Features
 - [Request and Response Handling](request-response-handling.md)
 - [Authentication](authentication-guide.md)
+  - [Authentication Events](auth-events.md)
 - [Data Validation](validation-guide.md)
 - [Event System](events-guide.md)
   - [Event Service Provider](event-service-provider.md)
@@ -37,6 +38,7 @@ This documentation provides detailed information about the features and usage of
 - [Migration System Enhancements](migration-enhancement-documentation.md)
 - [Foreign Key Actions](foreign-key-actions.md)
 - [New Event System](events-guide.md)
+- [Authentication Events](auth-events.md)
 - [Email System](mail-system.md)
 - [Improved Exception Handling](exception-handling.md)
 
