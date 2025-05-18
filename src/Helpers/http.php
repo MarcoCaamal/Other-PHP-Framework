@@ -21,7 +21,11 @@ function request(): RequestContract
 {
     return app(\LightWeight\App::class)->request;
 }
-function back(): Response
+function response(): Response
+{
+    return app(\LightWeight\App::class)->make(Response::class);
+}
+function back(): ResponseContract
 {
     return redirect(session()->get('_previous', '/'));
 }

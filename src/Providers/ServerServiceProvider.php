@@ -18,6 +18,7 @@ class ServerServiceProvider implements ServiceProviderContract
         };
         $serviceContainer->set(RequestContract::class, fn(ServerContract $server) => $server->getRequest());
         $serviceContainer->set(Router::class, \DI\create(Router::class));
-
+        
+        // No longer register Response as a service - each component should create its own instance
     }
 }

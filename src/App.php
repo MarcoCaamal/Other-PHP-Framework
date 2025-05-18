@@ -225,6 +225,10 @@ class App
         $this->server = app(ServerContract::class);
         $this->request = app(RequestContract::class);
         $this->session = app(Session::class);
+        
+        // No need to create a global response instance
+        // Each controller/route will create its own response
+        
         return $this;
     }
     /**
