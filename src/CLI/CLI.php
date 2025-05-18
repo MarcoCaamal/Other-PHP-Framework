@@ -62,14 +62,14 @@ class CLI
                 }
                 
                 // Registrar el Migrator solo si la conexión a la base de datos es exitosa
-                singleton(
-                    Migrator::class,
-                    fn(\DI\Container $c) => \DI\create(Migrator::class)->constructor(
-                        $migrationsDir,
-                        null,
-                        $c->get(DatabaseDriverContract::class),
-                    )
-                );
+                Container::getInstance()->set(Migrator::class, function ($c) use ($migrationsDir) {
+                    return new Migrator(
+                        migrationsDirectory: $migrationsDir,
+                        templatesDirectory: null,
+                        driver: $c->get(DatabaseDriverContract::class),
+                        logProgress: true,
+                    );
+                });
             }
         } catch (\Exception $e) {
             // Solo log de error, no detener la ejecución
