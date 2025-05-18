@@ -64,10 +64,10 @@ class CLI
                 // Registrar el Migrator solo si la conexión a la base de datos es exitosa
                 singleton(
                     Migrator::class,
-                    fn () => new Migrator(
+                    fn(\DI\Container $c) => new Migrator(
                         $migrationsDir,
-                        null, // Usar el path por defecto
-                        app(DatabaseDriverContract::class),
+                        null,
+                        $c->get(DatabaseDriverContract::class),
                     )
                 );
             }
