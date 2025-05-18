@@ -9,24 +9,24 @@ Se ha implementado soporte completo para las cláusulas `ON DELETE` y `ON UPDATE
 ## Características Implementadas
 
 1. **Métodos `onDelete()` y `onUpdate()`**
-   - Añadidos a la clase `ForeignKeyDefinition` para especificar acciones referenciales
-   - Soporte para todas las acciones estándar de MySQL: CASCADE, SET NULL, RESTRICT, NO ACTION, SET DEFAULT
+- Añadidos a la clase `ForeignKeyDefinition` para especificar acciones referenciales
+- Soporte para todas las acciones estándar de MySQL: CASCADE, SET NULL, RESTRICT, NO ACTION, SET DEFAULT
 
 2. **Validación de Acciones Referenciales**
-   - Implementado método `validateReferentialAction()` que normaliza y valida las acciones
-   - Manejo de errores para valores incorrectos con mensajes descriptivos
+- Implementado método `validateReferentialAction()` que normaliza y valida las acciones
+- Manejo de errores para valores incorrectos con mensajes descriptivos
 
 3. **Generación de SQL Mejorada**
-   - Actualizado método `compileForeignKey()` para generar correctamente las cláusulas ON DELETE y ON UPDATE
-   - Mantenimiento de compatibilidad con migraciones existentes
+- Actualizado método `compileForeignKey()` para generar correctamente las cláusulas ON DELETE y ON UPDATE
+- Mantenimiento de compatibilidad con migraciones existentes
 
 4. **Nombres de Restricciones Inteligentes**
-   - Sistema mejorado de nomenclatura que considera las acciones referenciales para evitar colisiones
-   - Algoritmo optimizado para generar nombres de restricciones que respetan el límite de 64 caracteres de MySQL
+- Sistema mejorado de nomenclatura que considera las acciones referenciales para evitar colisiones
+- Algoritmo optimizado para generar nombres de restricciones que respetan el límite de 64 caracteres de MySQL
 
 5. **Acortamiento de Identificadores**
-   - Método `shortenIdentifier()` mejorado con técnicas avanzadas para preservar la semántica de los nombres
-   - Eliminación de palabras comunes, manejo inteligente de vocales y uso de hash para identificadores muy largos
+- Método `shortenIdentifier()` mejorado con técnicas avanzadas para preservar la semántica de los nombres
+- Eliminación de palabras comunes, manejo inteligente de vocales y uso de hash para identificadores muy largos
 
 ## Testing
 

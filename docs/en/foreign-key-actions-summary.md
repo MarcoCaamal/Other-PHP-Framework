@@ -9,24 +9,24 @@ Full support for `ON DELETE` and `ON UPDATE` clauses in foreign keys has been im
 ## Implemented Features
 
 1. **`onDelete()` and `onUpdate()` Methods**
-   - Added to the `ForeignKeyDefinition` class to specify referential actions
-   - Support for all standard MySQL actions: CASCADE, SET NULL, RESTRICT, NO ACTION, SET DEFAULT
+- Added to the `ForeignKeyDefinition` class to specify referential actions
+- Support for all standard MySQL actions: CASCADE, SET NULL, RESTRICT, NO ACTION, SET DEFAULT
 
 2. **Referential Action Validation**
-   - Implemented `validateReferentialAction()` method that normalizes and validates actions
-   - Error handling for incorrect values with descriptive messages
+- Implemented `validateReferentialAction()` method that normalizes and validates actions
+- Error handling for incorrect values with descriptive messages
 
 3. **Enhanced SQL Generation**
-   - Updated `compileForeignKey()` method to correctly generate ON DELETE and ON UPDATE clauses
-   - Maintained compatibility with existing migrations
+- Updated `compileForeignKey()` method to correctly generate ON DELETE and ON UPDATE clauses
+- Maintained compatibility with existing migrations
 
 4. **Smart Constraint Names**
-   - Improved naming system that considers referential actions to avoid collisions
-   - Optimized algorithm for generating constraint names that respect MySQL's 64 character limit
+- Improved naming system that considers referential actions to avoid collisions
+- Optimized algorithm for generating constraint names that respect MySQL's 64 character limit
 
 5. **Identifier Shortening**
-   - Enhanced `shortenIdentifier()` method with advanced techniques to preserve name semantics
-   - Removal of common words, intelligent handling of vowels, and hash usage for very long identifiers
+- Enhanced `shortenIdentifier()` method with advanced techniques to preserve name semantics
+- Removal of common words, intelligent handling of vowels, and hash usage for very long identifiers
 
 ## Testing
 

@@ -5,38 +5,38 @@
 ## Completed Implementation Features
 
 1. **Column Types**
-   - Added extensive column types: `id`, `string`, `integer`, `boolean`, `text`, `decimal`, `timestamp`, `datetime`, `date`, `enum`
-   - Added additional types: `bigInteger`, `mediumInteger`, `smallInteger`, `tinyInteger`, `mediumText`, `longText`, `binary`, `json`, `time`, `year`
-   - Added unsigned variants: `unsignedInteger`, `unsignedBigInteger`, `unsignedSmallInteger`, `unsignedTinyInteger`
+- Added extensive column types: `id`, `string`, `integer`, `boolean`, `text`, `decimal`, `timestamp`, `datetime`, `date`, `enum`
+- Added additional types: `bigInteger`, `mediumInteger`, `smallInteger`, `tinyInteger`, `mediumText`, `longText`, `binary`, `json`, `time`, `year`
+- Added unsigned variants: `unsignedInteger`, `unsignedBigInteger`, `unsignedSmallInteger`, `unsignedTinyInteger`
 
 2. **Column Modifiers**
-   - Implemented: `nullable()`, `default()`, `unique()`, `unsigned()`, `autoIncrement()`, `comment()`, `columnCharset()`, `columnCollation()`
-   - Seamless chaining: `$table->string('email')->nullable()->default('user@example.com')`
+- Implemented: `nullable()`, `default()`, `unique()`, `unsigned()`, `autoIncrement()`, `comment()`, `columnCharset()`, `columnCollation()`
+- Seamless chaining: `$table->string('email')->nullable()->default('user@example.com')`
 
 3. **Index Operations**
-   - Basic indexes: `index()` for adding standard indexes on columns
-   - Unique indexes: `uniqueIndex()` for adding unique constraints
-   - Primary keys: `primary()` for setting primary key on specific column(s)
-   - Support for composite indexes: `index(['name', 'email'])`
-   - Index removal: `dropIndex()`, `dropPrimary()`, `dropUnique()`
+- Basic indexes: `index()` for adding standard indexes on columns
+- Unique indexes: `uniqueIndex()` for adding unique constraints
+- Primary keys: `primary()` for setting primary key on specific column(s)
+- Support for composite indexes: `index(['name', 'email'])`
+- Index removal: `dropIndex()`, `dropPrimary()`, `dropUnique()`
 
 4. **Foreign Key Management**
-   - Full foreign key support: `$table->foreign('user_id')->references('id')->on('users')`
-   - Foreign key implementation in both `CREATE TABLE` and `ALTER TABLE` statements
-   - Support for referential actions: `onDelete('CASCADE')` and `onUpdate('CASCADE')`
-   - Validation of referential actions with proper SQL syntax generation
-   - Support for all standard actions: CASCADE, SET NULL, RESTRICT, NO ACTION, SET DEFAULT
+- Full foreign key support: `$table->foreign('user_id')->references('id')->on('users')`
+- Foreign key implementation in both `CREATE TABLE` and `ALTER TABLE` statements
+- Support for referential actions: `onDelete('CASCADE')` and `onUpdate('CASCADE')`
+- Validation of referential actions with proper SQL syntax generation
+- Support for all standard actions: CASCADE, SET NULL, RESTRICT, NO ACTION, SET DEFAULT
 
 5. **Table Operations**
-   - Table creation: `Schema::create()`
-   - Table modification: `Schema::table()`
-   - Table deletion: `Schema::dropIfExists()`
-   - Table attribute control: `engine()`, `charset()`, `collation()`
+- Table creation: `Schema::create()`
+- Table modification: `Schema::table()`
+- Table deletion: `Schema::dropIfExists()`
+- Table attribute control: `engine()`, `charset()`, `collation()`
 
 6. **Schema Builder**
-   - Unified interface for database structure definition
-   - Fluent API similar to Laravel's migration system
-   - Easy to use for both simple and complex database schema creation
+- Unified interface for database structure definition
+- Fluent API similar to Laravel's migration system
+- Easy to use for both simple and complex database schema creation
 
 7. **Column Drop Support**
    - Support for dropping single columns: `dropColumn('column')`
