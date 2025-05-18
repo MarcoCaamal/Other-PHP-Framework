@@ -4,7 +4,6 @@ namespace LightWeight\Providers;
 
 use LightWeight\Providers\Contracts\ServiceProviderContract;
 use LightWeight\Storage\Drivers\Contracts\FileStorageDriverContract;
-use LightWeight\Storage\Drivers\DiskFileStorage;
 use LightWeight\Storage\Drivers\LocalFileStorage;
 use LightWeight\Storage\Drivers\PublicFileStorage;
 use LightWeight\Exceptions\ConfigurationException;
@@ -16,7 +15,7 @@ class FileStorageDriverServiceProvider implements ServiceProviderContract
      */
     public function registerServices(\DI\Container $serviceContainer)
     {
-        $default = config("storage.default", "disk");
+        $default = config("storage.default", "local");
         $driverConfig = config("storage.drivers.$default", null);
         
         if (!$driverConfig) {
@@ -27,32 +26,12 @@ class FileStorageDriverServiceProvider implements ServiceProviderContract
         
         // Register the appropriate driver based on configuration
         match ($driver) {
-            "disk" => $this->registerDiskDriver($serviceContainer, $driverConfig),
-            "local" => $this->registerLocalDriver($serviceContainer, $driverConfig),
+            "disk", "local" => $this->registerLocalDriver($serviceContainer, $driverConfig),
             "public" => $this->registerPublicDriver($serviceContainer, $driverConfig),
             "s3" => $this->registerS3Driver($serviceContainer, $driverConfig),
             "ftp" => $this->registerFtpDriver($serviceContainer, $driverConfig),
             default => throw new ConfigurationException("Unsupported storage driver: $driver")
         };
-    }
-    
-    /**
-     * Register disk driver
-     *
-     * @param \DI\Container $serviceContainer
-     * @param array $config
-     * @return void
-     */
-    protected function registerDiskDriver(\DI\Container $serviceContainer, array $config): void
-    {
-        $serviceContainer->set(
-            FileStorageDriverContract::class, 
-            \DI\create(DiskFileStorage::class)->constructor(
-                $config['path'] ?? config('storage.path', rootDirectory() . '/storage'),
-                $config['storage_uri'] ?? config('storage.storage_uri', 'storage'),
-                $config['url'] ?? config('storage.url', 'http://localhost')
-            )
-        );
     }
     
     /**

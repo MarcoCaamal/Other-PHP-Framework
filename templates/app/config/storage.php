@@ -20,7 +20,7 @@ return [
     | Here you may configure as many storage "drivers" as you wish. You may
     | even configure multiple drivers of the same type with different names.
     | 
-    | Supported drivers: "local", "public", "s3", "ftp"
+    | Supported drivers: "local", "public", "s3", "ftp", "disk" (alias for "local")
     |
     */
     'drivers' => [
