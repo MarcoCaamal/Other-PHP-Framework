@@ -187,19 +187,19 @@ class Route
     }
     public static function get(string $uri, \Closure|array $action): self
     {
-        return app()->router->get($uri, $action);
+        return app(\LightWeight\Routing\Router::class)->get($uri, $action);
     }
 
     public static function post(string $uri, \Closure|array $action): self
     {
-        return app()->router->post($uri, $action);
+        return app(\LightWeight\Routing\Router::class)->post($uri, $action);
     }
     public static function put(string $uri, \Closure|array $action): Route
     {
-        return app()->router->put($uri, $action);
+        return app(\LightWeight\Routing\Router::class)->put($uri, $action);
     }
     public static function delete(string $uri, \Closure|array $action): Route
     {
-        return app()->router->delete($uri, $action);
+        return app(\LightWeight\Routing\Router::class)->delete($uri, $action);
     }
 }
