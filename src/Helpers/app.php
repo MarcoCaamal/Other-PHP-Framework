@@ -81,3 +81,14 @@ function debugDie($var)
     echo var_dump($var);
     die;
 }
+
+/**
+ * Get the path to the public directory.
+ *
+ * @param  string  $path
+ * @return string
+ */
+function publicPath(string $path = ''): string
+{
+    return App::$root . '/public' . ($path ? '/' . ltrim($path, '/') : '');
+}

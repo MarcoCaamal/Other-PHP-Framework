@@ -10,6 +10,7 @@ use LightWeight\CLI\Commands\MakeMigration;
 use LightWeight\CLI\Commands\MakeModel;
 use LightWeight\CLI\Commands\Migrate;
 use LightWeight\CLI\Commands\MigrateRollback;
+use LightWeight\CLI\Commands\StorageLink;
 use LightWeight\Config\Config;
 use LightWeight\Container\Container;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
@@ -85,7 +86,8 @@ class CLI
             new MigrateRollback(),
             new MakeController(),
             new MakeModel(),
-            new InitApp()
+            new InitApp(),
+            new StorageLink()
         ]);
         $cli->run();
     }
