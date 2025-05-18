@@ -15,7 +15,7 @@ class RouteServiceProvider implements ServiceProviderContract
      */
     public function registerServices(Container $serviceContainer)
     {
-        $router = app(Router::class);
+        $router = singleton(Router::class);
         $router->setGlobalMiddlewares([
             // Descomentar y ajustar según tus necesidades
             // \App\Middleware\CorsMiddleware::class,
