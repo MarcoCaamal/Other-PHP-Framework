@@ -197,7 +197,7 @@ class App
                 ->setUpEventSystem()
                 ->runServiceProviders('runtime')
                 ->setHttpHandlers();
-            
+
             // Dispatch bootstrap completed event
             if (isset($app->events)) {
                 $app->events->dispatch(new \LightWeight\Events\System\ApplicationBootstrapped());
@@ -221,14 +221,10 @@ class App
      */
     public function setHttpHandlers(): self
     {
-        $this->router = singleton(Router::class);
+        $this->router = app(Router::class);
         $this->server = app(ServerContract::class);
-        $this->request = singleton(Request::class, fn () => $this->server->getRequest());
-        $this->session = singleton(Session::class, function(\DI\Container $container) {
-            return new Session(
-                $container->get(SessionStorageContract::class)
-            );
-        });
+        $this->request = app(RequestContract::class);
+        $this->session = app(Session::class);
         return $this;
     }
     /**
