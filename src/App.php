@@ -244,7 +244,13 @@ class App
         
         $response->setHeader(
             'Access-Control-Allow-Methods', 
-            implode(',', config('cors.allowed_methods', ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']))
+            implode(',', config('cors.allowed_methods', [
+                HttpMethod::GET->value, 
+                HttpMethod::POST->value, 
+                HttpMethod::PUT->value, 
+                HttpMethod::DELETE->value, 
+                HttpMethod::OPTIONS->value
+            ]))
         );
         
         $response->setHeader(

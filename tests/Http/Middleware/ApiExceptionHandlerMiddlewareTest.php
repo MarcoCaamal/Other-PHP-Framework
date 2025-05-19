@@ -20,17 +20,17 @@ class ApiExceptionHandlerMiddlewareTest extends TestCase
      * Helper method to create a Request object for testing
      *
      * @param string $uri The URI
-     * @param string $method The HTTP method
+     * @param HttpMethod|string $method The HTTP method
      * @param array $queryParams Query parameters
      * @param array $postData POST data
      * @param array $headers HTTP headers
      * @return Request
      */
-    private function createRequest(string $uri, string $method = 'GET', array $queryParams = [], array $postData = [], array $headers = []): Request
+    private function createRequest(string $uri, HttpMethod|string $method = HttpMethod::GET, array $queryParams = [], array $postData = [], array $headers = []): Request
     {
         $request = new Request();
         $request->setUri($uri)
-                ->setMethod(HttpMethod::from($method))
+                ->setMethod($method instanceof HttpMethod ? $method : HttpMethod::from($method))
                 ->setQueryParameters($queryParams)
                 ->setPostData($postData);
                 
@@ -56,7 +56,7 @@ class ApiExceptionHandlerMiddlewareTest extends TestCase
     public function testHandleSuccessfulRequest(): void
     {
         // Create a request
-        $request = $this->createRequest('/api/test', 'GET');
+        $request = $this->createRequest('/api/test', HttpMethod::GET);
         
         // Create a mock response for the next middleware
         $expectedResponse = Response::json(['success' => true]);
@@ -77,7 +77,7 @@ class ApiExceptionHandlerMiddlewareTest extends TestCase
     {
         // Create a mock exception
         $exception = new \Exception('Test exception');
-        $requestMock = $this->createRequest('/api/test', 'GET');
+        $requestMock = $this->createRequest('/api/test', HttpMethod::GET);
         
         // Create a mock response for the rendered exception
         $expectedResponse = $this->createMock(ResponseContract::class);

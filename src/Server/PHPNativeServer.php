@@ -23,35 +23,60 @@ class PHPNativeServer implements ServerContract
     {
         $files = [];
         foreach ($_FILES as $key => $file) {
-            if (!empty($file["tmp_name"])) {
+            if (is_array($file['name'])) {
+                // Handle multiple file uploads
+                $fileCount = count($file['name']);
+                for ($i = 0; $i < $fileCount; $i++) {
+                    if ($file['error'][$i] === UPLOAD_ERR_OK) {
+                        $files["{$key}_{$i}"] = new File(
+                            file_get_contents($file['tmp_name'][$i]),
+                            $file['type'][$i],
+                            $file['name'][$i]
+                        );
+                    }
+                }
+            } elseif (isset($file['error']) && $file['error'] === UPLOAD_ERR_OK) {
                 $files[$key] = new File(
-                    file_get_contents($file["tmp_name"]),
-                    $file["type"],
-                    $file["name"],
+                    file_get_contents($file['tmp_name']),
+                    $file['type'],
+                    $file['name']
                 );
             }
         }
         return $files;
     }
+    /**
+     * Get request data from either POST or request body
+     *
+     * @return array
+     */
     protected function requestData(): array
     {
-        $headers = getallheaders();
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        $isJson = strpos($contentType, 'application/json') !== false;
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-        $isJson = isset($headers["Content-Type"])
-            && $headers["Content-Type"] === "application/json";
-
-
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && !$isJson) {
+        // For standard POST requests, use $_POST
+        if ($method === 'POST' && !$isJson) {
             return $_POST;
         }
 
-        if ($isJson) {
-            $data = json_decode(file_get_contents("php://input"), associative: true);
-        } else {
-            parse_str(file_get_contents("php://input"), $data);
+        // For other methods or JSON content, parse the request body
+        $inputData = [];
+        $input = file_get_contents('php://input');
+        
+        if (!empty($input)) {
+            if ($isJson) {
+                $decoded = json_decode($input, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    $inputData = $decoded;
+                }
+            } else {
+                parse_str($input, $inputData);
+            }
         }
 
-        return $data;
+        return $inputData;
     }
     /**
      * @inheritDoc
@@ -76,12 +101,66 @@ class PHPNativeServer implements ServerContract
      */
     public function getRequest(): RequestContract
     {
-        return (new Request())
-            ->setUri(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH))
-            ->setMethod(HttpMethod::from($_SERVER['REQUEST_METHOD']))
-            ->setHeaders(getallheaders())
-            ->setPostData($this->requestData())
-            ->setQueryParameters($_GET)
-            ->setFiles($this->uploadedFiles());
+        $request = new Request();
+        
+        // Set basic request properties
+        $request->setUri(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH))
+                ->setMethod(HttpMethod::from($_SERVER['REQUEST_METHOD'] ?? 'GET'))
+                ->setQueryParameters($_GET)
+                ->setPostData($this->requestData())
+                ->setHost($_SERVER['HTTP_HOST'] ?? 'localhost');
+        
+        // Set URL scheme
+        $https = $_SERVER['HTTPS'] ?? '';
+        $request->setScheme(!empty($https) && $https !== 'off' ? 'https' : 'http');
+        
+        // Set port
+        $port = (int)($_SERVER['SERVER_PORT'] ?? 80);
+        $request->setPort($port);
+        
+        // Set IP address
+        $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+        if (!$ip && isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
+        }
+        $request->setIp($ip);
+        
+        // Set User Agent
+        $request->setUserAgent($_SERVER['HTTP_USER_AGENT'] ?? null);
+        
+        // Set Referer
+        $request->setReferer($_SERVER['HTTP_REFERER'] ?? null);
+        
+        // Check if AJAX request
+        $request->setAjax(
+            isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+        );
+        
+        // Set content type
+        $request->setContentType($_SERVER['CONTENT_TYPE'] ?? null);
+        
+        // Set headers
+        $request->setHeaders(getallheaders());
+        
+        // Set uploaded files
+        $request->setFiles($this->uploadedFiles());
+        
+        // Get raw content for non-form requests
+        if (!in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', [HttpMethod::GET->value, HttpMethod::POST->value]) || 
+            ($request->contentType() && strpos($request->contentType(), 'application/json') !== false)) {
+            $content = file_get_contents('php://input');
+            $request->setContent($content);
+            
+            // Process JSON content
+            if ($request->isContentType('application/json') && !empty($content)) {
+                $jsonData = json_decode($content, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($jsonData)) {
+                    $request->setPostData($jsonData);
+                }
+            }
+        }
+        
+        return $request;
     }
 }

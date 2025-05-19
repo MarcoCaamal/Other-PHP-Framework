@@ -72,17 +72,17 @@ class ExceptionHandlerTest extends TestCase
      * Helper method to create a Request object for testing
      *
      * @param string $uri The URI
-     * @param string $method The HTTP method
+     * @param HttpMethod|string $method The HTTP method
      * @param array $queryParams Query parameters
      * @param array $postData POST data
      * @param array $headers HTTP headers
      * @return Request
      */
-    private function createRequest(string $uri, string $method = 'GET', array $queryParams = [], array $postData = [], array $headers = []): Request
+    private function createRequest(string $uri, HttpMethod|string $method = HttpMethod::GET, array $queryParams = [], array $postData = [], array $headers = []): Request
     {
         $request = new Request();
         $request->setUri($uri)
-                ->setMethod(HttpMethod::from($method))
+                ->setMethod($method instanceof HttpMethod ? $method : HttpMethod::from($method))
                 ->setQueryParameters($queryParams)
                 ->setPostData($postData);
                 

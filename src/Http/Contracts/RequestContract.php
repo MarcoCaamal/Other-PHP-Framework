@@ -174,4 +174,265 @@ interface RequestContract
      * @return array All request attributes
      */
     public function getAttributes(): array;
+    
+    /**
+     * Get the full URL of the request
+     *
+     * @return string The complete URL
+     */
+    public function url(): string;
+    
+    /**
+     * Get the URL without query string
+     *
+     * @return string The URL without query parameters
+     */
+    public function baseUrl(): string;
+    
+    /**
+     * Get the request path (URI without query string)
+     *
+     * @return string The path component of the URL
+     */
+    public function path(): string;
+    
+    /**
+     * Get the URL scheme (http or https)
+     *
+     * @return string The URL scheme
+     */
+    public function scheme(): string;
+    
+    /**
+     * Check if the request is using HTTPS
+     *
+     * @return bool True if using HTTPS
+     */
+    public function isSecure(): bool;
+    
+    /**
+     * Get the host name
+     *
+     * @return string The host name
+     */
+    public function host(): string;
+    
+    /**
+     * Get the port number
+     *
+     * @return int|null The port number or null if using standard ports
+     */
+    public function port(): ?int;
+    
+    /**
+     * Get the client's IP address
+     *
+     * @return string|null The IP address
+     */
+    public function ip(): ?string;
+    
+    /**
+     * Get the user agent string
+     *
+     * @return string|null The user agent
+     */
+    public function userAgent(): ?string;
+    
+    /**
+     * Check if the request is an AJAX request
+     *
+     * @return bool True if AJAX request
+     */
+    public function isAjax(): bool;
+    
+    /**
+     * Check if the request is expecting a JSON response
+     *
+     * @return bool True if expecting JSON
+     */
+    public function expectsJson(): bool;
+    
+    /**
+     * Get the raw request body content
+     *
+     * @return string|null The raw content
+     */
+    public function getContent(): ?string;
+    
+    /**
+     * Get the request content type
+     *
+     * @return string|null The content type
+     */
+    public function contentType(): ?string;
+    
+    /**
+     * Check if the request is a specific content type
+     *
+     * @param string $type The content type to check
+     * @return bool True if matches
+     */
+    public function isContentType(string $type): bool;
+    
+    /**
+     * Get the referer URL
+     *
+     * @return string|null The referer
+     */
+    public function referer(): ?string;
+    
+    /**
+     * Set the scheme for this request
+     *
+     * @param string $scheme The URL scheme
+     * @return self
+     */
+    public function setScheme(string $scheme): self;
+    
+    /**
+     * Set the host for this request
+     *
+     * @param string $host The host name
+     * @return self
+     */
+    public function setHost(string $host): self;
+    
+    /**
+     * Set the port for this request
+     *
+     * @param int|null $port The port number
+     * @return self
+     */
+    public function setPort(?int $port): self;
+    
+    /**
+     * Set the client IP address
+     *
+     * @param string|null $ip The IP address
+     * @return self
+     */
+    public function setIp(?string $ip): self;
+    
+    /**
+     * Set the user agent
+     *
+     * @param string|null $userAgent The user agent string
+     * @return self
+     */
+    public function setUserAgent(?string $userAgent): self;
+    
+    /**
+     * Set the referer
+     *
+     * @param string|null $referer The referer URL
+     * @return self
+     */
+    public function setReferer(?string $referer): self;
+    
+    /**
+     * Set whether this is an AJAX request
+     *
+     * @param bool $ajax Whether this is an AJAX request
+     * @return self
+     */
+    public function setAjax(bool $ajax): self;
+    
+    /**
+     * Set the raw request content
+     *
+     * @param string|null $content The raw content
+     * @return self
+     */
+    public function setContent(?string $content): self;
+    
+    /**
+     * Set the content type
+     *
+     * @param string|null $contentType The content type
+     * @return self
+     */
+    public function setContentType(?string $contentType): self;
+    
+    /**
+     * Check if the request has a specific input value
+     *
+     * @param string $key The input key to check
+     * @return bool True if the input exists
+     */
+    public function has(string $key): bool;
+    
+    /**
+     * Get a value from the combined input (POST data + query parameters)
+     *
+     * @param string|null $key The input key
+     * @param mixed $default Default value if key doesn't exist
+     * @return mixed The input value or default
+     */
+    public function input(?string $key = null, mixed $default = null): mixed;
+    
+    /**
+     * Get all inputs except specified ones
+     *
+     * @param array $keys Keys to exclude
+     * @return array Filtered input data
+     */
+    public function except(array $keys): array;
+    
+    /**
+     * Get only specified inputs
+     *
+     * @param array $keys Keys to include
+     * @return array Filtered input data
+     */
+    public function only(array $keys): array;
+    
+    /**
+     * Check if the request is for a specific method
+     *
+     * @param HttpMethod $method HTTP method to check
+     * @return bool True if matches
+     */
+    public function isMethod(HttpMethod $method): bool;
+    
+    /**
+     * Check if the current request is a GET request
+     *
+     * @return bool True if GET request
+     */
+    public function isGet(): bool;
+    
+    /**
+     * Check if the current request is a POST request
+     *
+     * @return bool True if POST request
+     */
+    public function isPost(): bool;
+    
+    /**
+     * Check if the current request is a PUT request
+     *
+     * @return bool True if PUT request
+     */
+    public function isPut(): bool;
+    
+    /**
+     * Check if the current request is a DELETE request
+     *
+     * @return bool True if DELETE request
+     */
+    public function isDelete(): bool;
+    
+    /**
+     * Check if the current request is a PATCH request
+     *
+     * @return bool True if PATCH request
+     */
+    public function isPatch(): bool;
+    
+    /**
+     * Check if the current request is an OPTIONS request
+     *
+     * @return bool True if OPTIONS request
+     */
+    public function isOptions(): bool;
 }
