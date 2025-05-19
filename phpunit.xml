@@ -4,14 +4,19 @@
          bootstrap="vendor/autoload.php"
          colors="true"
          testdox="true"
+         testdoxSummary="true"
+         displayDetailsOnAllIssues="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
          displayDetailsOnTestsThatTriggerErrors="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
          displayDetailsOnTestsThatTriggerNotices="true"
          displayDetailsOnSkippedTests="true"
+         displayDetailsOnIncompleteTests="true"
+         displayDetailsOnRiskyTests="true"
          stopOnFailure="true"
          stopOnError="true"
-         stopOnSkipped="true">
+         stopOnSkipped="true"
+         stopOnIncomplete="true">
     <testsuites>
         <testsuite name="All">
             <directory>./tests</directory>

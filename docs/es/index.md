@@ -12,6 +12,7 @@ Esta documentación proporciona información detallada sobre las característica
 
 ### Características principales
 - [Manejo de peticiones y respuestas](request-response-handling.md)
+- [Configuración del servidor](server-configuration.md)
 - [Autenticación](authentication-guide.md)
 - [Eventos de autenticación](auth-events.md)
 - [Validación de datos](validation-guide.md)

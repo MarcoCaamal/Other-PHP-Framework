@@ -163,4 +163,94 @@ class PHPNativeServer implements ServerContract
         
         return $request;
     }
+    
+    /**
+     * Check if the current request needs to be redirected for HTTPS or WWW enforcement
+     * 
+     * @param RequestContract $request The current request
+     * @return ResponseContract|null A redirect response if needed, null otherwise
+     */
+    public function checkRedirects(RequestContract $request): ?ResponseContract
+    {
+        $forceHttps = config('server.force_https', false);
+        $forceWww = config('server.force_www', false);
+        
+        if (!$forceHttps && !$forceWww) {
+            return null;
+        }
+        
+        $scheme = $request->scheme();
+        $host = $request->host();
+        
+        $needsRedirect = false;
+        
+        // New scheme and host that may be required
+        $newScheme = $scheme;
+        $newHost = $host;
+        
+        // Check if HTTPS enforcement is needed
+        if ($forceHttps && $scheme !== 'https') {
+            $newScheme = 'https';
+            $needsRedirect = true;
+        }
+        
+        // Check if WWW enforcement is needed
+        if ($forceWww && !$this->hasWwwPrefix($host)) {
+            $newHost = 'www.' . $this->stripWwwPrefix($host);
+            $needsRedirect = true;
+        }
+        
+        if ($needsRedirect) {
+            // Build the redirect URL
+            $redirectUrl = $newScheme . '://' . $newHost;
+            
+            // Add port if not standard and not changing to HTTPS (which uses 443)
+            $port = $request->port();
+            if ($port && 
+                !(($newScheme === 'http' && $port === 80) || 
+                  ($newScheme === 'https' && $port === 443))) {
+                $redirectUrl .= ':' . $port;
+            }
+            
+            // Add path and query string
+            $redirectUrl .= $request->path();
+            $query = $request->query();
+            if (!empty($query)) {
+                $redirectUrl .= '?' . http_build_query($query);
+            }
+            
+            // Create the redirect response
+            $response = new \LightWeight\Http\Response();
+            $response->setStatus(301); // Permanent redirect
+            $response->setHeader('Location', $redirectUrl);
+            return $response;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Check if a hostname has the www prefix
+     *
+     * @param string $host The hostname to check
+     * @return bool True if the hostname starts with www.
+     */
+    private function hasWwwPrefix(string $host): bool
+    {
+        return strpos($host, 'www.') === 0;
+    }
+    
+    /**
+     * Remove www prefix from a hostname if it exists
+     *
+     * @param string $host The hostname to process
+     * @return string The hostname without www prefix
+     */
+    private function stripWwwPrefix(string $host): string
+    {
+        if ($this->hasWwwPrefix($host)) {
+            return substr($host, 4);
+        }
+        return $host;
+    }
 }

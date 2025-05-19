@@ -13,12 +13,10 @@ use LightWeight\Exceptions\Contracts\ExceptionHandlerContract;
 use LightWeight\Http\HttpMethod;
 use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\Contracts\ResponseContract;
-use LightWeight\Http\Request;
 use LightWeight\Http\Response;
 use LightWeight\Log\Contracts\LoggerContract;
 use LightWeight\Routing\Router;
 use LightWeight\Server\Contracts\ServerContract;
-use LightWeight\Session\Contracts\SessionStorageContract;
 use LightWeight\Session\Session;
 use LightWeight\View\Contracts\ViewContract;
 use Throwable;
@@ -358,6 +356,27 @@ class App
         return $this;
     }
     /**
+     * Check if the request needs to be redirected for HTTPS or WWW enforcement
+     *
+     * @return void
+     */
+    protected function checkForRedirects(): void
+    {
+        // Skip redirect checks for API requests
+        if ($this->isApiRequest()) {
+            return;
+        }
+        
+        // Check if redirect is needed for HTTPS or WWW
+        if (method_exists($this->server, 'checkRedirects')) {
+            $response = $this->server->checkRedirects($this->request);
+            if ($response) {
+                $this->terminate($response);
+                exit;
+            }
+        }
+    }
+    /**
      * Run the application
      *
      * @return void
@@ -365,6 +384,7 @@ class App
     public function run(): void
     {
         try {
+            $this->checkForRedirects();
             // No routes defined and this is the homepage
             if ($this->router->isEmpty() && $this->request->uri() === '/') {
                 $this->terminate($this->showWelcomePage());

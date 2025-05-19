@@ -12,6 +12,7 @@ This documentation provides detailed information about the features and usage of
 
 ### Core Features
 - [Request and Response Handling](request-response-handling.md)
+- [Server Configuration](server-configuration.md)
 - [Authentication](authentication-guide.md)
 - [Authentication Events](auth-events.md)
 - [Data Validation](validation-guide.md)
