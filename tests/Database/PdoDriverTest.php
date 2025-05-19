@@ -35,7 +35,7 @@ class PdoDriverTest extends TestCase
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255),
             value VARCHAR(255)
-        )");
+        )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
     }
     
     protected function tearDown(): void

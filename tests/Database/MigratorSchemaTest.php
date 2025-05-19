@@ -24,11 +24,10 @@ class MigratorSchemaTest extends TestCase
         if (!file_exists($this->migrationsDirectory)) {
             mkdir($this->migrationsDirectory);
         }
-        
-        // Asegurarse de que existe la plantilla de migración para pruebas
+          // Asegurarse de que existe la plantilla de migración para pruebas
         if (!file_exists("$this->templatesDirectory/migration.template")) {
             copy(
-                "/home/marco/public_html/LightWeight/templates/migration.template",
+                dirname(dirname(dirname(__DIR__))) . "/templates/migration.template",
                 "$this->templatesDirectory/migration.template"
             );
         }

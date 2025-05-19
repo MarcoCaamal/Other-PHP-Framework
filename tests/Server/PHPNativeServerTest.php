@@ -6,6 +6,7 @@ use LightWeight\Http\HttpMethod;
 use LightWeight\Http\Request;
 use LightWeight\Http\Response;
 use LightWeight\Server\PHPNativeServer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,96 +15,93 @@ use PHPUnit\Framework\TestCase;
 class PHPNativeServerTest extends TestCase
 {
     private PHPNativeServer $server;
-    private array $configValues = [];
-
-    /**
+    private array $originalConfig = [];    /**
      * Set up before each test
-     */
-    protected function setUp(): void
+     */    protected function setUp(): void
     {
-        $this->server = $this->getMockBuilder(PHPNativeServer::class)
-            ->onlyMethods(['getConfigValue'])
-            ->getMock();
-            
-        // Configure the mock to use our test config values
-        $this->server->method('getConfigValue')
-            ->willReturnCallback(function($key, $default) {
-                return $this->configValues[$key] ?? $default;
-            });
+        // Save original config for restoration later
+        $this->originalConfig = \LightWeight\Config\Config::$config;
+        
+        // Reset the config array for our tests
+        \LightWeight\Config\Config::$config = ['server' => []];
+        
+        // Create the server instance
+        $this->server = new PHPNativeServer();
     }
     
     /**
-     * @dataProvider httpsRedirectionDataProvider
+     * Clean up after each test
      */
+    protected function tearDown(): void
+    {
+        // Restore original config
+        \LightWeight\Config\Config::$config = $this->originalConfig;
+    }
+
+    #[DataProvider('httpsRedirectionDataProvider')]
     public function testHttpsRedirection(
         bool $forceHttps, 
         string $scheme, 
         string $host,
         int $port,
         bool $shouldRedirect, 
-        string $expectedUrl = null
+        ?string $expectedUrl = null
     ): void {
-        // Set config values for this test
-        $this->configValues = [
-            'server.force_https' => $forceHttps,
-            'server.force_www' => false
-        ];
+        // Set config values for this test using the helper method
+        $this->setConfig([
+            'force_https' => $forceHttps,
+            'force_www' => false
+        ]);
+        
+        // $this->debugConfig("Before testHttpsRedirection - forceHttps: " . var_export($forceHttps, true));
         
         $request = $this->createMockRequest($scheme, $host, $port);
         $response = $this->server->checkRedirects($request);
-        
-        if (!$shouldRedirect) {
+          if (!$shouldRedirect) {
             $this->assertNull($response, 'Should not redirect');
         } else {
             $this->assertInstanceOf(Response::class, $response);
             $this->assertEquals(301, $response->getStatus());
-            $this->assertEquals($expectedUrl, $response->headers()['Location']);
+            $this->assertEquals($expectedUrl, $response->headers('Location'));
         }
     }
-    
-    /**
-     * @dataProvider wwwRedirectionDataProvider
-     */
+    #[DataProvider('wwwRedirectionDataProvider')]
     public function testWwwRedirection(
         bool $forceWww, 
         string $host, 
         bool $shouldRedirect, 
-        string $expectedUrl = null
+        ?string $expectedUrl = null
     ): void {
         // Set config values for this test
-        $this->configValues = [
-            'server.force_https' => false,
-            'server.force_www' => $forceWww
-        ];
+        $this->setConfig([
+            'force_https' => false,
+            'force_www' => $forceWww
+        ]);
         
         $request = $this->createMockRequest('http', $host);
         $response = $this->server->checkRedirects($request);
-        
-        if (!$shouldRedirect) {
+          if (!$shouldRedirect) {
             $this->assertNull($response, 'Should not redirect');
         } else {
             $this->assertInstanceOf(Response::class, $response);
             $this->assertEquals(301, $response->getStatus());
-            $this->assertEquals($expectedUrl, $response->headers()['Location']);
+            $this->assertEquals($expectedUrl, $response->headers('location'));
         }
     }
-    
-    /**
-     * @dataProvider combinedRedirectionDataProvider
-     */
+    #[DataProvider('combinedRedirectionDataProvider')]
     public function testCombinedHttpsAndWwwRedirection(
         bool $forceHttps,
         bool $forceWww,
         string $scheme,
         string $host,
         bool $shouldRedirect,
-        string $expectedUrl = null
+        ?string $expectedUrl = null
     ): void {
         // Set config values for this test
-        $this->configValues = [
-            'server.force_https' => $forceHttps,
-            'server.force_www' => $forceWww
-        ];
+        $this->setConfig([
+            'force_https' => $forceHttps,
+            'force_www' => $forceWww
+        ]);
         
         $request = $this->createMockRequest($scheme, $host);
         $response = $this->server->checkRedirects($request);
@@ -113,60 +111,76 @@ class PHPNativeServerTest extends TestCase
         } else {
             $this->assertInstanceOf(Response::class, $response);
             $this->assertEquals(301, $response->getStatus());
-            $this->assertEquals($expectedUrl, $response->headers()['Location']);
+            $this->assertEquals($expectedUrl, $response->headers('Location'));
         }
     }
-    
+
     /**
-     * Test that API routes are treated differently in App class, but this implementation 
+     * Test that API routes are treated differently in App class, but this implementation
      * should still redirect them if they're passed directly to checkRedirects
      */
     public function testApiRouteRedirection(): void
     {
         // Set config values with both redirects enabled
-        $this->configValues = [
-            'server.force_https' => true,
-            'server.force_www' => true
-        ];
+        $this->setConfig([
+            'force_https' => true,
+            'force_www' => true
+        ]);
         
         // API routes should still be redirected if passed directly to checkRedirects
         $request = $this->createMockRequest('http', 'example.com');
-        $request->method('path')->willReturn('/api/users');
+        $request->setUri('/api/users');
         
         $response = $this->server->checkRedirects($request);
-        
         // Should redirect since App is responsible for skipping API redirects
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(301, $response->getStatus());
-        $this->assertEquals('https://www.example.com/api/users', $response->headers()['Location']);
+        $this->assertEquals('https://www.example.com/api/users', $response->headers('Location'));
     }
-    
+
     /**
      * Test redirection with paths and query parameters
      */
     public function testRedirectionWithPathAndQuery(): void
     {
         // Set config values
-        $this->configValues = [
-            'server.force_https' => true,
-            'server.force_www' => false
-        ];
-        
+        $this->setConfig([
+            'force_https' => true,
+            'force_www' => false
+        ]);
+
         $request = $this->createMockRequest('http', 'example.com');
-        $request->method('path')->willReturn('/products/123');
-        $request->method('query')->willReturn(['sort' => 'price', 'dir' => 'asc']);
-        
+        $request->setUri('/products/123');
+        $query = ['sort' => 'price', 'dir' => 'asc'];
+        $request->setQueryParameters($query);
+
         $response = $this->server->checkRedirects($request);
-        
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(301, $response->getStatus());
-        $this->assertEquals('https://example.com/products/123?sort=price&dir=asc', $response->headers()['Location']);
+        $this->assertEquals('https://example.com/products/123?sort=price&dir=asc', $response->headers('Location'));
+    }
+
+    /**
+     * Helper method to set server configuration
+     */
+    private function setConfig(array $config): void
+    {
+        \LightWeight\Config\Config::$config['server'] = $config;
+    }
+    
+    /**
+     * Debug method to verify config values
+     */
+    private function debugConfig(string $label = ""): void
+    {
+        echo "\n$label Config: " . print_r(\LightWeight\Config\Config::$config, true);
+        echo "\nConfig value from function: " . var_export(config('server.force_https', 'DEFAULT'), true);
+        echo "\n";
     }
     
     /**
      * Data provider for HTTPS redirection tests
-     */
-    public function httpsRedirectionDataProvider(): array
+     */    public static function httpsRedirectionDataProvider(): array
     {
         return [
             // [forceHttps, scheme, host, port, shouldRedirect, expectedUrl]
@@ -174,30 +188,27 @@ class PHPNativeServerTest extends TestCase
             'https when force https is disabled' => [false, 'https', 'example.com', 443, false],
             'http when force https is enabled' => [true, 'http', 'example.com', 80, true, 'https://example.com/'],
             'https when force https is enabled' => [true, 'https', 'example.com', 443, false],
-            'http with non-standard port when force https enabled' => [true, 'http', 'example.com', 8080, true, 'https://example.com/'],
+            'http with non-standard port when force https enabled' => [true, 'http', 'example.com', 8080, true, 'https://example.com:8080/'],
             'https with non-standard port when force https enabled' => [true, 'https', 'example.com', 8443, false],
         ];
     }
-    
-    /**
+      /**
      * Data provider for WWW redirection tests
-     */
-    public function wwwRedirectionDataProvider(): array
+     */    public static function wwwRedirectionDataProvider(): array
     {
         return [
             // [forceWww, host, shouldRedirect, expectedUrl]
-            'non-www when force www is disabled' => [false, 'example.com', false],
-            'www when force www is disabled' => [false, 'www.example.com', false],
+            'non-www when force www is disabled' => [false, 'example.com', false, null],
+            'www when force www is disabled' => [false, 'www.example.com', false, null],
             'non-www when force www is enabled' => [true, 'example.com', true, 'http://www.example.com/'],
-            'www when force www is enabled' => [true, 'www.example.com', false],
+            'www when force www is enabled' => [true, 'www.example.com', false, null],
             'subdomain when force www is enabled' => [true, 'sub.example.com', true, 'http://www.sub.example.com/'],
         ];
     }
-    
-    /**
+      /**
      * Data provider for combined HTTPS and WWW redirection tests
-     */
-    public function combinedRedirectionDataProvider(): array
+     */    
+    public static function combinedRedirectionDataProvider(): array
     {
         return [
             // [forceHttps, forceWww, scheme, host, shouldRedirect, expectedUrl]
@@ -218,25 +229,25 @@ class PHPNativeServerTest extends TestCase
             'https non-www when https disabled, www enabled' => [false, true, 'https', 'example.com', true, 'https://www.example.com/'],
         ];
     }
-    
-    /**
-     * Creates a mock Request object with the given parameters
+      /**
+     * Creates a Request object with the given parameters
      */
-    private function createMockRequest(string $scheme, string $host, int $port = null): Request
+    private function createMockRequest(string $scheme, string $host, ?int $port = null): Request
     {
-        $request = $this->createMock(Request::class);
-        
-        $request->method('scheme')->willReturn($scheme);
-        $request->method('host')->willReturn($host);
-        $request->method('path')->willReturn('/');
-        $request->method('query')->willReturn([]);
+        $request = new Request();
+        $request->setScheme($scheme);
+        $request->setHost($host);
         
         if ($port !== null) {
-            $request->method('port')->willReturn($port);
+            $request->setPort($port);
         } else {
             $port = ($scheme === 'https') ? 443 : 80;
-            $request->method('port')->willReturn($port);
+            $request->setPort($port);
         }
+        
+        $request->setMethod(HttpMethod::GET);
+        $request->setUri('/');
+        $request->setQueryParameters([]);
         
         return $request;
     }

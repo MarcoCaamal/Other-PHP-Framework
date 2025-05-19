@@ -29,7 +29,7 @@ class MigrationsTest extends TestCase
         // Asegurarse de que existe la plantilla de migración para pruebas
         if (!file_exists("$this->templatesDirectory/migration.template")) {
             copy(
-                "/home/marco/public_html/LightWeight/templates/migration.template",
+                dirname(dirname(__DIR__)) . "/templates/migration.template",
                 "$this->templatesDirectory/migration.template"
             );
         }
@@ -70,15 +70,23 @@ class MigrationsTest extends TestCase
                 __DIR__ . "/expected" . "/remove_name_from_products_table.php",
             ],
         ];
-    }
-    #[DataProvider('migrationNames')]
+    }    #[DataProvider('migrationNames')]
     public function testCreatesMigrationFiles($name, $expectedMigrationFile)
     {
         $expectedName = sprintf("%s_%06d_%s.php", date('Y_m_d'), 0, $name);
         $this->migrator->make($name);
         $file = "$this->migrationsDirectory/$expectedName";
         $this->assertFileExists($file);
-        $this->assertFileEquals($expectedMigrationFile, $file);
+        
+        // Normalizar los finales de línea antes de comparar
+        $expected = file_get_contents($expectedMigrationFile);
+        $actual = file_get_contents($file);
+        
+        // Convertir todas las terminaciones de línea a \n para la comparación
+        $expected = str_replace(["\r\n", "\r"], "\n", $expected);
+        $actual = str_replace(["\r\n", "\r"], "\n", $actual);
+        
+        $this->assertEquals($expected, $actual);
     }
     #[Depends('testCreatesMigrationFiles')]
     public function testMigrateFiles()

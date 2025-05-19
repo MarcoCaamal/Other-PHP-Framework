@@ -35,6 +35,13 @@ class DiskFileStorage implements FileStorageDriverContract
     protected string $defaultVisibility;
     
     /**
+     * Map of file paths to their visibility
+     * 
+     * @var array
+     */
+    protected array $visibilityMap = [];
+    
+    /**
      * Instantiate disk file storage.
      *
      * @param string $storageDirectory
@@ -53,8 +60,7 @@ class DiskFileStorage implements FileStorageDriverContract
         $this->appUrl = rtrim($appUrl, '/');
         $this->defaultVisibility = $defaultVisibility;
     }
-    
-    /**
+      /**
      * {@inheritdoc}
      */
     public function put(string $path, mixed $content, ?string $visibility = null): string
@@ -114,8 +120,7 @@ class DiskFileStorage implements FileStorageDriverContract
         
         return unlink($fullPath);
     }
-    
-    /**
+      /**
      * {@inheritdoc}
      */
     public function files(?string $directory = null): array
@@ -137,8 +142,13 @@ class DiskFileStorage implements FileStorageDriverContract
             
             foreach ($iterator as $item) {
                 if ($item->isFile()) {
-                    $relativePath = str_replace($this->storageDirectory . '/', '', $item->getPathname());
-                    $files[] = $relativePath;
+                    // Normalize path separators to forward slashes
+                    $pathname = str_replace('\\', '/', $item->getPathname());
+                    $storagePath = str_replace('\\', '/', $this->storageDirectory);
+                    
+                    // Remove the storage directory prefix to get the relative path
+                    // Add trailing slash to ensure we only replace at the beginning
+                    $files[] = str_replace($storagePath . '/', '', $pathname);
                 }
             }
         } else {
@@ -219,9 +229,7 @@ class DiskFileStorage implements FileStorageDriverContract
     public function mimeType(string $path): string|false
     {
         return mime_content_type($this->normalizePath($path));
-    }
-    
-    /**
+    }    /**
      * Get the visibility of a file.
      *
      * @param string $path
@@ -230,16 +238,24 @@ class DiskFileStorage implements FileStorageDriverContract
     public function getVisibility(string $path): string
     {
         $path = $this->normalizePath($path);
+        
+        // Use the tracked visibility if available
+        if (isset($this->visibilityMap[$path])) {
+            return $this->visibilityMap[$path];
+        }
+        
         $permissions = fileperms($path);
         
         if (!$permissions) {
             return $this->defaultVisibility;
         }
         
-        // Check if the file is readable by others
-        $isPublic = ($permissions & 0x0004) !== 0;
+        // Check if the file is readable by others (world-readable)
+        // File permissions in octal: 0644 (public) vs 0600 (private)
+        // We check the last digit (4) which means world-readable
+        $worldReadable = ($permissions & 0x0004) !== 0;
         
-        return $isPublic ? 'public' : 'private';
+        return $worldReadable ? 'public' : 'private';
     }
     
     /**
@@ -255,6 +271,8 @@ class DiskFileStorage implements FileStorageDriverContract
         
         // Default permissions: 0644 for public, 0600 for private
         $permissions = $visibility === 'public' ? 0644 : 0600;
+        
+        $this->visibilityMap[$path] = $visibility;
         
         return chmod($path, $permissions);
     }

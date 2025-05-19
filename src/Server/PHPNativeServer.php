@@ -172,8 +172,8 @@ class PHPNativeServer implements ServerContract
      */
     public function checkRedirects(RequestContract $request): ?ResponseContract
     {
-        $forceHttps = config('server.force_https', false);
-        $forceWww = config('server.force_www', false);
+        $forceHttps = filter_var(config('server.force_https', false), FILTER_VALIDATE_BOOLEAN);
+        $forceWww = filter_var(config('server.force_www', false), FILTER_VALIDATE_BOOLEAN);
         
         if (!$forceHttps && !$forceWww) {
             return null;
@@ -181,7 +181,6 @@ class PHPNativeServer implements ServerContract
         
         $scheme = $request->scheme();
         $host = $request->host();
-        
         $needsRedirect = false;
         
         // New scheme and host that may be required
@@ -199,16 +198,17 @@ class PHPNativeServer implements ServerContract
             $newHost = 'www.' . $this->stripWwwPrefix($host);
             $needsRedirect = true;
         }
-        
-        if ($needsRedirect) {
+          if ($needsRedirect) {
             // Build the redirect URL
             $redirectUrl = $newScheme . '://' . $newHost;
-            
-            // Add port if not standard and not changing to HTTPS (which uses 443)
+              // Add port only if it's not the standard port for the scheme
             $port = $request->port();
+            // Don't include standard ports (80 for HTTP, 443 for HTTPS)
+            // Don't include port 80 when redirecting from HTTP to HTTPS
             if ($port && 
                 !(($newScheme === 'http' && $port === 80) || 
-                  ($newScheme === 'https' && $port === 443))) {
+                  ($newScheme === 'https' && $port === 443) ||
+                  ($newScheme === 'https' && $scheme === 'http' && $port === 80))) {
                 $redirectUrl .= ':' . $port;
             }
             
