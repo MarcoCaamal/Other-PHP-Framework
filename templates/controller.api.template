@@ -1,0 +1,72 @@
+<?php
+
+namespace App\Controllers;
+
+use LightWeight\Http\ControllerBase;
+use LightWeight\Http\Request;
+use LightWeight\Http\Response;
+
+class ControllerName extends ControllerBase
+{
+    /**
+     * Responde a solicitudes GET a la API.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function index(Request $request): Response
+    {
+        // Implementar lógica para listar recursos
+        return $this->json(['message' => 'API Index endpoint']);
+    }
+
+    /**
+     * Responde a solicitudes GET con un ID específico.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return Response
+     */
+    public function show(Request $request, int $id): Response
+    {
+        // Implementar lógica para obtener un recurso
+        return $this->json(['message' => 'API Show endpoint', 'id' => $id]);
+    }
+
+    /**
+     * Responde a solicitudes POST para crear un nuevo recurso.
+     *
+     * @param Request $request
+     * @return Response
+     */    public function store(Request $request): Response
+    {
+        // Implementar lógica para crear un recurso
+        return $this->json(['message' => 'API Store endpoint', 'data' => $request->input()], 201);
+    }
+
+    /**
+     * Responde a solicitudes PUT/PATCH para actualizar un recurso existente.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return Response
+     */
+    public function update(Request $request, int $id): Response
+    {
+        // Implementar lógica para actualizar un recurso
+        return $this->json(['message' => 'API Update endpoint', 'id' => $id, 'data' => $request->input()]);
+    }
+
+    /**
+     * Responde a solicitudes DELETE para eliminar un recurso.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return Response
+     */
+    public function destroy(Request $request, int $id): Response
+    {
+        // Implementar lógica para eliminar un recurso
+        return $this->json(['message' => 'API Destroy endpoint', 'id' => $id], 204);
+    }
+}

@@ -1,0 +1,104 @@
+<?php
+
+namespace App\Controllers;
+
+use LightWeight\Http\ControllerBase;
+use LightWeight\Http\Request;
+use LightWeight\Http\Response;
+
+class ControllerName extends ControllerBase
+{
+    /**
+     * Muestra una lista de recursos.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function index(Request $request): Response
+    {
+        // Lógica para listar recursos
+        return $this->view('resource.index');
+    }
+
+    /**
+     * Muestra el formulario para crear un nuevo recurso.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function create(Request $request): Response
+    {
+        // Lógica para mostrar el formulario de creación
+        return $this->view('resource.create');
+    }
+
+    /**
+     * Almacena un recurso recién creado.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function store(Request $request): Response
+    {
+        // Lógica para almacenar el recurso
+        
+        // Redireccionar después de guardar
+        return $this->redirect('/resources');
+    }
+
+    /**
+     * Muestra un recurso específico.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return Response
+     */
+    public function show(Request $request, int $id): Response
+    {
+        // Lógica para obtener y mostrar un recurso
+        return $this->view('resource.show', ['id' => $id]);
+    }
+
+    /**
+     * Muestra el formulario para editar un recurso específico.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return Response
+     */
+    public function edit(Request $request, int $id): Response
+    {
+        // Lógica para mostrar el formulario de edición
+        return $this->view('resource.edit', ['id' => $id]);
+    }
+
+    /**
+     * Actualiza un recurso específico.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return Response
+     */
+    public function update(Request $request, int $id): Response
+    {
+        // Lógica para actualizar el recurso
+        
+        // Redireccionar después de actualizar
+        return $this->redirect('/resources/' . $id);
+    }
+
+    /**
+     * Elimina un recurso específico.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return Response
+     */
+    public function destroy(Request $request, int $id): Response
+    {
+        // Lógica para eliminar el recurso
+        
+        // Redireccionar después de eliminar
+        return $this->redirect('/resources');
+    }
+}

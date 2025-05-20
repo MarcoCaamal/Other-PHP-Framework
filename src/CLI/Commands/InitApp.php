@@ -14,9 +14,9 @@ class InitApp extends Command
     protected static $defaultName = 'init';
     protected static $defaultDescription = 'Copy a project skeleton to create a new application';
 
-    private string $templatesDir;
+    private ?string $templatesDir;
 
-    public function __construct(string $templatesDir = null)
+    public function __construct(?string $templatesDir = null)
     {
         parent::__construct();
         $this->templatesDir = $templatesDir ?? dirname(dirname(dirname(__DIR__))) . '/templates/app';
