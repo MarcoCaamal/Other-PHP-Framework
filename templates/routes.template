@@ -1,0 +1,21 @@
+<?php
+
+use LightWeight\Routing\Route;
+
+/*
+|--------------------------------------------------------------------------
+| ControllerNameRoute Routes
+|--------------------------------------------------------------------------
+|
+| Route definitions for the ControllerName controller.
+|
+*/
+
+// Basic CRUD routes
+Route::get('/ControllerNameRoute', [ControllerClass::class, 'index'])->name('controllerRoute.index');
+Route::get('/ControllerNameRoute/create', [ControllerClass::class, 'create'])->name('controllerRoute.create');
+Route::post('/ControllerNameRoute', [ControllerClass::class, 'store'])->name('controllerRoute.store');
+Route::get('/ControllerNameRoute/{id}', [ControllerClass::class, 'show'])->name('controllerRoute.show');
+Route::get('/ControllerNameRoute/{id}/edit', [ControllerClass::class, 'edit'])->name('controllerRoute.edit');
+Route::put('/ControllerNameRoute/{id}', [ControllerClass::class, 'update'])->name('controllerRoute.update');
+Route::delete('/ControllerNameRoute/{id}', [ControllerClass::class, 'destroy'])->name('controllerRoute.destroy');

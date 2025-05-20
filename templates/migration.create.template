@@ -1,0 +1,34 @@
+<?php
+
+use LightWeight\Database\Schema\Blueprint;
+use LightWeight\Database\Migrations\Migration;
+
+class CreateTableNameTable extends Migration
+{
+    /**
+     * Ejecuta las migraciones.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        $this->schema->create('table_name', function (Blueprint $table) {
+            $table->id();
+            
+            // Define aquí las columnas de la tabla
+            $table->string('name');
+            
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Revierte las migraciones.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        $this->schema->dropIfExists('table_name');
+    }
+}

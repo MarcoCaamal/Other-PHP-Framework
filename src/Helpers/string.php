@@ -42,3 +42,52 @@ function snakeCase(string $str): string
 
     return implode($snakeCased);
 }
+
+/**
+ * Convierte un string a PascalCase.
+ *
+ * @param string $input
+ * @return string
+ */
+function pascalCase(string $input): string
+{
+    $parts = explode('_', snakeCase($input));
+    $parts = array_map('ucfirst', $parts);
+    return implode('', $parts);
+}
+
+/**
+ * Convierte un string a camelCase.
+ *
+ * @param string $input
+ * @return string
+ */
+function camelCase(string $input): string
+{
+    return lcfirst(pascalCase($input));
+}
+
+/**
+ * Genera el path para las rutas basado en el nombre del controlador.
+ *
+ * @param string $controllerName
+ * @return string
+ */
+function routePath(string $controllerName): string
+{
+    // Convertir a snake_case y luego reemplazar guiones bajos por guiones
+    $path = strtolower(snakeCase($controllerName));
+    return str_replace('_', '-', $path);
+}
+
+/**
+ * Convierte un string a snake_case para nombres de tabla y pluraliza.
+ *
+ * @param string $input
+ * @return string
+ */
+function tableName(string $input): string
+{
+    // Usa la función snakeCase y pluraliza
+    return snakeCase($input) . 's';
+}

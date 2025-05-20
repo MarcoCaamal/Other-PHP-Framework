@@ -1,0 +1,43 @@
+<?php
+/**
+ * Vista de índice para ControllerName
+ */
+?>
+<h1><?php echo $title; ?></h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <a href="/ControllerNameRoute/create" class="btn btn-primary">Crear nuevo</a>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php // Loop through items here ?>
+                    <tr>
+                        <td>1</td>
+                        <td>Ejemplo</td>
+                        <td>
+                            <a href="/ControllerNameRoute/1" class="btn btn-sm btn-info">Ver</a>
+                            <a href="/ControllerNameRoute/1/edit" class="btn btn-sm btn-warning">Editar</a>
+                            <form action="/ControllerNameRoute/1" method="POST" style="display: inline;">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

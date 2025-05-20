@@ -9,19 +9,19 @@ use LightWeight\Http\Response;
 class ControllerName extends ControllerBase
 {
     /**
-     * Responde a solicitudes GET a la API.
+     * Responds to GET requests to the API.
      *
      * @param Request $request
      * @return Response
      */
     public function index(Request $request): Response
     {
-        // Implementar lógica para listar recursos
+        // Implement logic to list resources
         return $this->json(['message' => 'API Index endpoint']);
     }
 
     /**
-     * Responde a solicitudes GET con un ID específico.
+     * Responds to GET requests with a specific ID.
      *
      * @param Request $request
      * @param int $id
@@ -29,23 +29,24 @@ class ControllerName extends ControllerBase
      */
     public function show(Request $request, int $id): Response
     {
-        // Implementar lógica para obtener un recurso
+        // Implement logic to get a resource
         return $this->json(['message' => 'API Show endpoint', 'id' => $id]);
     }
 
     /**
-     * Responde a solicitudes POST para crear un nuevo recurso.
+     * Responds to POST requests to create a new resource.
      *
      * @param Request $request
      * @return Response
-     */    public function store(Request $request): Response
+     */    
+    public function store(Request $request): Response
     {
-        // Implementar lógica para crear un recurso
+        // Implement logic to create a resource
         return $this->json(['message' => 'API Store endpoint', 'data' => $request->input()], 201);
     }
 
     /**
-     * Responde a solicitudes PUT/PATCH para actualizar un recurso existente.
+     * Responds to PUT/PATCH requests to update an existing resource.
      *
      * @param Request $request
      * @param int $id
@@ -53,12 +54,12 @@ class ControllerName extends ControllerBase
      */
     public function update(Request $request, int $id): Response
     {
-        // Implementar lógica para actualizar un recurso
+        // Implement logic to update a resource
         return $this->json(['message' => 'API Update endpoint', 'id' => $id, 'data' => $request->input()]);
     }
 
     /**
-     * Responde a solicitudes DELETE para eliminar un recurso.
+     * Responds to DELETE requests to remove a resource.
      *
      * @param Request $request
      * @param int $id
@@ -66,7 +67,7 @@ class ControllerName extends ControllerBase
      */
     public function destroy(Request $request, int $id): Response
     {
-        // Implementar lógica para eliminar un recurso
+        // Implement logic to delete a resource
         return $this->json(['message' => 'API Destroy endpoint', 'id' => $id], 204);
     }
 }

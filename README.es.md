@@ -6,6 +6,7 @@ LightWeight es un framework PHP ligero y elegante diseñado para facilitar el de
 
 ## Nuevas funcionalidades (Mayo 2025)
 
+- **Generación mejorada de controladores** - Comando `make:controller` mejorado con mejor manejo de archivos de rutas, soporte para nombres de archivo de rutas personalizados y manejo más inteligente de diferentes tipos de controladores.
 - **Sistema de eventos (Observer Pattern)** - Implementación del patrón observador para gestionar eventos en la aplicación, permitiendo desacoplar componentes y mejorar la extensibilidad.
 - **Soporte para acciones en claves foráneas** - Ahora puedes especificar comportamientos `ON DELETE` y `ON UPDATE` (CASCADE, SET NULL, etc.) en las relaciones de clave foránea.
 - **Sistema mejorado de nombres de restricciones** - Mejor manejo de nombres de restricciones con soporte para evitar colisiones incluso con acciones referenciales.
@@ -208,8 +209,11 @@ Para una guía completa sobre el sistema de correos, consulta la [documentación
 LightWeight incluye una interfaz de comandos para tareas comunes:
 
 ```bash
-# Crear un nuevo controlador
-php light make:controller UserController
+# Crear un nuevo controlador (con varias opciones)
+php light make:controller UserController --type=web --routes --views --all
+
+# Crear un controlador con un archivo de rutas personalizado
+php light make:controller ProductController --type=api --routes=custom
 
 # Crear un nuevo modelo
 php light make:model User
@@ -223,6 +227,8 @@ php light migrate
 # Ver rutas disponibles
 php light routes:list
 ```
+
+Para información detallada sobre el comando de controlador, consulta la [documentación de make:controller](docs/es/make-controller-command.md).
 
 ## Solución de problemas
 

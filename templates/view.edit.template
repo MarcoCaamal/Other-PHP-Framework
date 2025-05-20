@@ -1,0 +1,28 @@
+<?php
+/**
+ * Vista de edición para ControllerName
+ */
+?>
+<h1>Editar</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <form action="/ControllerNameRoute/<?php echo $id; ?>" method="POST">
+                <input type="hidden" name="_method" value="PUT">
+                
+                <div class="form-group">
+                    <label for="name">Nombre</label>
+                    <input type="text" class="form-control" id="name" name="name" value="Ejemplo" required>
+                </div>
+                
+                <?php // Add more form fields as needed ?>
+                
+                <div class="form-group mt-3">
+                    <button type="submit" class="btn btn-primary">Actualizar</button>
+                    <a href="/ControllerNameRoute" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

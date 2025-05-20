@@ -8,15 +8,14 @@ use LightWeight\Http\Response;
 
 class ControllerName extends ControllerBase
 {    /**
-     * Displays a list of resources.
+     * Displays the main page.
      *
      * @param Request $request
      * @return Response
      */
     public function index(Request $request): Response
     {
-        // Logic to list resources
-        return $this->view('resource.index');
+        return $this->view('ControllerNameView.index');
     }
 
     /**
@@ -27,26 +26,29 @@ class ControllerName extends ControllerBase
      */
     public function create(Request $request): Response
     {
-        // Logic to show the creation form
-        return $this->view('resource.create');
+        return $this->view('ControllerNameView.create');
     }
 
     /**
-     * Stores a newly created resource.
+     * Stores a new resource.
      *
      * @param Request $request
      * @return Response
      */
     public function store(Request $request): Response
     {
-        // Logic to store the resource
+        // Validate the data
+        $validated = $request->validate([
+            // Define validation rules here
+        ]);
+
+        // Logic to save the resource
         
-        // Redirect after saving
-        return $this->redirect('/resources');
+        return $this->redirect('/ControllerNameRoute');
     }
 
     /**
-     * Displays a specific resource.
+     * Shows a specific resource.
      *
      * @param Request $request
      * @param int $id
@@ -54,10 +56,13 @@ class ControllerName extends ControllerBase
      */
     public function show(Request $request, int $id): Response
     {
-        // Logic to get and display a resource
-        return $this->view('resource.show', ['id' => $id]);
+        // Get the resource by ID
+        
+        return $this->view('ControllerNameView.show', [
+            'id' => $id
+        ]);
     }    /**
-     * Shows the form to edit a specific resource.
+     * Shows the form to edit a resource.
      *
      * @param Request $request
      * @param int $id
@@ -65,8 +70,11 @@ class ControllerName extends ControllerBase
      */
     public function edit(Request $request, int $id): Response
     {
-        // Logic to show the edit form
-        return $this->view('resource.edit', ['id' => $id]);
+        // Get the resource by ID
+        
+        return $this->view('ControllerNameView.edit', [
+            'id' => $id
+        ]);
     }
 
     /**
@@ -78,13 +86,15 @@ class ControllerName extends ControllerBase
      */
     public function update(Request $request, int $id): Response
     {
+        // Validate the data
+        $validated = $request->validate([
+            // Define validation rules here
+        ]);
+
         // Logic to update the resource
         
-        // Redirect after updating
-        return $this->redirect('/resources/' . $id);
-    }
-
-    /**
+        return $this->redirect('/ControllerNameRoute/' . $id);
+    }    /**
      * Deletes a specific resource.
      *
      * @param Request $request
@@ -95,7 +105,6 @@ class ControllerName extends ControllerBase
     {
         // Logic to delete the resource
         
-        // Redireccionar después de eliminar
-        return $this->redirect('/resources');
+        return $this->redirect('/ControllerNameRoute');
     }
 }

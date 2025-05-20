@@ -6,6 +6,7 @@ LightWeight is a lightweight and elegant PHP framework designed to facilitate th
 
 ## New Features (May 2025)
 
+- **Enhanced Controller Generation** - Improved `make:controller` command with better route file handling, support for custom route filenames, and more intelligent handling of different controller types.
 - **Event System (Observer Pattern)** - Implementation of the observer pattern to manage events in the application, allowing components to be decoupled and improving extensibility.
 - **Support for Foreign Key Actions** - Now you can specify `ON DELETE` and `ON UPDATE` behaviors (CASCADE, SET NULL, etc.) in foreign key relationships.
 - **Improved Constraint Naming System** - Better handling of constraint names with support to avoid collisions even with referential actions.
@@ -208,10 +209,13 @@ For a complete guide on the email system, see the [email system documentation](d
 LightWeight includes a command interface for common tasks:
 
 ```bash
-# Create a new controller
-php light make:controller UserController
+# Create a new controller (with various options)
+php light make:controller UserController --type=web --routes --views --all
 
-# Create a new model
+# Create a controller with a custom route file
+php light make:controller ProductController --type=api --routes=custom
+
+# Create a model
 php light make:model User
 
 # Create a migration
@@ -223,6 +227,8 @@ php light migrate
 # View available routes
 php light routes:list
 ```
+
+For detailed information about the controller command, see the [make:controller documentation](docs/en/make-controller-command.md).
 
 ## Troubleshooting
 

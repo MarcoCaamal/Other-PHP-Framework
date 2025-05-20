@@ -1,0 +1,31 @@
+<?php
+/**
+ * Vista de detalle para ControllerName
+ */
+?>
+<h1>Detalle</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>ID: <?php echo $id; ?></h5>
+                </div>
+                <div class="card-body">
+                    <?php // Display detailed information here ?>
+                    <p><strong>Nombre:</strong> Ejemplo</p>
+                    <?php // Add more fields as needed ?>
+                </div>
+                <div class="card-footer">
+                    <a href="/ControllerNameRoute" class="btn btn-secondary">Volver</a>
+                    <a href="/ControllerNameRoute/<?php echo $id; ?>/edit" class="btn btn-warning">Editar</a>
+                    <form action="/ControllerNameRoute/<?php echo $id; ?>" method="POST" style="display: inline;">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro?')">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Models;
+
+use LightWeight\Database\ORM\Model;
+
+class ModelName extends Model
+{
+    /**
+     * The table associated with the model.
+     *
+     * @var string|null
+     */
+    protected ?string $table = 'table_name';
+
+    /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected string $primaryKey = 'id';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected array $fillable = [
+        // Define the fillable fields here
+    ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected array $hidden = [
+        // Define the hidden fields here
+    ];
+
+    /**
+     * The model's default attributes.
+     *
+     * @var array
+     */
+    protected array $attributes = [
+        // Define the default attributes here
+    ];
+
+    /**
+     * Indicates if the model should insert timestamps (created_at, updated_at).
+     *
+     * @var bool
+     */
+    protected bool $insertTimestamps = true;
+}
