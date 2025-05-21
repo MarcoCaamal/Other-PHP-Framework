@@ -2,7 +2,7 @@
 
 namespace LightWeight\Tests\Log;
 
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\Log\Contracts\LoggerContract;
 use LightWeight\Log\Logger;
 use Monolog\Handler\StreamHandler;

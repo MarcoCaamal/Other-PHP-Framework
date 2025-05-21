@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use DI\Container;
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\Providers\Contracts\ServiceProviderContract;
 use LightWeight\Routing\Route;
 use LightWeight\Routing\Router;
@@ -37,6 +37,6 @@ class RouteServiceProvider implements ServiceProviderContract
             ]
         ]);
         
-        Route::load(App::$root . '/routes');
+        Route::load(Application::$root . '/routes');
     }
 }

@@ -2,7 +2,7 @@
 
 namespace LightWeight\CLI\Utils;
 
-use LightWeight\App;
+use LightWeight\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -22,7 +22,7 @@ class ModelCreator
         $className = array_pop($parts);
         $namespace = implode('\\', $parts);
         
-        $modelsDir = App::$root . "/app/Models";
+        $modelsDir = Application::$root . "/app/Models";
         
         // Create models directory if it doesn't exist
         if (!is_dir($modelsDir)) {
@@ -81,7 +81,7 @@ class ModelCreator
             return Command::FAILURE;
         }
         
-        $relativePath = str_replace(App::$root, '', $modelFilePath);
+        $relativePath = str_replace(Application::$root, '', $modelFilePath);
         $output->writeln("<info>Model created => $relativePath</info>");
         
         return Command::SUCCESS;

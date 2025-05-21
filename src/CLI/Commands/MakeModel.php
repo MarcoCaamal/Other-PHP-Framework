@@ -2,7 +2,7 @@
 
 namespace LightWeight\CLI\Commands;
 
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\Database\Migrations\Migrator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,7 +26,7 @@ class MakeModel extends Command
         $migration = $input->getOption("migration");
         $template = file_get_contents(dirname(dirname(dirname(__DIR__))) . "/templates/model.php");
         $template = str_replace("ModelName", $name, $template);
-        file_put_contents(App::$root . "/app/Models/$name.php", $template);
+        file_put_contents(Application::$root . "/app/Models/$name.php", $template);
         $output->writeln("<info>Model created => $name.php</info>");
         if ($migration !== false) {
             app(Migrator::class)->make("create_{$name}s_table");

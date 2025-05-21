@@ -2,7 +2,7 @@
 
 namespace LightWeight\Tests\App;
 
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\Config\Config;
 use LightWeight\Container\Container;
 use LightWeight\Database\Contracts\DatabaseDriverContract;
@@ -24,7 +24,7 @@ use Throwable;
 
 class AppTest extends TestCase
 {
-    private App $app;
+    private Application $app;
     private MockObject $routerMock;
     private MockObject $serverMock;
     private Request $requestMock;
@@ -62,10 +62,10 @@ class AppTest extends TestCase
     protected function setUp(): void
     {
         // Save current root path if App::$root is already set
-        $oldRoot = App::$root ?? null;
+        $oldRoot = Application::$root ?? null;
         
         // Set up test root
-        App::$root = __DIR__ . '/../..';
+        Application::$root = __DIR__ . '/../..';
         
         // Set up mocks
         $this->routerMock = $this->createMock(Router::class);
@@ -96,7 +96,7 @@ class AppTest extends TestCase
         $container->set(\LightWeight\Exceptions\Contracts\ExceptionHandlerContract::class, $this->exceptionHandlerMock);
         
         // Configure app with our mocks
-        $this->app = new App();
+        $this->app = new Application();
         $this->app->router = $this->routerMock;
         $this->app->server = $this->serverMock;
         $this->app->request = $this->requestMock;
@@ -139,7 +139,7 @@ class AppTest extends TestCase
         
         // Restore root path if needed
         if ($oldRoot) {
-            App::$root = $oldRoot;
+            Application::$root = $oldRoot;
         }
     }
     

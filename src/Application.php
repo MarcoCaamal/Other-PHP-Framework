@@ -24,7 +24,7 @@ use Throwable;
 /**
  * Main application class for the LightWeight framework.
  */
-class App
+class Application
 {
     /**
      * Application root directory
@@ -178,14 +178,14 @@ class App
      * Bootstrap the application
      *
      * @param string $root The root directory of the application
-     * @return App
+     * @return Application
      */
-    public static function bootstrap(string $root): App
+    public static function bootstrap(string $root): Application
     {
         self::$root = $root;
         
         try {
-            $app = singleton(App::class);
+            $app = singleton(Application::class);
             $result = $app
                 ->loadConfig()
                 ->runServiceProviders('boot')

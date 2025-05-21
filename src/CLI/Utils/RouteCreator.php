@@ -2,7 +2,7 @@
 
 namespace LightWeight\CLI\Utils;
 
-use LightWeight\App;
+use LightWeight\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -20,7 +20,7 @@ class RouteCreator
      */
     public function createRoutes(OutputInterface $output, string $controllerName, string $namespace, string $routeFileName, string $controllerType): int
     {
-        $routesDir = App::$root . "/routes";
+        $routesDir = Application::$root . "/routes";
         
         // Create routes directory if it doesn't exist
         if (!is_dir($routesDir)) {
@@ -105,7 +105,7 @@ class RouteCreator
                 return Command::FAILURE;
             }
             
-            $relativePath = str_replace(App::$root, '', $routesFile);
+            $relativePath = str_replace(Application::$root, '', $routesFile);
             $output->writeln("<info>Routes file created => $relativePath</info>");
         } else {
             // Append to existing file
@@ -119,7 +119,7 @@ class RouteCreator
                 return Command::FAILURE;
             }
             
-            $relativePath = str_replace(App::$root, '', $routesFile);
+            $relativePath = str_replace(Application::$root, '', $routesFile);
             $output->writeln("<info>Routes added to => $relativePath</info>");
         }
         

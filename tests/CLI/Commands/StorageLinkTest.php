@@ -2,7 +2,7 @@
 
 namespace LightWeight\Tests\CLI\Commands;
 
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\CLI\Commands\StorageLink;
 use LightWeight\Config\Config;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +27,7 @@ class StorageLinkTest extends TestCase
         $this->tempStoragePath = __DIR__ . '/temp-storage';
         $this->tempPublicPath = __DIR__ . '/temp-public';
         $this->testStorageUri = 'test-uploads';
-        App::$root  = __DIR__;
+        Application::$root  = __DIR__;
         Config::$config['storage.drivers.public.storage_uri'] = $this->testStorageUri;
         Config::$config['storage.storage_uri'] = $this->testStorageUri;
 

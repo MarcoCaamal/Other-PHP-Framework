@@ -338,7 +338,7 @@ class ControllerBase
      */
     protected function isAuthenticated(): bool
     {
-        return app(\LightWeight\App::class)
+        return app(\LightWeight\Application::class)
             ->has(\LightWeight\Auth\Contracts\Authenticators\AuthenticatorContract::class) 
             && app(\LightWeight\Auth\Contracts\Authenticators\AuthenticatorContract::class)->resolve() !== null;
     }

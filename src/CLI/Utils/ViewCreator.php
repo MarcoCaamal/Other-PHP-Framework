@@ -2,7 +2,7 @@
 
 namespace LightWeight\CLI\Utils;
 
-use LightWeight\App;
+use LightWeight\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -28,7 +28,7 @@ class ViewCreator
         }
         
         // Ensure resources directory exists
-        $resourcesDir = App::$root . "/resources";
+        $resourcesDir = Application::$root . "/resources";
         if (!is_dir($resourcesDir)) {
             if (!mkdir($resourcesDir, 0755, true)) {
                 $output->writeln("<error>Could not create resources directory: $resourcesDir</error>");
@@ -98,7 +98,7 @@ class ViewCreator
                 continue;
             }
             
-            $relativePath = str_replace(App::$root, '', $viewPath);
+            $relativePath = str_replace(Application::$root, '', $viewPath);
             $output->writeln("<info>View created => $relativePath</info>");
         }
         

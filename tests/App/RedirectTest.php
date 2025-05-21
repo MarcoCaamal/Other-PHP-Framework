@@ -2,7 +2,7 @@
 
 namespace LightWeight\Tests\App;
 
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\Http\HttpMethod;
@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class RedirectTest extends TestCase
 {
-    private App $app;
+    private Application $app;
     private $serverMock;
     private $requestMock;
     
@@ -24,7 +24,7 @@ class RedirectTest extends TestCase
         $this->requestMock = new Request();
         
         // Create and set up App instance
-        $this->app = new App();
+        $this->app = new Application();
         
         // Inject the mocks into the app
         $this->setPrivateProperty($this->app, 'server', $this->serverMock);
@@ -88,7 +88,7 @@ class RedirectTest extends TestCase
             ->willReturn($responseMock);
           // Expect terminate to be called with the response
         // Since we're not actually calling the method, we adjust the expectation to never
-        $app = $this->getMockBuilder(App::class)
+        $app = $this->getMockBuilder(Application::class)
             ->onlyMethods(['terminate'])
             ->setConstructorArgs([])
             ->getMock();

@@ -19,11 +19,11 @@ function view(string $view, array $data = [], ?string $layout = null): ResponseC
 }
 function request(): RequestContract
 {
-    return app(\LightWeight\App::class)->request;
+    return app(\LightWeight\Application::class)->request;
 }
 function response(): Response
 {
-    return app(\LightWeight\App::class)->make(Response::class);
+    return app(\LightWeight\Application::class)->make(Response::class);
 }
 function back(): ResponseContract
 {

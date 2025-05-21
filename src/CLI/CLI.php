@@ -3,7 +3,7 @@
 namespace LightWeight\CLI;
 
 use Dotenv\Dotenv;
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\CLI\Commands\InitApp;
 use LightWeight\CLI\Commands\MakeController;
 use LightWeight\CLI\Commands\MakeMigration;
@@ -21,7 +21,7 @@ class CLI
 {
     public static function bootstrap(string $root): self
     {
-        App::$root = $root;
+        Application::$root = $root;
         
         // Intentar cargar .env si existe, pero no fallar si no se encuentra
         if (file_exists($root . '/.env')) {

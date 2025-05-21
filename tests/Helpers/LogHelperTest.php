@@ -2,7 +2,7 @@
 
 namespace LightWeight\Tests\Helpers;
 
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\Container\Container;
 use LightWeight\Log\Contracts\LoggerContract;
 use LightWeight\Log\Logger;

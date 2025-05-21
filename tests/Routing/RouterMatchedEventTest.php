@@ -30,9 +30,9 @@ class RouterMatchedEventTest extends TestCase
         $container->set(EventDispatcherContract::class, $this->eventDispatcher);
         
         // Configurar la aplicación para que tenga una propiedad 'events'
-        $app = new \LightWeight\App();
+        $app = new \LightWeight\Application();
         $app->events = $this->eventDispatcher;
-        $container->set(\LightWeight\App::class, $app);
+        $container->set(\LightWeight\Application::class, $app);
 
         // Configurar el router
         $this->router = new Router();

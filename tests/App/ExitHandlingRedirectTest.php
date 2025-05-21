@@ -2,7 +2,7 @@
 
 namespace LightWeight\Tests\App;
 
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\Http\HttpMethod;
@@ -52,7 +52,7 @@ class ExitHandlingRedirectTest extends TestCase
             
         // Create a App mock that will assert terminate is called
         // But we won't actually call the method that would trigger terminate
-        $appMock = $this->getMockBuilder(App::class)
+        $appMock = $this->getMockBuilder(Application::class)
             ->onlyMethods(['terminate'])
             ->setConstructorArgs([])
             ->getMock();
@@ -65,7 +65,7 @@ class ExitHandlingRedirectTest extends TestCase
         $this->setPrivateProperty($appMock, 'request', $this->requestMock);
         
         // Get the App class and method information
-        $reflection = new \ReflectionClass(App::class);
+        $reflection = new \ReflectionClass(Application::class);
         $methodReflection = $reflection->getMethod('checkForRedirects');
         $methodReflection->setAccessible(true);
         

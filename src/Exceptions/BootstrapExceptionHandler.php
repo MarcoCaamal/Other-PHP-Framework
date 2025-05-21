@@ -2,7 +2,7 @@
 
 namespace LightWeight\Exceptions;
 
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\Exceptions\Contracts\BootstrapExceptionHandlerContract;
 use LightWeight\Exceptions\LightWeightException;
 use Throwable;
@@ -21,8 +21,8 @@ class BootstrapExceptionHandler implements BootstrapExceptionHandlerContract
     public function logException(Throwable $exception): void
     {
         // Check if App::$root is defined and accessible
-        $logPath = class_exists('LightWeight\App') && isset(App::$root) 
-            ? App::$root . '/storage/logs/bootstrap-errors.log' 
+        $logPath = class_exists('LightWeight\Application') && isset(Application::$root) 
+            ? Application::$root . '/storage/logs/bootstrap-errors.log' 
             : __DIR__ . '/../../storage/logs/bootstrap-errors.log';
         
         // Make sure the log directory exists

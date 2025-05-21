@@ -2,7 +2,7 @@
 
 namespace LightWeight\CLI\Utils;
 
-use LightWeight\App;
+use LightWeight\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -40,12 +40,12 @@ class ControllerCreator
         }
         
         // Build the directory path
-        $dirPath = App::$root . "/app/Controllers";
+        $dirPath = Application::$root . "/app/Controllers";
         
         // Verify that the base controllers directory exists
-        if (!is_dir(App::$root . "/app")) {
-            if (!mkdir(App::$root . "/app", 0755, true)) {
-                $output->writeln("<error>Could not create base directory: " . App::$root . "/app</error>");
+        if (!is_dir(Application::$root . "/app")) {
+            if (!mkdir(Application::$root . "/app", 0755, true)) {
+                $output->writeln("<error>Could not create base directory: " . Application::$root . "/app</error>");
                 return [Command::FAILURE, $controllerName, $namespace, null];
             }
         }
@@ -121,7 +121,7 @@ class ControllerCreator
             return [Command::FAILURE, $controllerName, $namespace, $baseControllerName];
         }
         
-        $relativePath = str_replace(App::$root, '', $filePath);
+        $relativePath = str_replace(Application::$root, '', $filePath);
         $output->writeln("<info>Controller created => $relativePath</info>");
         
         return [Command::SUCCESS, $controllerName, $namespace, $baseControllerName];

@@ -1,6 +1,6 @@
 <?php
 
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\Config\Config;
 use LightWeight\Container\Container;
 
@@ -12,7 +12,7 @@ use function PHPSTORM_META\type;
  * @param class-string<T> $class
  * @return T
  */
-function app(string $class = App::class)
+function app(string $class = Application::class)
 {
     $resolved = Container::getInstance()->get($class);
     return $resolved;
@@ -60,11 +60,11 @@ function config(string $configuration, $default = null)
 }
 function resourcesDirectory(): string
 {
-    return App::$root . "/resources";
+    return Application::$root . "/resources";
 }
 function rootDirectory(): string
 {
-    return App::$root;
+    return Application::$root;
 }
 /**
  * Get the path to the storage directory.
@@ -74,7 +74,7 @@ function rootDirectory(): string
  */
 function storagePath(string $path = ''): string
 {
-    return App::$root . '/storage' . ($path ? '/' . ltrim($path, '/') : '');
+    return Application::$root . '/storage' . ($path ? '/' . ltrim($path, '/') : '');
 }
 function debugDie($var)
 {
@@ -90,5 +90,5 @@ function debugDie($var)
  */
 function publicPath(string $path = ''): string
 {
-    return App::$root . '/public' . ($path ? '/' . ltrim($path, '/') : '');
+    return Application::$root . '/public' . ($path ? '/' . ltrim($path, '/') : '');
 }

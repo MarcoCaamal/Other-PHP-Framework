@@ -2,7 +2,7 @@
 
 namespace LightWeight\CLI\Utils;
 
-use LightWeight\App;
+use LightWeight\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -19,10 +19,10 @@ class MigrationCreator
     {
         try {
             // Verify that the migrations directory exists
-            $migrationsDir = App::$root . "/database/migrations";
-            if (!is_dir(App::$root . "/database")) {
-                if (!mkdir(App::$root . "/database", 0755, true)) {
-                    $output->writeln("<error>Could not create database directory: " . App::$root . "/database</error>");
+            $migrationsDir = Application::$root . "/database/migrations";
+            if (!is_dir(Application::$root . "/database")) {
+                if (!mkdir(Application::$root . "/database", 0755, true)) {
+                    $output->writeln("<error>Could not create database directory: " . Application::$root . "/database</error>");
                     return Command::FAILURE;
                 }
             }

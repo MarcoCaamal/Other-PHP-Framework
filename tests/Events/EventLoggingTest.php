@@ -2,7 +2,7 @@
 
 namespace Tests\Events;
 
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\Config\Config;
 use LightWeight\Events\Contracts\EventContract;
 use LightWeight\Events\Contracts\EventDispatcherContract;
@@ -33,7 +33,7 @@ class EventLoggingTest extends TestCase
         }
         
         // Inicializar las propiedades estáticas necesarias
-        App::$root = BASE_PATH;
+        Application::$root = BASE_PATH;
         
         // Inicializar el dispatcher
         $this->dispatcher = new EventDispatcher();

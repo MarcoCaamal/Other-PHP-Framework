@@ -2,7 +2,7 @@
 
 namespace LightWeight\CLI\Commands;
 
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\CLI\Utils\ControllerCreator;
 use LightWeight\CLI\Utils\ModelCreator;
 use LightWeight\CLI\Utils\ViewCreator;

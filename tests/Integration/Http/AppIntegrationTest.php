@@ -2,7 +2,7 @@
 
 namespace LightWeight\Tests\Integration\Http;
 
-use LightWeight\App;
+use LightWeight\Application;
 use LightWeight\Config\Config;
 use LightWeight\Container\Container;
 use LightWeight\Http\Contracts\MiddlewareContract;
@@ -61,21 +61,21 @@ class CounterMiddleware implements MiddlewareContract
 class AppIntegrationTest extends TestCase
 {
     private static string $originalAppRoot;
-    private App $app;
+    private Application $app;
     private Router $router;
 
     public static function setUpBeforeClass(): void
     {
         // Guardar la raíz original de la aplicación
-        self::$originalAppRoot = App::$root ?? '';
-        App::$root = __DIR__ . '/../../..';
+        self::$originalAppRoot = Application::$root ?? '';
+        Application::$root = __DIR__ . '/../../..';
     }
 
     public static function tearDownAfterClass(): void
     {
         // Restaurar la raíz original de la aplicación
         if (self::$originalAppRoot) {
-            App::$root = self::$originalAppRoot;
+            Application::$root = self::$originalAppRoot;
         }
     }
 
@@ -86,14 +86,14 @@ class AppIntegrationTest extends TestCase
         Container::getInstance();
         
         // Crear una nueva instancia de App con componentes reales (no mocks)
-        $this->app = new App();
+        $this->app = new Application();
         
         // Configurar el Router real
         $this->router = new Router();
         $this->app->router = $this->router;
         
         // Indicar al contenedor de dependencias que usamos este router
-        app(App::class)->bind(Router::class, fn(\DI\Container $c) => $this->router);
+        app(Application::class)->bind(Router::class, fn(\DI\Container $c) => $this->router);
         
         // Registrar la implementación de RequestContract
         singleton(RequestContract::class, Request::class);
