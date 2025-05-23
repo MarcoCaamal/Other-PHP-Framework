@@ -5,28 +5,72 @@ namespace LightWeight\Container;
 use DI\Container as DIContainer;
 use DI\ContainerBuilder;
 use LightWeight\Container\Exceptions\ContainerNotBuildException;
+use Psr\Container\ContainerInterface;
 
-class Container
+class Container implements ContainerInterface
 {
-    private static ?DIContainer $instance = null;
-    private function __construct()
+    protected static ?Container $instance = null;
+    protected static ?ContainerBuilder $builder = null;
+    private ?DIContainer $container = null;
+    public static function getInstance(): Container
     {
-    }
-    public static function getInstance()
-    {
-        if(self::$instance === null) {
-            $builder = new ContainerBuilder();
-            // if(env('', 'dev') === 'prod') {
-            //     $builder->enableCompilation(__DIR__ . '/tmp');
-            //     $builder->writeProxiesToFile(true, __DIR__ . '/tmp/proxies');
-            // }
-            self::$instance = $builder->build();
+        if (self::$instance === null) {
+            throw new ContainerNotBuildException();
         }
         return self::$instance;
     }
-    public static function deleteInstance()
+    public function __construct()
     {
-        self::$instance = null;
+        self::$builder = new ContainerBuilder();
+        self::$builder->addDefinitions(__DIR__ . '/app-container.php');
+    }
+    /**
+     * Build the container
+     * @return void
+     */
+    public function build(): void
+    {
+        if (self::$instance === null) {
+            self::$instance = $this;
+            $this->container = self::$builder->build();
+        }
+    }
+    public function addDefinitions(string|array $definitions): void
+    {
+        if (self::$builder === null) {
+            throw new ContainerNotBuildException();
+        }
+        self::$builder->addDefinitions($definitions);
+    }
+    public function enableCache(string $cachePath): void
+    {
+        if (self::$builder === null) {
+            throw new ContainerNotBuildException();
+        }
+        self::$builder->enableCompilation($cachePath);
+        self::$builder->writeProxiesToFile(true, $cachePath . '/proxies');
+    }
+    public function disableCache(): void
+    {
+        if (self::$builder === null) {
+            throw new ContainerNotBuildException();
+        }
+        self::$builder->enableCompilation(false);
+        self::$builder->writeProxiesToFile(false, '');
+    }
+    public function enableAutowiring(): void
+    {
+        if (self::$builder === null) {
+            throw new ContainerNotBuildException();
+        }
+        self::$builder->useAutowiring(true);
+    }
+    public function disableAutowiring(): void
+    {
+        if (self::$builder === null) {
+            throw new ContainerNotBuildException();
+        }
+        self::$builder->useAutowiring(false);
     }
     /**
      * @template T
@@ -34,46 +78,46 @@ class Container
      * @throws \LightWeight\Container\Exceptions\ContainerNotBuildException
      * @return T
      */
-    public static function get(string $id)
+    public function get(string $id)
     {
-        if(self::$instance === null) {
+        if($this->container === null) {
             throw new ContainerNotBuildException();
         }
-        return self::$instance->get($id);
+        return $this->container->get($id);
     }
-    public static function set(string $id, mixed $value)
+    public function set(string $id, mixed $value)
     {
-        if(self::$instance === null) {
+        if($this->container === null) {
             throw new ContainerNotBuildException();
         }
-        self::$instance->set($id, $value);
+        $this->container->set($id, $value);
     }
-    public static function has(string $id): bool
+    public function has(string $id): bool
     {
-        if(self::$instance === null) {
+        if($this->container === null) {
             throw new ContainerNotBuildException();
         }
-        return self::$instance->has($id);
+        return $this->container->has($id);
     }
-    public static function call(array|string|callable $id, array $parameters = []): mixed
+    public function call(array|string|callable $id, array $parameters = []): mixed
     {
-        if(self::$instance === null) {
+        if($this->container === null) {
             throw new ContainerNotBuildException();
         }
-        return self::$instance->call($id, $parameters);
+        return $this->container->call($id, $parameters);
     }
-    public static function make(string $id, array $parameters = []): mixed
+    public function make(string $id, array $parameters = []): mixed
     {
-        if(self::$instance === null) {
+        if($this->container === null) {
             throw new ContainerNotBuildException();
         }
-        return self::$instance->make($id, $parameters);
+        return $this->container->make($id, $parameters);
     }
-    public static function getContainer(): DIContainer
+    public function getContainer(): DIContainer
     {
-        if(self::$instance === null) {
+        if($this->container === null) {
             throw new ContainerNotBuildException();
         }
-        return self::$instance;
+        return $this->container;
     }
 }

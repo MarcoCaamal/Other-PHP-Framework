@@ -2,23 +2,37 @@
 
 namespace LightWeight\Providers;
 
-use DI\Container as DIContainer;
+use LightWeight\Container\Container;
 use LightWeight\Http\Contracts\RequestContract;
-use LightWeight\Providers\Contracts\ServiceProviderContract;
 use LightWeight\Routing\Router;
 use LightWeight\Server\Contracts\ServerContract;
 use LightWeight\Server\PHPNativeServer;
 
-class ServerServiceProvider implements ServiceProviderContract
+class ServerServiceProvider extends ServiceProvider
 {
-    public function registerServices(DIContainer $serviceContainer)
+    /**
+     * Proporciona definiciones para el contenedor antes de su compilación
+     * 
+     * @return array
+     */
+    public function getDefinitions(): array
     {
-        match(config('server.implementation', 'native')) {
-            'native' => $serviceContainer->set(ServerContract::class, \DI\create(PHPNativeServer::class))
-        };
-        $serviceContainer->set(RequestContract::class, fn(ServerContract $server) => $server->getRequest());
-        $serviceContainer->set(Router::class, \DI\create(Router::class));
-        
-        // No longer register Response as a service - each component should create its own instance
+        return [
+            ServerContract::class => \DI\factory(function (\LightWeight\Config\Config $config) {
+                return match($config->get('server.implementation', null)) {
+                    'native' => new PHPNativeServer(),
+                    default => throw new \RuntimeException("Server implementation not supported: " . $config->get('server.implementation'))
+                };
+            }),
+            RequestContract::class => \DI\factory(function (ServerContract $server) {
+                return $server->getRequest();
+            }),
+            Router::class => \DI\create(Router::class)
+        ];
+    }
+
+    public function registerServices(Container $serviceContainer)
+    {
+        // Las definiciones ya están configuradas en getDefinitions()
     }
 }

@@ -2,41 +2,40 @@
 
 namespace LightWeight\Providers;
 
-use DI\Container as DIContainer;
+use LightWeight\Container\Container;
 use LightWeight\Mail\Contracts\MailerContract;
 use LightWeight\Mail\Mailer;
-use LightWeight\Providers\Contracts\ServiceProviderContract;
 use LightWeight\View\Contracts\ViewContract;
 
 /**
  * Proveedor de servicios para el sistema de correo electrónico
  */
-class MailServiceProvider implements ServiceProviderContract
+class MailServiceProvider extends ServiceProvider
 {
+    /**
+     * Proporciona definiciones para el contenedor antes de su compilación
+     * 
+     * @return array
+     */
+    public function getDefinitions(): array
+    {
+        return [
+            MailerContract::class => \DI\factory(function (?ViewContract $viewEngine = null) {
+                $defaultDriver = config('mail.default', 'phpmailer');
+                return new Mailer($defaultDriver, $viewEngine);
+            }),
+            'mailer' => \DI\get(MailerContract::class)
+        ];
+    }
+
     /**
      * Registra los servicios relacionados con el correo electrónico en el contenedor
      *
-     * @param DIContainer $container Contenedor de inyección de dependencias
+     * @param Container $container Contenedor de inyección de dependencias
      * @return void
      */
-    public function registerServices(DIContainer $container): void
+    public function registerServices(Container $container)
     {
-        // Registrar el servicio Mailer como singleton
-        $container->set(MailerContract::class, function () use ($container) {
-            // Obtener el driver predeterminado de la configuración
-            $defaultDriver = config('mail.default', 'phpmailer');
-            
-            // Intentar resolver el motor de vistas del contenedor
-            $viewEngine = null;
-            if ($container->has(ViewContract::class)) {
-                $viewEngine = $container->get(ViewContract::class);
-            }
-            
-            // Crear y configurar el servicio de correo con el motor de vistas
-            return new Mailer($defaultDriver, $viewEngine);
-        });
-        
-        // También hacerlo disponible como 'mailer'
-        $container->set('mailer', \DI\get(MailerContract::class));
+        // Todas las definiciones ya están configuradas en getDefinitions()
     }
 }

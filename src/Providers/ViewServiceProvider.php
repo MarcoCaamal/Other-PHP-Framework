@@ -2,31 +2,48 @@
 
 namespace LightWeight\Providers;
 
-use DI\Container as DIContainer;
-use LightWeight\Providers\Contracts\ServiceProviderContract;
+use LightWeight\Container\Container;
 use LightWeight\View\Contracts\ViewContract;
 use LightWeight\View\LightEngine;
 
-class ViewServiceProvider implements ServiceProviderContract
+class ViewServiceProvider extends ServiceProvider
 {
-    public function registerServices(DIContainer $serviceContainer)
+    /**
+     * Proporciona definiciones para el contenedor antes de su compilación
+     * 
+     * @return array
+     */
+    public function getDefinitions(): array
+    {
+        return [
+            ViewContract::class => \DI\factory(function () {
+                $engine = match(config('view.engine', 'LightWeight')) {
+                    'LightWeight' => new LightEngine(config('view.path')),
+                    default => throw new \RuntimeException("View engine not supported: " . config('view.engine'))
+                };
+                
+                return $engine;
+            })
+        ];
+    }
+    
+    public function registerServices(Container $serviceContainer)
     {
         match(config('view.engine', 'LightWeight')) {
             'LightWeight' => $this->registerLightEngine($serviceContainer),
             default => throw new \RuntimeException("View engine not supported: " . config('view.engine'))
         };
     }
-    
-    /**
+      /**
      * Register the LightEngine view engine with its configuration
      *
-     * @param DIContainer $serviceContainer
+     * @param Container $serviceContainer
      * @return void
      */
-    protected function registerLightEngine(DIContainer $serviceContainer): void
+    protected function registerLightEngine(Container $serviceContainer): void
     {
-        // Create instance with path
-        $viewEngine = new LightEngine(config('view.path'));
+        // Obtenemos el motor de vistas ya instanciado
+        $viewEngine = $serviceContainer->get(ViewContract::class);
         
         // Configure default layout
         if ($defaultLayout = config('view.default_layout')) {

@@ -2,17 +2,31 @@
 
 namespace LightWeight\Providers;
 
-use DI\Container as DIContainer;
-use LightWeight\Providers\Contracts\ServiceProviderContract;
+use LightWeight\Container\Container;
 use LightWeight\Session\Contracts\SessionStorageContract;
 use LightWeight\Session\PhpNativeSessionStorage;
 
-class SessionStorageServiceProvider implements ServiceProviderContract
+class SessionStorageServiceProvider extends ServiceProvider
 {
-    public function registerServices(DIContainer $serviceContainer)
+    /**
+     * Proporciona definiciones para el contenedor antes de su compilación
+     * 
+     * @return array
+     */
+    public function getDefinitions(): array
     {
-        match(config('session.storage', 'native')) {
-            'native' => $serviceContainer->set(SessionStorageContract::class, \DI\create(PhpNativeSessionStorage::class))
-        };
+        return [
+            SessionStorageContract::class => \DI\factory(function () {
+                return match(config('session.storage', 'native')) {
+                    'native' => new PhpNativeSessionStorage(),
+                    default => throw new \RuntimeException("Session storage not supported: " . config('session.storage'))
+                };
+            })
+        ];
+    }
+    
+    public function registerServices(Container $serviceContainer)
+    {
+        // La configuración ya está definida en getDefinitions()
     }
 }

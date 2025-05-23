@@ -2,7 +2,6 @@
 
 namespace LightWeight\Providers;
 
-use DI\Container as DIContainer;
 use LightWeight\Container\Container;
 use LightWeight\Events\Contracts\EventDispatcherContract;
 use LightWeight\Events\Contracts\EventSubscriberContract;
@@ -10,12 +9,11 @@ use LightWeight\Events\Contracts\ListenerContract;
 use LightWeight\Events\EventDispatcher;
 use LightWeight\Log\Contracts\LoggerContract;
 use LightWeight\Log\Handlers\EventLogHandler;
-use LightWeight\Providers\Contracts\ServiceProviderContract;
 
 /**
  * Service provider for the event system
  */
-class EventServiceProvider implements ServiceProviderContract
+class EventServiceProvider extends ServiceProvider
 {
     /**
      * List of default event listeners to register
@@ -24,50 +22,46 @@ class EventServiceProvider implements ServiceProviderContract
      *
      * @var array<string, array<ListenerContract|callable>>
      */
-    protected array $listen = [];
+    protected array $listen = [];    /**
+     * Proporciona definiciones para el contenedor antes de su compilación
+     * 
+     * @return array
+     */
+    public function getDefinitions(): array
+    {
+        return [
+            EventDispatcherContract::class => \DI\create(EventDispatcher::class)
+        ];
+    }
 
     /**
      * Register event-related services in the container
      *
-     * @param DIContainer $serviceContainer The DI container
+     * @param Container $serviceContainer The DI container
      * @return void
      */
-    public function registerServices(DIContainer $serviceContainer)
+    public function registerServices(Container $serviceContainer)
     {
-        // Register the event dispatcher
-        $serviceContainer->set(
-            EventDispatcherContract::class,
-            function () use ($serviceContainer) {
-                $dispatcher = new EventDispatcher();
-                
-                // Register default listeners
-                $this->registerEventListeners($dispatcher);
-                
-                // Register subscribers from config
-                $this->registerConfigSubscribers($dispatcher);
-                
-                // Configure event logging
-                $this->configureEventLogging($dispatcher, $serviceContainer);
-                
-                return $dispatcher;
-            }
-        );
+        $dispatcher = $serviceContainer->get(EventDispatcherContract::class);
+        $this->registerEventListeners($dispatcher, $serviceContainer);
+        $this->registerConfigSubscribers($dispatcher, $serviceContainer);
+        $this->configureEventLogging($dispatcher, $serviceContainer);
     }
-    
+
     /**
      * Register default event listeners
      *
      * @param EventDispatcherContract $dispatcher
      * @return void
      */
-    protected function registerEventListeners(EventDispatcherContract $dispatcher): void
+    protected function registerEventListeners(EventDispatcherContract $dispatcher, Container $container): void
     {
         foreach ($this->listen as $event => $listeners) {
             foreach ($listeners as $listener) {
                 if (is_string($listener) && class_exists($listener)) {
                     // Si es un nombre de clase, usamos el contenedor para instanciarla con sus dependencias
-                    $dispatcher->listen($event, function ($event) use ($listener) {
-                        $instance = Container::make($listener);
+                    $dispatcher->listen($event, function ($event) use ($listener, $container) {
+                        $instance = $container->make($listener);
                         return $instance->handle($event);
                     });
                 } else {
@@ -84,17 +78,18 @@ class EventServiceProvider implements ServiceProviderContract
      * @param EventDispatcherContract $dispatcher
      * @return void
      */
-    protected function registerConfigSubscribers(EventDispatcherContract $dispatcher): void
+    protected function registerConfigSubscribers(EventDispatcherContract $dispatcher, Container $container): void
     {
+        // Get the list of subscribers from the configuration
         $subscribers = config('events.subscribers', []);
         
         foreach ($subscribers as $subscriber) {
             if (class_exists($subscriber)) {
-                // Usar el contenedor para instanciar el suscriptor
-                $instance = Container::make($subscriber);
+                // Use the container to instantiate the subscriber
+                $instance = $container->make($subscriber);
                 
                 if ($instance instanceof EventSubscriberContract) {
-                    // Registrar oyentes mediante el método subscribe
+                    // Register listeners using the subscribe method
                     $instance->subscribe($dispatcher);
                 }
             }
@@ -105,10 +100,10 @@ class EventServiceProvider implements ServiceProviderContract
      * Configure event logging if enabled
      *  
      * @param EventDispatcherContract $dispatcher
-     * @param DIContainer $container
+     * @param Container $container
      * @return void
      */
-    protected function configureEventLogging(EventDispatcherContract $dispatcher, DIContainer $container): void
+    protected function configureEventLogging(EventDispatcherContract $dispatcher, Container $container): void
     {
         $enableEventLogging = filter_var(
             config('logging.event_logging.enabled', config('events.log_events', false)),

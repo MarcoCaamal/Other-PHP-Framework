@@ -3,8 +3,6 @@
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
-         testdox="true"
-         displayDetailsOnAllIssues="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
          displayDetailsOnTestsThatTriggerErrors="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
@@ -16,31 +14,11 @@
          stopOnSkipped="true"
          stopOnIncomplete="true">
     <testsuites>
-        <testsuite name="All">
-            <directory>./tests</directory>
+        <testsuite name="Unit">
+            <directory>./tests/Unit</directory>
         </testsuite>
-        <testsuite name="Events">
-            <directory>./tests/Events</directory>
-        </testsuite>
-        <testsuite name="Mail">
-            <directory>./tests/Mail</directory>
-        </testsuite>
-        <testsuite name="Database">
-            <directory>./tests/Database</directory>
-            <exclude>./tests/Database/ORM</exclude>
-            <exclude>./tests/Database/QueryBuilder</exclude>
-        </testsuite>
-        <testsuite name="ORM">
-            <directory>./tests/Database/ORM</directory>
-        </testsuite>
-        <testsuite name="QueryBuilder">
-            <directory>./tests/Database/QueryBuilder</directory>
-        </testsuite>
-        <testsuite name="Validation">
-            <directory>./tests/Validation</directory>
-        </testsuite>
-        <testsuite name="CLI">
-            <directory>./tests/CLI</directory>
+        <testsuite name="Feature">
+            <directory>./tests/Feature</directory>
         </testsuite>
     </testsuites>
     <php>

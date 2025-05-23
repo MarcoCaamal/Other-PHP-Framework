@@ -21,16 +21,12 @@
         ]
     },
     "scripts": {
-        "tests": "phpunit --testsuite=All",
-        "test:db": "phpunit --testsuite=Database",
-        "test:orm": "phpunit --testsuite=ORM",
-        "test:builder": "phpunit --testsuite=QueryBuilder",
-        "test:validation": "phpunit --testsuite=Validation",
+        "tests": "./vendor/bin/pest ./tests",
         "php-cs-fixer": "php-cs-fixer fix . --diff"
     },
     "autoload-dev": {
         "psr-4": {
-            "LightWeight\\Tests\\": "tests"
+            "Tests\\": "tests"
         }
     },
     "authors": [
@@ -40,8 +36,8 @@
         }
     ],
     "require-dev": {
-        "phpunit/phpunit": "^12.1",
-        "friendsofphp/php-cs-fixer": "^3.75"
+        "friendsofphp/php-cs-fixer": "^3.75",
+        "pestphp/pest": "^2.36"
     },
     "require": {
         "vlucas/phpdotenv": "^5.6",
@@ -52,6 +48,11 @@
         "monolog/monolog": "^3.9"
     },
     "bin": [
-        "light.php"
-    ]
+        "light"
+    ],
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
 }

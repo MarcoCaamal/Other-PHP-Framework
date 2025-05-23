@@ -56,7 +56,7 @@ function env(string $variable, $default = null)
 }
 function config(string $configuration, $default = null)
 {
-    return Config::get($configuration, $default);
+    return Container::getInstance()->get(Config::class)->get($configuration, $default);
 }
 function resourcesDirectory(): string
 {

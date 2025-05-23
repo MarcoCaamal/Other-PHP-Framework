@@ -2,24 +2,41 @@
 
 namespace LightWeight\Providers;
 
+use LightWeight\Container\Container;
 use LightWeight\Exceptions\Contracts\ExceptionHandlerContract;
-use Psr\Container\ContainerInterface;
 
 /**
  * Service provider for exception handling
  */
-class ExceptionHandlerServiceProvider
+class ExceptionHandlerServiceProvider extends ServiceProvider
 {
+    /**
+     * Proporciona definiciones para el contenedor antes de su compilación
+     * 
+     * @return array
+     */
+    public function getDefinitions(): array
+    {
+        
+        return [
+            ExceptionHandlerContract::class => \DI\factory(function (\LightWeight\Config\Config $config) {
+                $exceptionHandler = $config->get('exceptions.handler',  null);
+                if ($exceptionHandler === null) {
+                    throw new \RuntimeException("Exception handler not configured");
+                }
+                return new $exceptionHandler();
+            }),
+        ];
+    }
+    
     /**
      * Register the exception handler service
      *
-     * @param ContainerInterface $container
+     * @param Container $container
      * @return void
      */
-    public function registerServices(ContainerInterface $container): void
+    public function registerServices(Container $container): void
     {
-        // Register exception handler binding
-        $handlerClass = config('app.exception_handler', \App\Exceptions\Handler::class);
-        $container->set(ExceptionHandlerContract::class, \DI\create($handlerClass));
+        // Las definiciones ya están configuradas en getDefinitions()
     }
 }

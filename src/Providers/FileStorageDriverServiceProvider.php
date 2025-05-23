@@ -2,36 +2,56 @@
 
 namespace LightWeight\Providers;
 
-use LightWeight\Providers\Contracts\ServiceProviderContract;
+use LightWeight\Container\Container;
 use LightWeight\Storage\Drivers\Contracts\FileStorageDriverContract;
 use LightWeight\Storage\Drivers\LocalFileStorage;
 use LightWeight\Storage\Drivers\PublicFileStorage;
 use LightWeight\Exceptions\ConfigurationException;
 
-class FileStorageDriverServiceProvider implements ServiceProviderContract
+class FileStorageDriverServiceProvider extends ServiceProvider
 {
+    /**
+     * Proporciona definiciones para el contenedor antes de su compilación
+     * 
+     * @return array
+     */
+    public function getDefinitions(): array
+    {
+        return [
+            FileStorageDriverContract::class => \DI\factory(function () {
+                $default = config("storage.default", "local");
+                $driverConfig = config("storage.drivers.$default", null);
+                
+                if (!$driverConfig) {
+                    throw new ConfigurationException("Storage driver configuration for '$default' not found");
+                }
+                
+                $driver = $driverConfig['driver'] ?? $default;
+                  // Create the appropriate driver based on configuration
+                return match ($driver) {
+                    "disk", "local" => new LocalFileStorage(
+                        $driverConfig['path'] ?? config('storage.path', rootDirectory() . '/storage/app')
+                    ),                    "public" => new PublicFileStorage(
+                        $driverConfig['path'] ?? config('storage.path', rootDirectory() . '/storage/public'),
+                        $driverConfig['storage_uri'] ?? config('storage.storage_uri', 'storage/public'),
+                        $driverConfig['url'] ?? config('storage.url', 'http://localhost')
+                    ),
+                    // Para S3 y FTP, necesitarías implementar estos métodos o
+                    // refactorizar la lógica que estaba en registerS3Driver y registerFtpDriver
+                    "s3" => throw new ConfigurationException("S3 driver not implemented in container definitions"),
+                    "ftp" => throw new ConfigurationException("FTP driver not implemented in container definitions"),
+                    default => throw new ConfigurationException("Unsupported storage driver: $driver")
+                };
+            })
+        ];
+    }
+    
     /**
      * @inheritDoc
      */
-    public function registerServices(\DI\Container $serviceContainer)
+    public function registerServices(Container $serviceContainer)
     {
-        $default = config("storage.default", "local");
-        $driverConfig = config("storage.drivers.$default", null);
-        
-        if (!$driverConfig) {
-            throw new ConfigurationException("Storage driver configuration for '$default' not found");
-        }
-        
-        $driver = $driverConfig['driver'] ?? $default;
-        
-        // Register the appropriate driver based on configuration
-        match ($driver) {
-            "disk", "local" => $this->registerLocalDriver($serviceContainer, $driverConfig),
-            "public" => $this->registerPublicDriver($serviceContainer, $driverConfig),
-            "s3" => $this->registerS3Driver($serviceContainer, $driverConfig),
-            "ftp" => $this->registerFtpDriver($serviceContainer, $driverConfig),
-            default => throw new ConfigurationException("Unsupported storage driver: $driver")
-        };
+        // Todas las definiciones ya están configuradas en getDefinitions()
     }
     
     /**

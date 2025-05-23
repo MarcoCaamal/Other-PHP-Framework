@@ -98,8 +98,8 @@ class BootstrapExceptionHandler implements BootstrapExceptionHandlerContract
         http_response_code(500);
         
         // Check if APP_DEBUG is set to true (as a string or boolean)
-        $isDebug = config('app.debug', false);
-        
+        $isDebug = env('APP_DEBUG', false);
+
         if ($isDebug) {
             echo $this->getDebugErrorPage($exception);
         } else {
