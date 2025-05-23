@@ -29,14 +29,14 @@ class Application
     //-------------------------------------------------------------------------
     // PROPIEDADES PÚBLICAS
     //-------------------------------------------------------------------------
-    
+
     /**
      * Application root directory
      *
      * @var string
      */
     public static string $root;
-    
+
     /**
      * DI Container instance
      *
@@ -55,49 +55,49 @@ class Application
      * @var Router
      */
     private Router $router;
-    
+
     /**
      * Current request instance
      *
      * @var RequestContract
      */
     private RequestContract $request;
-    
+
     /**
      * Server handler instance
      *
      * @var ServerContract
      */
     private ServerContract $server;
-    
+
     /**
      * View engine instance
      *
      * @var ViewContract
      */
     private ViewContract $view;
-    
+
     /**
      * Session handler instance
      *
      * @var Session
      */
     private Session $session;
-    
+
     /**
      * Database driver instance
      *
      * @var DatabaseDriverContract
      */
     private DatabaseDriverContract $database;
-    
+
     /**
      * Exception handler instance
      *
      * @var ExceptionHandlerContract
      */
     private ExceptionHandlerContract $exceptionHandler;
-    
+
     /**
      * Event dispatcher instance
      *
@@ -118,8 +118,7 @@ class Application
 
     public function __construct(
         Container $container,
-    ) 
-    {
+    ) {
         $this->container = $container;
     }
 
@@ -128,11 +127,11 @@ class Application
      *
      * @param string $root The root directory of the application
      * @return Application
-     */    
+     */
     public static function bootstrap(string $root): Application
     {
         self::$root = $root;
-        
+
         try {
             // Crear el contenedor
             $container = new Container();
@@ -141,16 +140,16 @@ class Application
             ]);
             // Cargar definiciones básicas
             $container->addDefinitions(self::$root . '/config/container.php');
-            
+
             // Recolectar definiciones de todos los providers ANTES de construir
             self::collectProviderDefinitions($container);
-            
+
             // Activar caché en producción y construir el contenedor
-            if(env('APP_ENV', 'production') === 'production') {
+            if (env('APP_ENV', 'production') === 'production') {
                 $container->enableCache(self::$root . '/storage/cache/container');
             }
             $container->build();
-            
+
             // Crear la aplicación con el contenedor ya construido
             $app = new Application($container);
             $app->container = $container; // Asegurar que el contenedor esté asignado a la aplicación
@@ -169,20 +168,20 @@ class Application
             if (isset($app->events)) {
                 $app->events->dispatch(new \LightWeight\Events\System\ApplicationBootstrapped());
             }
-            
+
             return $app;
         } catch (Throwable $e) {
             // Use the bootstrap exception handler to handle any errors during startup
             $bootstrapHandler = new \LightWeight\Exceptions\BootstrapExceptionHandler();
             $bootstrapHandler->handleException($e);
-            
+
             // This line won't be reached because handleException calls exit(1)
             exit(1);
         }
     }
-      /**
+    /**
      * Recolecta definiciones de todos los providers antes de compilar el contenedor
-     * 
+     *
      * @param Container $container
      * @return void
      */
@@ -190,18 +189,18 @@ class Application
     {
         // Cargar configuración para obtener lista de providers
         $providerClasses = [];
-        
+
         // Cargar directamente desde el archivo para evitar dependencia circular
         if (file_exists(self::$root . '/config/providers.php')) {
             $providers = require self::$root . '/config/providers.php';
-            
+
             // Recolectar providers de boot y runtime (excluyendo CLI)
             $providerClasses = array_merge(
                 $providers['boot'] ?? [],
                 $providers['runtime'] ?? []
             );
         }
-        
+
         // Recolectar definiciones de cada provider
         foreach ($providerClasses as $providerClass) {
             if (class_exists($providerClass)) {
@@ -215,7 +214,7 @@ class Application
             }
         }
     }
-    
+
     /**
      * Run the application
      *
@@ -230,7 +229,7 @@ class Application
                 $this->terminate($this->showWelcomePage());
                 return;
             }
-            
+
             $this->terminate($this->router->resolve($this->request));
         } catch (Throwable $e) {
             // Report exception if needed
@@ -238,12 +237,12 @@ class Application
 
             // Render appropriate response based on exception type
             $response = $this->exceptionHandler->render($this->request, $e);
-            
+
             // Send the response
             $this->abort($response);
         }
     }
-    
+
     /**
      * Set up HTTP handlers and related components
      *
@@ -258,10 +257,10 @@ class Application
 
         // No need to create a global response instance
         // Each controller/route will create its own response
-        
+
         return $this;
     }
-    
+
     /**
      * Set up database connection and ORM configuration
      *
@@ -280,7 +279,7 @@ class Application
                 config("database.username"),
                 config("database.password"),
             );
-            
+
             return $this;
         } catch (Exception $e) {
             throw new DatabaseException("Failed to connect to database: {$e->getMessage()}", 0, $e);
@@ -297,10 +296,10 @@ class Application
         $handlerClass = config('app.exception_handler', \App\Exceptions\Handler::class);
         $this->exceptionHandler = singleton(ExceptionHandlerContract::class, $handlerClass);
         $this->exceptionHandler->register();
-        
+
         return $this;
     }
-    
+
     /**
      * Set up the event system
      *
@@ -309,10 +308,10 @@ class Application
     public function setUpEventSystem(): self
     {
         $this->events = app(EventDispatcherContract::class);
-        
+
         return $this;
     }
-    
+
     /**
      * Set up the logging system
      *
@@ -322,13 +321,13 @@ class Application
     {
         // Set the logger instance
         $this->logger = app(LoggerContract::class);
-        
+
         return $this;
     }
-    
+
     /**
      * Apply CORS headers to the response
-     * 
+     *
      * @param ResponseContract $response The response to apply CORS headers to
      * @return self
      */
@@ -336,43 +335,43 @@ class Application
     {
         $allowedOrigins = config('cors.allowed_origins', []);
         $this->setAllowOriginHeader($response, $allowedOrigins);
-        
+
         $response->setHeader(
-            'Access-Control-Allow-Methods', 
+            'Access-Control-Allow-Methods',
             implode(',', config('cors.allowed_methods', [
-                HttpMethod::GET->value, 
-                HttpMethod::POST->value, 
-                HttpMethod::PUT->value, 
-                HttpMethod::DELETE->value, 
+                HttpMethod::GET->value,
+                HttpMethod::POST->value,
+                HttpMethod::PUT->value,
+                HttpMethod::DELETE->value,
                 HttpMethod::OPTIONS->value
             ]))
         );
-        
+
         $response->setHeader(
-            'Access-Control-Allow-Headers', 
+            'Access-Control-Allow-Headers',
             implode(',', config('cors.allowed_headers', ['Content-Type', 'Authorization']))
         );
-        
+
         if (config('cors.exposed_headers', [])) {
             $response->setHeader(
                 'Access-Control-Expose-Headers',
                 implode(',', config('cors.exposed_headers', []))
             );
         }
-        
+
         $response->setHeader(
-            'Access-Control-Allow-Credentials', 
+            'Access-Control-Allow-Credentials',
             config('cors.allow_credentials', 'false')
         );
-        
+
         $maxAge = config('cors.max_age', 0);
         if ($maxAge > 0) {
             $response->setHeader('Access-Control-Max-Age', (string)$maxAge);
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Prepare data for the next request
      * Stores current URI in session for use with back() helper
@@ -385,7 +384,7 @@ class Application
             $this->session->set('_previous', $this->request->uri());
         }
     }
-    
+
     /**
      * Terminate the application with a response
      *
@@ -398,13 +397,13 @@ class Application
         if (isset($this->events)) {
             $this->events->dispatch(new \LightWeight\Events\System\ApplicationTerminating(['response' => $response]));
         }
-        
+
         $this->prepareNextRequest();
         $this->setCors($response);
         $this->server->sendResponse($response);
         $this->closeDatabaseConnection();
     }
-    
+
     /**
      * Abort the application with a response
      *
@@ -415,7 +414,7 @@ class Application
     {
         $this->terminate($response);
     }
-    
+
     /**
      * Bind a class or interface to a concrete implementation
      *
@@ -427,7 +426,7 @@ class Application
     {
         $this->container->set($class, $definition);
     }
-    
+
     /**
      * Create a new instance of a class
      *
@@ -439,7 +438,7 @@ class Application
     {
         return $this->container->make($class, $parameters);
     }
-    
+
     /**
      * Create a singleton instance of a class
      *
@@ -452,7 +451,7 @@ class Application
     {
         return $this->container->get($class) ?? $this->container->set($class, $definition);
     }
-    
+
     /**
      * Call a method on a class instance
      *
@@ -464,7 +463,7 @@ class Application
     {
         return $this->container->call($class, $parameters);
     }
-    
+
     /**
      * Get a class instance from the container
      *
@@ -476,7 +475,7 @@ class Application
     {
         return $this->container->get($class);
     }
-    
+
     /**
      * Check if a class is registered in the container
      *
@@ -497,11 +496,11 @@ class Application
     {
         return $this->logger;
     }
-    
+
     //-------------------------------------------------------------------------
     // MÉTODOS PROTEGIDOS
     //-------------------------------------------------------------------------
-    
+
     /**
      * Check if the current request is an API request
      *
@@ -511,7 +510,7 @@ class Application
     {
         return str_starts_with($this->request->uri(), '/api');
     }
-    
+
     /**
      * Safely close database connection
      *
@@ -551,7 +550,7 @@ class Application
         }
         return $this;
     }
-    
+
     /**
      * Check if the request needs to be redirected for HTTPS or WWW enforcement
      *
@@ -563,7 +562,7 @@ class Application
         if ($this->isApiRequest()) {
             return;
         }
-        
+
         // Check if redirect is needed for HTTPS or WWW
         if (method_exists($this->server, 'checkRedirects')) {
             $response = $this->server->checkRedirects($this->request);
@@ -573,10 +572,10 @@ class Application
             }
         }
     }
-    
+
     /**
      * Set the Access-Control-Allow-Origin header on the response
-     * 
+     *
      * @param ResponseContract $response The response to set headers on
      * @param array $allowedOrigins List of allowed origins
      * @return void
@@ -592,11 +591,11 @@ class Application
             }
         }
     }
-    
+
     //-------------------------------------------------------------------------
     // MÉTODOS PRIVADOS
     //-------------------------------------------------------------------------
-    
+
     /**
      * Show welcome page when no routes are defined
      *

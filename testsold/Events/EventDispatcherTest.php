@@ -55,7 +55,7 @@ class EventDispatcherTest extends TestCase
         $receivedData = null;
 
         // Creamos un evento de prueba
-        $testEvent = new class(['test' => 123]) extends Event {
+        $testEvent = new class (['test' => 123]) extends Event {
             public function getName(): string
             {
                 return 'custom.event';
@@ -79,7 +79,7 @@ class EventDispatcherTest extends TestCase
     public function testCanRegisterAndExecuteListenerClass(): void
     {
         // Creamos una clase listener
-        $listener = new class implements ListenerContract {
+        $listener = new class () implements ListenerContract {
             public $wasCalled = false;
             public $eventData = null;
 
@@ -129,13 +129,13 @@ class EventDispatcherTest extends TestCase
     {
         // Registramos un listener
         $this->dispatcher->listen('test.event', function () {});
-        
+
         // Confirmamos que existe
         $this->assertTrue($this->dispatcher->hasListeners('test.event'));
-        
+
         // Lo eliminamos
         $this->dispatcher->forget('test.event');
-        
+
         // Verificamos que ya no existe
         $this->assertFalse($this->dispatcher->hasListeners('test.event'));
     }
@@ -145,14 +145,14 @@ class EventDispatcherTest extends TestCase
         // Registramos varios listeners en diferentes eventos
         $this->dispatcher->listen('event1', function () {});
         $this->dispatcher->listen('event2', function () {});
-        
+
         // Confirmamos que existen
         $this->assertTrue($this->dispatcher->hasListeners('event1'));
         $this->assertTrue($this->dispatcher->hasListeners('event2'));
-        
+
         // Eliminamos todos
         $this->dispatcher->forget();
-        
+
         // Verificamos que ya no existen
         $this->assertFalse($this->dispatcher->hasListeners('event1'));
         $this->assertFalse($this->dispatcher->hasListeners('event2'));
@@ -161,7 +161,7 @@ class EventDispatcherTest extends TestCase
     public function testGenericEventHoldsNameAndData(): void
     {
         $event = new GenericEvent('test.name', ['data1' => 'value1']);
-        
+
         $this->assertEquals('test.name', $event->getName());
         $this->assertEquals(['data1' => 'value1'], $event->getData());
     }

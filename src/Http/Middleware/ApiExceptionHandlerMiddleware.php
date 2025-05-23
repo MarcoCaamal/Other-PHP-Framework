@@ -46,7 +46,7 @@ class ApiExceptionHandlerMiddleware implements MiddlewareContract
         } catch (Throwable $exception) {
             // Report the exception
             $this->exceptionHandler->report($exception);
-            
+
             // Return a JSON response for API
             return $this->handleApiException($request, $exception);
         }
@@ -63,10 +63,10 @@ class ApiExceptionHandlerMiddleware implements MiddlewareContract
     {
         // Use exception handler to get a response
         $response = $this->exceptionHandler->render($request, $exception);
-        
+
         // Ensure we have a JSON response with the correct content type
         $response->setHeader('Content-Type', 'application/json');
-        
+
         return $response;
     }
 }

@@ -11,28 +11,28 @@ class CriticalException extends LightWeightException
 {
     /**
      * System component that failed
-     * 
+     *
      * @var string
      */
     protected string $component;
 
     /**
      * Severity level of the exception
-     * 
+     *
      * @var string
      */
     protected string $severity;
 
     /**
      * List of notification channels to use
-     * 
+     *
      * @var array
      */
     protected array $notificationChannels = [];
 
     /**
      * Create a new critical exception
-     * 
+     *
      * @param string $message Error message
      * @param string $component System component that failed
      * @param string $severity Severity level (critical, high, medium, low)
@@ -56,7 +56,7 @@ class CriticalException extends LightWeightException
 
     /**
      * Get the system component that failed
-     * 
+     *
      * @return string
      */
     public function getComponent(): string
@@ -66,7 +66,7 @@ class CriticalException extends LightWeightException
 
     /**
      * Get the severity level
-     * 
+     *
      * @return string
      */
     public function getSeverity(): string
@@ -76,7 +76,7 @@ class CriticalException extends LightWeightException
 
     /**
      * Get notification channels
-     * 
+     *
      * @return array
      */
     public function getNotificationChannels(): array

@@ -22,41 +22,41 @@ class CLI
     public static function bootstrap(string $root): self
     {
         App::$root = $root;
-        
+
         // Intentar cargar .env si existe, pero no fallar si no se encuentra
         if (file_exists($root . '/.env')) {
             Dotenv::createImmutable($root)->load();
         }
-        
+
         // Crear el contenedor siguiendo el mismo enfoque que Application
         $container = new Container();
         $container->addDefinitions([
             'app.root' => \DI\value($root),
         ]);
-        
+
         // Cargar definiciones básicas si existe el archivo
         if (file_exists($root . '/config/container.php')) {
             $container->addDefinitions($root . '/config/container.php');
         }
-        
+
         // Cargar definiciones específicas para CLI
         self::collectCliDefinitions($container, $root);
-        
+
         // Construir el contenedor (sin caché para CLI)
         $container->build();
-        
+
         // Intentar configurar la conexión a la base de datos
         try {
             if ($container->has(Config::class)) {
                 $config = $container->get(Config::class);
-                
+
                 // Ejecutar proveedores de servicios CLI
                 if ($config->get('providers.cli')) {
                     foreach ($config->get('providers.cli') as $provider) {
                         (new $provider())->registerServices($container);
                     }
                 }
-                
+
                 // Configurar base de datos si está disponible
                 if ($container->has(DatabaseDriverContract::class)) {
                     $db = $container->get(DatabaseDriverContract::class);
@@ -68,7 +68,7 @@ class CLI
                         $config->get("database.username", "root"),
                         $config->get("database.password", ""),
                     );
-                    
+
                     // Crear directorio de migraciones si no existe
                     $migrationsDir = "$root/database/migrations";
                     if (!is_dir($migrationsDir)) {
@@ -77,7 +77,7 @@ class CLI
                         }
                         mkdir($migrationsDir, 0755, true);
                     }
-                    
+
                     // Registrar el Migrator
                     $container->set(Migrator::class, function ($c) use ($migrationsDir) {
                         return new Migrator(
@@ -93,7 +93,7 @@ class CLI
             // Solo log de error, no detener la ejecución
             error_log("CLI initialization error: " . $e->getMessage());
         }
-        
+
         return new self();
     }
     /**
@@ -108,7 +108,7 @@ class CLI
         // Cargar definiciones de Config como prioritarias
         if (file_exists($root . '/config/providers.php')) {
             $providers = require $root . '/config/providers.php';
-            
+
             // Cargar definiciones para providers CLI
             if (isset($providers['cli']) && is_array($providers['cli'])) {
                 foreach ($providers['cli'] as $providerClass) {

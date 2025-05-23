@@ -14,28 +14,28 @@ class MakeMigration extends Command
 {
     protected static $defaultName = "make:migration";
     protected static $defaultDescription = "Create new migration file";
-    
+
     protected function configure()
     {
         $this
             ->addArgument("name", InputArgument::REQUIRED, "Migration name (e.g. create_users_table)")
             ->addOption(
-                "fields", 
-                "f", 
-                InputOption::VALUE_OPTIONAL, 
+                "fields",
+                "f",
+                InputOption::VALUE_OPTIONAL,
                 "Define fields for the migration (format: name:type,name2:type2,...)"
             )
             ->addOption(
-                "table", 
-                "t", 
-                InputOption::VALUE_OPTIONAL, 
+                "table",
+                "t",
+                InputOption::VALUE_OPTIONAL,
                 "Table name (will be extracted from migration name if not provided)"
             )
             ->addOption(
-                "type", 
-                null, 
-                InputOption::VALUE_OPTIONAL, 
-                "Migration type (create, alter, update, custom)", 
+                "type",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "Migration type (create, alter, update, custom)",
                 "auto"
             )
             ->setHelp(
@@ -56,33 +56,33 @@ class MakeMigration extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Creating Migration');
-        
+
         // Get inputs
         $name = $input->getArgument('name');
         $fields = $input->getOption('fields');
         $table = $input->getOption('table');
         $type = $input->getOption('type');
-        
+
         // Parse fields if provided
         $parsedFields = [];
         if ($fields) {
             $parsedFields = $this->parseFields($fields);
         }
-        
+
         // Create the migration
         $fileName = app(Migrator::class)->make($name, [
             'fields' => $parsedFields,
             'table' => $table,
             'type' => $type
         ]);
-        
+
         $io->success("Migration created: $fileName");
         return Command::SUCCESS;
     }
-    
+
     /**
      * Parse field definitions from command line
-     * 
+     *
      * @param string $fields Field definitions in format name:type,name2:type2,...
      * @return array Structured field definitions
      */
@@ -90,32 +90,32 @@ class MakeMigration extends Command
     {
         $parsedFields = [];
         $fieldDefinitions = explode(',', $fields);
-        
+
         foreach ($fieldDefinitions as $fieldDefinition) {
             $parts = explode(':', $fieldDefinition);
-            
+
             // Basic validation
             if (count($parts) < 2) {
                 continue;
             }
-            
+
             $name = trim($parts[0]);
             $type = trim($parts[1]);
-            
+
             $field = [
                 'name' => $name,
                 'type' => $type
             ];
-            
+
             // Check for additional parameters
             if (count($parts) > 2) {
                 // For enum values or other parameters
                 $field['parameters'] = array_slice($parts, 2);
             }
-            
+
             $parsedFields[] = $field;
         }
-        
+
         return $parsedFields;
     }
 }

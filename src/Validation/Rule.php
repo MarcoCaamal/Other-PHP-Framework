@@ -33,7 +33,7 @@ class Rule
     }
     public static function load(array $rules)
     {
-        foreach($rules as $class) {
+        foreach ($rules as $class) {
             $className = array_slice(explode("\\", $class), -1)[0];
             $ruleName = snakeCase($className);
             self::$rules[$ruleName] = $class;

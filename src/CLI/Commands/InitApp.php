@@ -21,7 +21,7 @@ class InitApp extends Command
         parent::__construct();
         $this->templatesDir = $templatesDir ?? dirname(dirname(dirname(__DIR__))) . '/templates/app';
     }
-    
+
     protected function configure()
     {
         $this
@@ -29,7 +29,7 @@ class InitApp extends Command
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force overwrite of existing files')
             ->setHelp('This command creates a new LightWeight application by copying the template files');
     }
-    
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -37,67 +37,67 @@ class InitApp extends Command
 
         $appName = $input->getArgument('name');
         $force = $input->getOption('force');
-        
+
         $targetDir = getcwd();
         if ($appName !== '.') {
             $targetDir .= "/$appName";
-            
+
             // Check if directory already exists
             if (is_dir($targetDir) && !$force) {
                 $io->error("Directory '{$appName}' already exists! Use --force to overwrite files.");
                 return Command::FAILURE;
             }
-            
+
             // Create target directory if it doesn't exist
             if (!is_dir($targetDir) && !mkdir($targetDir, 0755, true)) {
                 $io->error("Failed to create directory '{$appName}'");
                 return Command::FAILURE;
             }
-            
+
             $io->section("Creating new LightWeight application in {$appName}");
         } else {
             $io->section("Initializing LightWeight application in current directory");
         }
-        
+
         // Check if templates directory exists
         if (!is_dir($this->templatesDir)) {
             $io->error("Templates directory not found: {$this->templatesDir}");
             return Command::FAILURE;
         }
-        
+
         // Copy template files
         $this->copyTemplateFiles($this->templatesDir, $targetDir, $io, $force);
-        
+
         // Success message
         $io->success("Application initialized successfully!");
-        
-        
+
+
         if ($appName !== '.') {
             $io->text("Run 'cd {$appName} && composer install' to install dependencies");
         } else {
             $io->text("Run 'composer install' to install dependencies");
         }
-        
+
         return Command::SUCCESS;
     }
-    
+
     private function copyTemplateFiles(string $sourceDir, string $targetDir, SymfonyStyle $io, bool $force)
     {
         if (!is_dir($sourceDir)) {
             $io->error("Source directory does not exist: {$sourceDir}");
             return;
         }
-        
+
         $dir = opendir($sourceDir);
-        
+
         while (($file = readdir($dir)) !== false) {
             if ($file === '.' || $file === '..') {
                 continue;
             }
-            
+
             $sourcePath = $sourceDir . '/' . $file;
             $targetPath = $targetDir . '/' . $file;
-            
+
             if (is_dir($sourcePath)) {
                 if (!is_dir($targetPath)) {
                     if (mkdir($targetPath, 0755, true)) {
@@ -118,7 +118,7 @@ class InitApp extends Command
                 }
             }
         }
-        
+
         closedir($dir);
     }
 }

@@ -13,34 +13,34 @@ class LightEngine implements ViewContract
     protected string $viewsDirectory;
     protected string $defaultLayout = 'main';
     protected string $contentAnotation = '@content';
-    
+
     // Cache settings
     protected bool $cacheEnabled = false;
     protected string $cachePath = '';
-    
+
     // Security settings
     protected bool $autoEscape = true;
-    
+
     // Sections
     protected array $sections = [];
     protected ?string $currentSection = null;
-    
+
     // Current view parameters
     protected ?array $currentViewParams = null;
-    
+
     /**
      * Constructor
-     * 
+     *
      * @param string $viewsDirectory Directory containing views
      */
     public function __construct(string $viewsDirectory)
     {
         $this->viewsDirectory = rtrim($viewsDirectory, '/');
     }
-    
+
     /**
      * Set default layout
-     * 
+     *
      * @param string $layout Layout name
      * @return self
      */
@@ -49,10 +49,10 @@ class LightEngine implements ViewContract
         $this->defaultLayout = $layout;
         return $this;
     }
-    
+
     /**
      * Set content annotation marker
-     * 
+     *
      * @param string $annotation The string marker that will be replaced with content
      * @return self
      */
@@ -61,7 +61,7 @@ class LightEngine implements ViewContract
         $this->contentAnotation = $annotation;
         return $this;
     }
-    
+
     /**
      * Set cache configuration
      *
@@ -77,7 +77,7 @@ class LightEngine implements ViewContract
         }
         return $this;
     }
-    
+
     /**
      * Set auto-escaping configuration
      *
@@ -89,7 +89,7 @@ class LightEngine implements ViewContract
         $this->autoEscape = $enabled;
         return $this;
     }
-    
+
     /**
      * Set views directory
      *
@@ -101,10 +101,10 @@ class LightEngine implements ViewContract
         $this->viewsDirectory = rtrim($directory, '/');
         return $this;
     }
-    
+
     /**
      * Find a view file in either user directory or default templates
-     * 
+     *
      * @param string $path Relative path to the view
      * @return string Full path to the found view file or null if not found
      */
@@ -112,22 +112,22 @@ class LightEngine implements ViewContract
     {
         // Check if the file exists in the configured views directory
         $viewPath = "{$this->viewsDirectory}/$path.php";
-        
+
         if (file_exists($viewPath)) {
             return $viewPath;
         }
-        
+
         // Check in resources/views as a fallback
         $resourcesViewsPath = __DIR__ . '/../../templates/default/views';
         $resourceViewPath = "$resourcesViewsPath/$path.php";
-        
+
         if (is_dir($resourcesViewsPath) && file_exists($resourceViewPath)) {
             return $resourceViewPath;
         }
-        
+
         return null;
     }
-    
+
     /**
      * Dispatch the view.rendering event
      *
@@ -147,7 +147,7 @@ class LightEngine implements ViewContract
             ]));
         }
     }
-    
+
     /**
      * Dispatch the view.rendered event
      *
@@ -169,7 +169,7 @@ class LightEngine implements ViewContract
             ]));
         }
     }
-    
+
     /**
      * Render a view with the given parameters
      *
@@ -183,38 +183,38 @@ class LightEngine implements ViewContract
     {
         // Reset sections
         $this->sections = [];
-        
+
         $view = str_replace('.', '/', $view);
         $viewPath = $this->findViewFile($view);
-        
+
         if (!$viewPath) {
             throw new \RuntimeException("View file not found: $view.php");
         }
-        
+
         // Dispatch view.rendering event
         $this->dispatchViewRenderingEvent($view, $params, $layout);
-        
+
         $viewContent = $this->renderView($view, $params);
-        
+
         // No layout
         if ($layout === false) {
             // Dispatch view.rendered event
             $this->dispatchViewRenderedEvent($view, $params, $layout, $viewContent);
-            
+
             return $viewContent;
         }
-        
+
         // With layout - only use defaultLayout if layout is null (not false or empty string)
         $layoutName = $layout === null ? $this->defaultLayout : $layout;
         $layoutContent = $this->renderLayout($layoutName);
         $finalContent = str_replace($this->contentAnotation, $viewContent, $layoutContent);
-        
+
         // Dispatch view.rendered event
         $this->dispatchViewRenderedEvent($view, $params, $layout, $finalContent);
-        
+
         return $finalContent;
     }
-    
+
     /**
      * Render a view file
      *
@@ -225,38 +225,38 @@ class LightEngine implements ViewContract
     public function renderView(string $view, array $params = [])
     {
         $viewPath = $this->findViewFile($view);
-        
+
         if (!$viewPath) {
             throw new \RuntimeException(
                 "View file not found: $view.php"
             );
         }
-        
+
         if ($this->cacheEnabled && $this->cachePath) {
             $cacheKey = md5($view . serialize($params));
             $cachePath = "{$this->cachePath}/$cacheKey.php";
-            
+
             // Use cached version if it exists and is newer than view file
             if (file_exists($cachePath) && filemtime($cachePath) > filemtime($viewPath)) {
                 return include $cachePath;
             }
-            
+
             // Generate and cache the view
             $content = $this->phpFileOutput($viewPath, $params);
-            
+
             if (!is_dir($this->cachePath)) {
                 mkdir($this->cachePath, 0755, true);
             }
-            
+
             // Escapamos las comillas simples para evitar problemas con el código PHP
             $escapedContent = str_replace("'", "\\'", $content);
             file_put_contents($cachePath, "<?php return '" . $escapedContent . "';");
             return $content;
         }
-        
+
         return $this->phpFileOutput($viewPath, $params);
     }
-    
+
     /**
      * Render a layout file
      *
@@ -268,19 +268,19 @@ class LightEngine implements ViewContract
     {
         // Try user layouts directory first
         $userLayoutPath = "{$this->viewsDirectory}/layouts/$layout.php";
-        
+
         if (file_exists($userLayoutPath)) {
             return $this->phpFileOutput($userLayoutPath);
         }
-        
+
         // Check in resources/views as a fallback
         $resourcesViewsPath = rtrim(dirname(dirname(dirname(__DIR__))), '/') . '/resources/views';
         $resourceLayoutPath = "$resourcesViewsPath/layouts/$layout.php";
-        
+
         if (is_dir($resourcesViewsPath) && file_exists($resourceLayoutPath)) {
             return $this->phpFileOutput($resourceLayoutPath);
         }
-        
+
         throw new \RuntimeException(
             "Layout file not found: $layout.php\n" .
             "Searched locations:\n" .
@@ -288,7 +288,7 @@ class LightEngine implements ViewContract
             "- $resourceLayoutPath"
         );
     }
-    
+
     /**
      * Render a PHP file with extracted parameters
      *
@@ -302,28 +302,28 @@ class LightEngine implements ViewContract
         if (!file_exists($phpFile)) {
             throw new \RuntimeException("File not found: $phpFile");
         }
-        
+
         // Store current params for includes
         $previousParams = $this->currentViewParams;
         $this->currentViewParams = $params;
-        
+
         $params = $this->prepareParams($params);
-        
+
         // Add view helper functions to scope
         $view = $this;
-        
+
         extract($params);
-        
+
         ob_start();
         include $phpFile;
         $content = ob_get_clean();
-        
+
         // Restore previous params
         $this->currentViewParams = $previousParams;
-        
+
         return $content;
     }
-    
+
     /**
      * Prepare parameters with auto-escaping if enabled
      *
@@ -335,7 +335,7 @@ class LightEngine implements ViewContract
         if (!$this->autoEscape) {
             return $params;
         }
-        
+
         $escapedParams = [];
         foreach ($params as $key => $value) {
             // Don't escape objects and arrays, only scalar values
@@ -345,13 +345,13 @@ class LightEngine implements ViewContract
                 $escapedParams[$key] = $value;
             }
         }
-        
+
         // Add the escape helper function to params
         $escapedParams['e'] = [$this, 'e'];
-        
+
         return $escapedParams;
     }
-    
+
     /**
      * Start a new section
      *
@@ -363,7 +363,7 @@ class LightEngine implements ViewContract
         $this->currentSection = $name;
         ob_start();
     }
-    
+
     /**
      * End the current section
      *
@@ -376,7 +376,7 @@ class LightEngine implements ViewContract
             $this->currentSection = null;
         }
     }
-    
+
     /**
      * Yield a section's content
      *
@@ -388,7 +388,7 @@ class LightEngine implements ViewContract
     {
         return $this->sections[$name] ?? $default;
     }
-    
+
     /**
      * Include another view within current view
      *
@@ -400,7 +400,7 @@ class LightEngine implements ViewContract
     {
         return $this->renderView(str_replace('.', '/', $view), array_merge($this->currentViewParams ?? [], $params));
     }
-    
+
     /**
      * Escape HTML special characters
      *
@@ -411,7 +411,7 @@ class LightEngine implements ViewContract
     {
         return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
     }
-    
+
     /**
      * Get the current URI
      *
@@ -421,7 +421,7 @@ class LightEngine implements ViewContract
     {
         return $_SERVER['REQUEST_URI'] ?? '/';
     }
-    
+
     /**
      * Check if the current request matches a URI pattern
      *
@@ -431,7 +431,7 @@ class LightEngine implements ViewContract
     public function isActive(string $pattern): bool
     {
         $currentUri = $this->currentUri();
-        return $pattern === $currentUri || 
+        return $pattern === $currentUri ||
                ($pattern !== '/' && strpos($currentUri, $pattern) === 0);
     }
 }

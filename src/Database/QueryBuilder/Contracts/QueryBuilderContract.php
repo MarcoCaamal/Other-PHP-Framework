@@ -26,7 +26,7 @@ interface QueryBuilderContract
 
     /**
      * Add a where clause with a callback function
-     * 
+     *
      * @param Closure $callback Function that receives the query builder
      * @param string $boolean The boolean operator (AND/OR)
      * @return static
@@ -59,21 +59,21 @@ interface QueryBuilderContract
     public function decrement(string $column, int $value = 1): int;
 
     public function toSql(): string;
-    
+
     /**
      * Get the current table name.
      *
      * @return string
      */
     public function getTable(): string;
-    
+
     /**
      * Get the database connection instance.
      *
      * @return \LightWeight\Database\Contracts\DatabaseDriverContract
      */
     public function getConnection();
-    
+
     /**
      * Get the where clause for the current query.
      * Used to extract constraints in subqueries for relationship queries.

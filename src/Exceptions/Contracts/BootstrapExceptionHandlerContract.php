@@ -16,7 +16,7 @@ interface BootstrapExceptionHandlerContract
      * @return void
      */
     public function logException(Throwable $exception): void;
-    
+
     /**
      * Handle a bootstrap exception
      *

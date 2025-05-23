@@ -12,35 +12,35 @@ class DiskFileStorage implements FileStorageDriverContract
      * @var string
      */
     protected string $storageDirectory;
-    
+
     /**
      * URL of the application.
      *
      * @var string
      */
     protected string $appUrl;
-    
+
     /**
      * URI of the public storage directory
      *
      * @var string
      */
     protected string $storageUri;
-    
+
     /**
      * Default visibility for files
      *
      * @var string
      */
     protected string $defaultVisibility;
-    
+
     /**
      * Map of file paths to their visibility
-     * 
+     *
      * @var array
      */
     protected array $visibilityMap = [];
-    
+
     /**
      * Instantiate disk file storage.
      *
@@ -50,8 +50,8 @@ class DiskFileStorage implements FileStorageDriverContract
      * @param string $defaultVisibility
      */
     public function __construct(
-        string $storageDirectory, 
-        string $storageUri, 
+        string $storageDirectory,
+        string $storageUri,
         string $appUrl,
         string $defaultVisibility = 'public'
     ) {
@@ -60,31 +60,31 @@ class DiskFileStorage implements FileStorageDriverContract
         $this->appUrl = rtrim($appUrl, '/');
         $this->defaultVisibility = $defaultVisibility;
     }
-      /**
+    /**
      * {@inheritdoc}
      */
     public function put(string $path, mixed $content, ?string $visibility = null): string
     {
         $path = $this->normalizePath($path);
         $this->ensureDirectoryExists(dirname($path));
-        
+
         file_put_contents($path, $content);
-        
+
         // Set visibility if provided
         if ($visibility !== null) {
             $this->setVisibility($path, $visibility);
-        } else if ($this->defaultVisibility) {
+        } elseif ($this->defaultVisibility) {
             $this->setVisibility($path, $this->defaultVisibility);
         }
-        
+
         $relativePath = str_replace($this->storageDirectory . '/', '', $path);
         $url = $this->url($relativePath);
-        
+
         // Para cumplir con el tipo de retorno, siempre devolvemos una cadena
         // incluso si el archivo es privado
         return $url ?? "{$this->appUrl}/{$this->storageUri}/" . ltrim($relativePath, '/');
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -92,60 +92,60 @@ class DiskFileStorage implements FileStorageDriverContract
     {
         return file_exists($this->normalizePath($path));
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function get(string $path): mixed
     {
         $fullPath = $this->normalizePath($path);
-        
+
         if (!file_exists($fullPath)) {
             return null;
         }
-        
+
         return file_get_contents($fullPath);
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function delete(string $path): bool
     {
         $fullPath = $this->normalizePath($path);
-        
+
         if (!file_exists($fullPath)) {
             return false;
         }
-        
+
         return unlink($fullPath);
     }
-      /**
+    /**
      * {@inheritdoc}
      */
     public function files(?string $directory = null): array
     {
         $directory = is_null($directory) ? $this->storageDirectory : $this->normalizePath($directory);
-        
+
         if (!is_dir($directory)) {
             return [];
         }
-        
+
         $files = [];
-        
+
         // If root directory, search recursively
         if ($directory === $this->storageDirectory) {
             $iterator = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
                 \RecursiveIteratorIterator::SELF_FIRST
             );
-            
+
             foreach ($iterator as $item) {
                 if ($item->isFile()) {
                     // Normalize path separators to forward slashes
                     $pathname = str_replace('\\', '/', $item->getPathname());
                     $storagePath = str_replace('\\', '/', $this->storageDirectory);
-                    
+
                     // Remove the storage directory prefix to get the relative path
                     // Add trailing slash to ensure we only replace at the beginning
                     $files[] = str_replace($storagePath . '/', '', $pathname);
@@ -154,44 +154,44 @@ class DiskFileStorage implements FileStorageDriverContract
         } else {
             // For specified directory, just list files in that directory
             $items = scandir($directory);
-            
+
             foreach ($items as $item) {
                 if ($item === '.' || $item === '..') {
                     continue;
                 }
-                
+
                 $path = $directory . '/' . $item;
-                
+
                 if (is_file($path)) {
                     $files[] = $item;
                 }
             }
         }
-        
+
         return $files;
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function directories(?string $directory = null): array
     {
         $directory = is_null($directory) ? $this->storageDirectory : $this->normalizePath($directory);
-        
+
         if (!is_dir($directory)) {
             return [];
         }
-        
+
         $directories = [];
         $items = scandir($directory);
-        
+
         foreach ($items as $item) {
             if ($item === '.' || $item === '..') {
                 continue;
             }
-            
+
             $path = $directory . '/' . $item;
-            
+
             if (is_dir($path)) {
                 if ($directory === $this->storageDirectory) {
                     // For root directory, include relative path
@@ -203,10 +203,10 @@ class DiskFileStorage implements FileStorageDriverContract
                 }
             }
         }
-        
+
         return $directories;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -214,7 +214,7 @@ class DiskFileStorage implements FileStorageDriverContract
     {
         return filesize($this->normalizePath($path));
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -222,7 +222,7 @@ class DiskFileStorage implements FileStorageDriverContract
     {
         return filemtime($this->normalizePath($path));
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -238,26 +238,26 @@ class DiskFileStorage implements FileStorageDriverContract
     public function getVisibility(string $path): string
     {
         $path = $this->normalizePath($path);
-        
+
         // Use the tracked visibility if available
         if (isset($this->visibilityMap[$path])) {
             return $this->visibilityMap[$path];
         }
-        
+
         $permissions = fileperms($path);
-        
+
         if (!$permissions) {
             return $this->defaultVisibility;
         }
-        
+
         // Check if the file is readable by others (world-readable)
         // File permissions in octal: 0644 (public) vs 0600 (private)
         // We check the last digit (4) which means world-readable
         $worldReadable = ($permissions & 0x0004) !== 0;
-        
+
         return $worldReadable ? 'public' : 'private';
     }
-    
+
     /**
      * Set the visibility of a file.
      *
@@ -268,15 +268,15 @@ class DiskFileStorage implements FileStorageDriverContract
     public function setVisibility(string $path, string $visibility): bool
     {
         $path = $this->normalizePath($path);
-        
+
         // Default permissions: 0644 for public, 0600 for private
         $permissions = $visibility === 'public' ? 0644 : 0600;
-        
+
         $this->visibilityMap[$path] = $visibility;
-        
+
         return chmod($path, $permissions);
     }
-    
+
     /**
      * Get the URL of a file.
      *
@@ -288,10 +288,10 @@ class DiskFileStorage implements FileStorageDriverContract
         if ($this->getVisibility($this->normalizePath($path)) !== 'public') {
             return null;
         }
-        
+
         return "{$this->appUrl}/{$this->storageUri}/" . ltrim($path, '/');
     }
-    
+
     /**
      * Get the absolute path of a file.
      *
@@ -302,7 +302,7 @@ class DiskFileStorage implements FileStorageDriverContract
     {
         return $this->normalizePath($path);
     }
-    
+
     /**
      * Normalizes a path, adding the storage directory if needed.
      *
@@ -314,10 +314,10 @@ class DiskFileStorage implements FileStorageDriverContract
         if (str_starts_with($path, $this->storageDirectory)) {
             return $path;
         }
-        
+
         return $this->storageDirectory . '/' . ltrim($path, '/');
     }
-    
+
     /**
      * Ensures that a directory exists, creating it if necessary.
      *
@@ -342,7 +342,7 @@ class DiskFileStorage implements FileStorageDriverContract
         $path = $this->normalizePath($path);
         return is_dir($path) || mkdir($path, 0755, true);
     }
-    
+
     /**
      * Delete a directory.
      *
@@ -353,22 +353,22 @@ class DiskFileStorage implements FileStorageDriverContract
     public function deleteDirectory(string $directory, bool $recursive = false): bool
     {
         $directory = $this->normalizePath($directory);
-        
+
         if (!is_dir($directory)) {
             return false;
         }
-        
+
         if (!$recursive) {
             // Only delete if empty
             return $this->directoryIsEmpty($directory) && rmdir($directory);
         }
-        
+
         // Delete all contents recursively
         $items = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
         );
-        
+
         foreach ($items as $item) {
             if ($item->isDir()) {
                 if (!rmdir($item->getPathname())) {
@@ -380,10 +380,10 @@ class DiskFileStorage implements FileStorageDriverContract
                 }
             }
         }
-        
+
         return rmdir($directory);
     }
-    
+
     /**
      * Determine if a directory is empty.
      *
@@ -393,11 +393,11 @@ class DiskFileStorage implements FileStorageDriverContract
     public function directoryIsEmpty(string $directory): bool
     {
         $directory = $this->normalizePath($directory);
-        
+
         if (!is_dir($directory)) {
             return false;
         }
-        
+
         $handle = opendir($directory);
         while (($entry = readdir($handle)) !== false) {
             if ($entry != "." && $entry != "..") {
@@ -406,10 +406,10 @@ class DiskFileStorage implements FileStorageDriverContract
             }
         }
         closedir($handle);
-        
+
         return true;
     }
-    
+
     /**
      * Copy a file from one location to another.
      *
@@ -421,22 +421,22 @@ class DiskFileStorage implements FileStorageDriverContract
     {
         $from = $this->normalizePath($from);
         $to = $this->normalizePath($to);
-        
+
         if (!file_exists($from)) {
             return false;
         }
-        
+
         $this->ensureDirectoryExists(dirname($to));
-        
+
         if (copy($from, $to)) {
             // Copy visibility as well
             $permissions = fileperms($from);
             return chmod($to, $permissions);
         }
-        
+
         return false;
     }
-    
+
     /**
      * Move a file from one location to another.
      *
@@ -448,13 +448,13 @@ class DiskFileStorage implements FileStorageDriverContract
     {
         $from = $this->normalizePath($from);
         $to = $this->normalizePath($to);
-        
+
         if (!file_exists($from)) {
             return false;
         }
-        
+
         $this->ensureDirectoryExists(dirname($to));
-        
+
         return rename($from, $to);
     }
 }

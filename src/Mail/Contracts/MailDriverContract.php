@@ -15,7 +15,7 @@ interface MailDriverContract
      * @return self
      */
     public function setFrom(string $address, ?string $name = null): self;
-    
+
     /**
      * Establece el destinatario del email
      *
@@ -24,7 +24,7 @@ interface MailDriverContract
      * @return self
      */
     public function setTo(string $address, ?string $name = null): self;
-    
+
     /**
      * Añade un destinatario en copia (CC)
      *
@@ -33,7 +33,7 @@ interface MailDriverContract
      * @return self
      */
     public function addCC(string $address, ?string $name = null): self;
-    
+
     /**
      * Añade un destinatario en copia oculta (BCC)
      *
@@ -42,7 +42,7 @@ interface MailDriverContract
      * @return self
      */
     public function addBCC(string $address, ?string $name = null): self;
-    
+
     /**
      * Establece el asunto del email
      *
@@ -50,7 +50,7 @@ interface MailDriverContract
      * @return self
      */
     public function setSubject(string $subject): self;
-    
+
     /**
      * Establece el cuerpo HTML del email
      *
@@ -58,7 +58,7 @@ interface MailDriverContract
      * @return self
      */
     public function setHtmlBody(string $body): self;
-    
+
     /**
      * Establece el cuerpo de texto plano del email
      *
@@ -66,7 +66,7 @@ interface MailDriverContract
      * @return self
      */
     public function setTextBody(string $body): self;
-    
+
     /**
      * Añade un archivo adjunto al email
      *
@@ -75,7 +75,7 @@ interface MailDriverContract
      * @return self
      */
     public function addAttachment(string $path, ?string $name = null): self;
-    
+
     /**
      * Añade un archivo adjunto desde una cadena de datos
      *
@@ -85,14 +85,14 @@ interface MailDriverContract
      * @return self
      */
     public function addStringAttachment(string $content, string $name, ?string $mimeType = null): self;
-    
+
     /**
      * Envía el email
      *
      * @return bool True si el email se envió correctamente, False en caso contrario
      */
     public function send(): bool;
-    
+
     /**
      * Reinicia el objeto de email para un nuevo envío
      *

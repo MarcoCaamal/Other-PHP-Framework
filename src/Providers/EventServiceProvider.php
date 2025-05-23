@@ -17,14 +17,14 @@ class EventServiceProvider extends ServiceProvider
 {
     /**
      * List of default event listeners to register
-     * 
+     *
      * Override this property in child classes to register app-specific listeners
      *
      * @var array<string, array<ListenerContract|callable>>
      */
     protected array $listen = [];    /**
      * Proporciona definiciones para el contenedor antes de su compilación
-     * 
+     *
      * @return array
      */
     public function getDefinitions(): array
@@ -71,10 +71,10 @@ class EventServiceProvider extends ServiceProvider
             }
         }
     }
-    
+
     /**
      * Register the default subscribers specified in the configuration file
-     * 
+     *
      * @param EventDispatcherContract $dispatcher
      * @return void
      */
@@ -82,12 +82,12 @@ class EventServiceProvider extends ServiceProvider
     {
         // Get the list of subscribers from the configuration
         $subscribers = config('events.subscribers', []);
-        
+
         foreach ($subscribers as $subscriber) {
             if (class_exists($subscriber)) {
                 // Use the container to instantiate the subscriber
                 $instance = $container->make($subscriber);
-                
+
                 if ($instance instanceof EventSubscriberContract) {
                     // Register listeners using the subscribe method
                     $instance->subscribe($dispatcher);
@@ -98,7 +98,7 @@ class EventServiceProvider extends ServiceProvider
 
     /**
      * Configure event logging if enabled
-     *  
+     *
      * @param EventDispatcherContract $dispatcher
      * @param Container $container
      * @return void
@@ -113,16 +113,16 @@ class EventServiceProvider extends ServiceProvider
         if (!$enableEventLogging) {
             return;
         }
-        
+
         // Get excluded events from config
         $excludedEvents = config('logging.event_logging.excluded_events', config('events.log_exclude', []));
-        
+
         // Create the event log handler
         $eventLogHandler = new EventLogHandler($excludedEvents);
-        
+
         // Get the logger
         $logger = $container->get(LoggerContract::class);
-        
+
         // Register a listener for all events
         $dispatcher->listen('*', function ($event, ?string $eventName = null) use ($eventLogHandler, $logger) {
             // If event name is not provided as second argument, it might be in the first parameter
@@ -130,12 +130,12 @@ class EventServiceProvider extends ServiceProvider
                 $eventName = $event;
                 $event = null;
             }
-            
+
             if (!is_string($eventName)) {
                 $logger->warning('Invalid event format received in event logger');
                 return;
             }
-            
+
             $eventLogHandler->handleEvent($eventName, $event, $logger);
         });
     }

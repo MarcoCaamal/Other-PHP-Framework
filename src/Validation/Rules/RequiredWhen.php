@@ -24,7 +24,7 @@ class RequiredWhen implements ValidationRuleContract
      */
     public function isValid(string $field, array $data): bool
     {
-        if(!array_key_exists($this->otherField, $data)) {
+        if (!array_key_exists($this->otherField, $data)) {
             return false;
         }
 

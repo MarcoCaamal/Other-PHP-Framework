@@ -18,11 +18,11 @@ class Config
      */
     public function loadFromDirectory(string $path, string|array|null $exclude = null)
     {
-        foreach(glob("$path/*.php") as $config) {
+        foreach (glob("$path/*.php") as $config) {
             if (is_array($exclude) && in_array(basename($config), $exclude)) {
                 continue;
             }
-            if(is_string($exclude) && $exclude === basename($config)) {
+            if (is_string($exclude) && $exclude === basename($config)) {
                 continue;
             }
             $key = explode('.', basename($config))[0];

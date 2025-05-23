@@ -13,7 +13,7 @@ interface ViewContract
      * @return string Rendered content
      */
     public function render(string $view, array $params = [], $layout = null): string;
-    
+
     /**
      * Render a view file
      *
@@ -22,7 +22,7 @@ interface ViewContract
      * @return string Rendered content
      */
     public function renderView(string $view, array $params = []);
-    
+
     /**
      * Render a layout file
      *
@@ -30,7 +30,7 @@ interface ViewContract
      * @return string Rendered layout
      */
     public function renderLayout(string $layout): string;
-    
+
     /**
      * Set default layout
      *
@@ -38,7 +38,7 @@ interface ViewContract
      * @return self
      */
     public function setDefaultLayout(string $layout): self;
-    
+
     /**
      * Set content annotation marker
      *
@@ -46,7 +46,7 @@ interface ViewContract
      * @return self
      */
     public function setContentAnnotation(string $annotation): self;
-    
+
     /**
      * Set cache configuration
      *
@@ -55,7 +55,7 @@ interface ViewContract
      * @return self
      */
     public function setCache(bool $enabled, string $path = ''): self;
-    
+
     /**
      * Set auto-escaping configuration
      *
@@ -63,7 +63,7 @@ interface ViewContract
      * @return self
      */
     public function setAutoEscape(bool $enabled): self;
-    
+
     /**
      * Start a new section
      *
@@ -71,14 +71,14 @@ interface ViewContract
      * @return void
      */
     public function startSection(string $name): void;
-    
+
     /**
      * End the current section
      *
      * @return void
      */
     public function endSection(): void;
-    
+
     /**
      * Yield a section's content
      *
@@ -87,7 +87,7 @@ interface ViewContract
      * @return string
      */
     public function yieldSection(string $name, string $default = ''): string;
-    
+
     /**
      * Include another view within current view
      *
@@ -96,7 +96,7 @@ interface ViewContract
      * @return string
      */
     public function include(string $view, array $params = []): string;
-    
+
     /**
      * Escape HTML special characters
      *

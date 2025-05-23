@@ -18,7 +18,7 @@ class LocalFileStorage extends DiskFileStorage
     public function __construct(string $storageDirectory)
     {
         parent::__construct(
-            $storageDirectory, 
+            $storageDirectory,
             '', // storageUri not needed for local storage
             '', // appUrl not needed for local storage
             'private' // Default visibility is private
@@ -33,7 +33,7 @@ class LocalFileStorage extends DiskFileStorage
         // Local storage has no URL access
         return null;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -41,16 +41,16 @@ class LocalFileStorage extends DiskFileStorage
     {
         $path = $this->normalizePath($path);
         $this->ensureDirectoryExists(dirname($path));
-        
+
         file_put_contents($path, $content);
-        
+
         // Set visibility if provided, otherwise use private
         $this->setVisibility($path, $visibility ?? 'private');
-        
+
         // Return the path instead of URL for local storage
         return str_replace($this->storageDirectory . '/', '', $path);
     }
-    
+
     /**
      * {@inheritdoc}
      * Override to always return 'private' for LocalFileStorage

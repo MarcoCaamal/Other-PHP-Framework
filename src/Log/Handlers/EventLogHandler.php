@@ -10,7 +10,7 @@ use Monolog\LogRecord;
 
 /**
  * Event Log Handler
- * 
+ *
  * A specialized log handler for events in the system
  */
 class EventLogHandler
@@ -21,7 +21,7 @@ class EventLogHandler
      * @var array
      */
     protected array $excludedEvents = [];
-    
+
     /**
      * Create a new event log handler
      *
@@ -31,7 +31,7 @@ class EventLogHandler
     {
         $this->excludedEvents = $excludedEvents;
     }
-    
+
     /**
      * Handle an event by logging it
      *
@@ -46,7 +46,7 @@ class EventLogHandler
         if (in_array($eventName, $this->excludedEvents)) {
             return;
         }
-        
+
         try {
             // Check if the event is a valid EventContract
             if (!$event instanceof EventContract) {
@@ -54,13 +54,13 @@ class EventLogHandler
                     'event' => $eventName,
                     'type' => is_object($event) ? get_class($event) : gettype($event)
                 ]);
-                
+
                 // If it's null or not an object, just log the event name
                 if ($event === null || !is_object($event)) {
                     $logger->info("Event dispatched: {$eventName}");
                     return;
                 }
-                
+
                 // Try to extract data if the event is an object with getData method
                 if (is_object($event) && method_exists($event, 'getData')) {
                     try {
@@ -74,18 +74,18 @@ class EventLogHandler
                     }
                     return;
                 }
-                
+
                 // Just log the event name if no data can be extracted
                 $logger->info("Event dispatched: {$eventName}", ['event' => $eventName]);
                 return;
             }
-            
+
             // Get relevant event data for logging
             $context = [
                 'event' => $eventName,
                 'data' => $event->getData(),
             ];
-            
+
             // Log the event
             $logger->info("Event dispatched: {$eventName}", $context);
         } catch (\Throwable $e) {

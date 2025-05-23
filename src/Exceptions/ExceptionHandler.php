@@ -25,14 +25,14 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
         HttpNotFoundException::class,
         ValidationException::class,
     ];
-    
+
     /**
      * Custom exception handlers
      *
      * @var array<class-string<Throwable>, callable>
      */
     protected array $handlers = [];
-    
+
     /**
      * Report an exception
      *
@@ -44,10 +44,10 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
         if (!$this->shouldReport($e)) {
             return;
         }
-        
+
         // Determine log level based on exception type
         $level = $this->getLogLevel($e);
-        
+
         // Create context for the log
         $context = [
             'exception' => get_class($e),
@@ -56,7 +56,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
             'code' => $e->getCode(),
             'trace' => $e->getTraceAsString(),
         ];
-        
+
         // Log the exception using the logger
         try {
             if (function_exists('logMessage')) {
@@ -70,13 +70,13 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
             error_log("Failed to log exception: {$logException->getMessage()}");
             error_log("Original exception: {$e->getMessage()} in {$e->getFile()} on line {$e->getLine()}");
         }
-        
+
         // Check if this is a critical exception that needs notification
         if ($this->isCriticalException($e)) {
             $this->notifyCriticalException($e);
         }
     }
-    
+
     /**
      * Get the log level for the exception
      *
@@ -88,23 +88,23 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
         if ($e instanceof DatabaseException) {
             return 'error';
         }
-        
+
         if ($e instanceof HttpNotFoundException) {
             return 'notice';
         }
-        
+
         if ($e instanceof ValidationException) {
             return 'warning';
         }
-        
+
         // Check for critical exceptions (using string comparison to avoid direct dependency)
         if (strpos(get_class($e), 'CriticalException') !== false) {
             return 'critical';
         }
-        
+
         return 'error';
     }
-    
+
     /**
      * Determine if the exception is critical and needs immediate notification
      *
@@ -117,17 +117,17 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
         if (strpos(get_class($e), 'CriticalException') !== false) {
             return true;
         }
-        
+
         // Check for database exceptions that might be critical
         if ($e instanceof DatabaseException && $e->getCode() >= 1000) {
             return true;
         }
-        
+
         // Add any other conditions for critical exceptions
-        
+
         return false;
     }
-    
+
     /**
      * Send notifications for critical exceptions
      *
@@ -140,19 +140,19 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
         $channels = method_exists($e, 'getNotificationChannels')
             ? $e->getNotificationChannels()
             : config('exceptions.notifications.channels', ['log', 'email']);
-            
+
         // Format exception for notification
         $context = $this->formatExceptionForNotification($e);
-        
+
         // Process each notification channel
         foreach ($channels as $channel) {
             $this->sendNotification($channel, $context, $e);
         }
     }
-    
+
     /**
      * Format exception data for notifications
-     * 
+     *
      * @param Throwable $e
      * @return array
      */
@@ -160,7 +160,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
     {
         $env = env('APP_ENV', 'production');
         $appName = config('app.name', 'LightWeight Application');
-        
+
         return [
             'subject' => "[{$appName}] [{$env}] Exception: " . get_class($e),
             'message' => $e->getMessage(),
@@ -179,10 +179,10 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
             'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
         ];
     }
-    
+
     /**
      * Send a notification through the specified channel
-     * 
+     *
      * @param string $channel
      * @param array $context
      * @param Throwable $e
@@ -210,17 +210,17 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
             }
             return;
         }
-        
+
         // Email notifications
         if ($channel === 'email') {
             $to = config('exceptions.notifications.email.to', '');
-            
+
             if (empty($to)) {
                 return;
             }
-            
+
             $subject = $context['subject'];
-            
+
             // Build email body
             $body = "An exception occurred in your application.\n\n";
             $body .= "Exception: {$context['exception']}\n";
@@ -230,15 +230,15 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
             $body .= "Environment: {$context['environment']}\n";
             $body .= "Time: {$context['timestamp']}\n\n";
             $body .= "Stack Trace:\n{$context['trace']}\n";
-            
+
             // Send email
             mail($to, $subject, $body);
         }
-        
+
         // Other notification methods can be added here
         // as needed for slack, sms, etc.
     }
-    
+
     /**
      * Determine if the exception should be reported
      *
@@ -249,7 +249,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
     {
         return !$this->isInDontReportList($e);
     }
-    
+
     /**
      * Check if the exception is in the don't report list
      *
@@ -265,7 +265,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
         }
         return false;
     }
-    
+
     /**
      * Get the list of exceptions that should not be reported
      *
@@ -275,7 +275,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
     {
         return $this->dontReport;
     }
-    
+
     /**
      * Render a response for the given exception
      *
@@ -291,7 +291,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
                 return $handler($e, $request);
             }
         }
-        
+
         // If no custom handler, use default handling based on exception type
         return match(true) {
             $e instanceof HttpNotFoundException => $this->renderHttpNotFound($e),
@@ -300,7 +300,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
             default => $this->renderGenericException($e)
         };
     }
-    
+
     /**
      * Register exception type handler
      *
@@ -313,7 +313,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
         $this->handlers[$exceptionClass] = $handler;
         return $this;
     }
-    
+
     /**
      * Render a response for HttpNotFoundException
      *
@@ -331,7 +331,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
             throw new \RuntimeException("404 error template not found. Please make sure template files exist in templates/default/views/errors directory.");
         }
     }
-    
+
     /**
      * Render a response for ValidationException
      *
@@ -342,7 +342,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
     protected function renderValidationException(RequestContract $request, ValidationException $e): ResponseContract
     {
         $isApi = str_starts_with($request->uri(), '/api');
-        
+
         if ($isApi) {
             return Response::json([
                 'errors' => $e->errors(),
@@ -352,7 +352,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
             // For web requests, show validation error template and keep previous input in session
             session()->set('_errors', $e->errors());
             session()->set('_old', $request->data() ?? []);
-            
+
             try {
                 $view = config('exceptions.views.validation', 'errors.validation');
                 return Response::view($view, [
@@ -364,7 +364,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
             }
         }
     }
-    
+
     /**
      * Render a response for DatabaseException
      *
@@ -375,7 +375,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
     {
         try {
             $view = config('exceptions.views.database', 'errors.database');
-            
+
             if (config('exceptions.debug', false) == true) {
                 return Response::view($view, [
                     'message' => $e->getMessage(),
@@ -385,7 +385,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
                     'trace' => $e->getTrace()
                 ], false)->setStatus(500);
             }
-            
+
             return Response::view($view, [
                 'message' => 'A database error has occurred.'
             ], false)->setStatus(500);
@@ -394,7 +394,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
             throw new \RuntimeException("Database error template not found. Please make sure template files exist in templates/default/views/errors directory.");
         }
     }
-    
+
     /**
      * Render a response for generic exceptions
      *
@@ -405,7 +405,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
     {
         try {
             $view = config('exceptions.views.general', 'errors.application');
-            
+
             if (config('exceptions.debug', false) == true) {
                 return Response::view($view, [
                     'message' => $e->getMessage(),
@@ -415,7 +415,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
                     'trace' => $e->getTrace()
                 ], false)->setStatus(500);
             }
-            
+
             return Response::view($view, [
                 'message' => 'An unexpected error occurred.'
             ], false)->setStatus(500);
@@ -424,7 +424,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
             throw new \RuntimeException("Application error template not found. Please make sure template files exist in templates/default/views/errors directory.");
         }
     }
-    
+
     /**
      * Create a standardized response for an exception
      *
@@ -439,16 +439,16 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
             'error' => $e::class,
             'message' => $e->getMessage()
         ];
-        
+
         if (config('exceptions.debug', false) === true) {
             $data['file'] = $e->getFile();
             $data['line'] = $e->getLine();
             $data['trace'] = $e->getTrace();
         }
-        
+
         return Response::json($data)->setStatus($status);
     }
-    
+
     /**
      * Fallback logging when logger is not available
      *
@@ -459,17 +459,17 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
     protected function fallbackLog(Throwable $e, string $level): void
     {
         try {
-            $logPath = function_exists('storagePath') 
+            $logPath = function_exists('storagePath')
                 ? storagePath('logs/exceptions.log')
                 : (dirname(__DIR__, 3) . '/storage/logs/exceptions.log');
-                
+
             $logDir = dirname($logPath);
-            
+
             // Create log directory if it doesn't exist
             if (!is_dir($logDir)) {
                 mkdir($logDir, 0755, true);
             }
-            
+
             $timestamp = date('Y-m-d H:i:s');
             $message = sprintf(
                 "[%s] %s: %s in %s on line %d\n%s\n\n",
@@ -480,7 +480,7 @@ abstract class ExceptionHandler implements ExceptionHandlerContract
                 $e->getLine(),
                 $e->getTraceAsString()
             );
-            
+
             file_put_contents($logPath, $message, FILE_APPEND);
         } catch (\Throwable $fallbackException) {
             // Last resort - use PHP's error_log if everything else fails

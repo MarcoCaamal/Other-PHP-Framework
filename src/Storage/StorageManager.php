@@ -39,7 +39,7 @@ class StorageManager
             static::$drivers[$driver] = app(FileStorageDriverContract::class);
             return static::$drivers[$driver];
         }
-        
+
         // Check if we have a custom driver configuration
         $driverConfig = config("storage.drivers.{$driver}");
         if (!empty($driverConfig) && isset($driverConfig['driver']) && $driverConfig['driver'] === $driver) {

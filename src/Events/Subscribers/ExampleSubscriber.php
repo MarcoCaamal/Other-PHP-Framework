@@ -8,7 +8,7 @@ use LightWeight\Events\Contracts\EventSubscriberContract;
 
 /**
  * Ejemplo de suscriptor de eventos
- * 
+ *
  * Esta clase proporciona un ejemplo de cómo crear un suscriptor de eventos
  * que agrupa varios oyentes (listeners) relacionados.
  */
@@ -16,7 +16,7 @@ class ExampleSubscriber implements EventSubscriberContract
 {
     /**
      * Obtiene los eventos manejados por este suscriptor
-     * 
+     *
      * @return array<string, string> Mapa de eventos a métodos del manejador
      */
     public static function getSubscribedEvents(): array
@@ -26,7 +26,7 @@ class ExampleSubscriber implements EventSubscriberContract
             'application.terminating' => 'onApplicationTerminating'
         ];
     }
-    
+
     /**
      * Registra los oyentes para este suscriptor
      *
@@ -42,7 +42,7 @@ class ExampleSubscriber implements EventSubscriberContract
             });
         }
     }
-    
+
     /**
      * Manejador para cuando la aplicación termina de inicializarse
      *
@@ -53,10 +53,10 @@ class ExampleSubscriber implements EventSubscriberContract
     {
         // Por ejemplo, podríamos inicializar caches de aplicación aquí
         // o registrar recursos adicionales después del bootstrap
-        
+
         // Este método se ejecutará cuando se dispare el evento application.bootstrapped
     }
-    
+
     /**
      * Manejador para cuando la aplicación está terminando
      *
@@ -67,7 +67,7 @@ class ExampleSubscriber implements EventSubscriberContract
     {
         // Por ejemplo, podríamos realizar limpiezas finales aquí
         // o guardar estadísticas de la solicitud actual
-        
+
         // Este método se ejecutará cuando se dispare el evento application.terminating
     }
 }

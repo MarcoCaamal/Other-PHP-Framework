@@ -33,22 +33,22 @@ class ApiExceptionHandlerMiddlewareTest extends TestCase
                 ->setMethod($method instanceof HttpMethod ? $method : HttpMethod::from($method))
                 ->setQueryParameters($queryParams)
                 ->setPostData($postData);
-                
+
         // Set headers if provided
         foreach ($headers as $key => $value) {
             $request->setHeader($key, $value);
         }
-        
+
         return $request;
     }
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create mock exception handler
         $this->exceptionHandler = $this->createMock(ExceptionHandlerContract::class);
-        
+
         // Create middleware instance
         $this->middleware = new ApiExceptionHandlerMiddleware($this->exceptionHandler);
     }
@@ -57,18 +57,18 @@ class ApiExceptionHandlerMiddlewareTest extends TestCase
     {
         // Create a request
         $request = $this->createRequest('/api/test', HttpMethod::GET);
-        
+
         // Create a mock response for the next middleware
         $expectedResponse = Response::json(['success' => true]);
-        
+
         // Create a next middleware function that returns the expected response
         $next = function ($request) use ($expectedResponse) {
             return $expectedResponse;
         };
-        
+
         // Call the middleware
         $actualResponse = $this->middleware->handle($request, $next);
-        
+
         // Assert that the middleware returns the response from the next middleware
         $this->assertSame($expectedResponse, $actualResponse);
     }
@@ -78,32 +78,32 @@ class ApiExceptionHandlerMiddlewareTest extends TestCase
         // Create a mock exception
         $exception = new \Exception('Test exception');
         $requestMock = $this->createRequest('/api/test', HttpMethod::GET);
-        
+
         // Create a mock response for the rendered exception
         $expectedResponse = $this->createMock(ResponseContract::class);
         $expectedResponse->expects($this->once())
             ->method('setHeader')
             ->with('Content-Type', 'application/json')
             ->willReturnSelf();
-        
+
         // Configure exception handler expectations
         $this->exceptionHandler->expects($this->once())
             ->method('report')
             ->with($exception);
-            
+
         $this->exceptionHandler->expects($this->once())
             ->method('render')
             ->with($requestMock, $exception)
             ->willReturn($expectedResponse);
-        
+
         // Create a next middleware function that throws an exception
         $next = function ($request) use ($exception) {
             throw $exception;
         };
-        
+
         // Call the middleware
         $actualResponse = $this->middleware->handle($requestMock, $next);
-        
+
         // Assert that the middleware returns the response from the exception handler
         $this->assertSame($expectedResponse, $actualResponse);
     }

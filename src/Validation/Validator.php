@@ -19,27 +19,27 @@ class Validator
         $errors = [];
 
         foreach ($validationRules as $field => $rules) {
-            if(!is_array($rules)) {
+            if (!is_array($rules)) {
                 $rules = [$rules];
             }
             $fieldUnderValidationErrors = [];
             foreach ($rules as $rule) {
-                if(is_string($rule)) {
+                if (is_string($rule)) {
                     $rule = Rule::from($rule);
                 }
-                if(!$rule->isValid($field, $this->data)) {
+                if (!$rule->isValid($field, $this->data)) {
                     $message = $messages[$field][Rule::nameOf($rule)] ?? $rule->message();
                     $fieldUnderValidationErrors[Rule::nameOf($rule)] = $message;
                 }
             }
-            if(count($fieldUnderValidationErrors) > 0) {
+            if (count($fieldUnderValidationErrors) > 0) {
                 $errors[$field] = $fieldUnderValidationErrors;
             } else {
                 $validated[$field] = $this->data[$field] ?? null;
             }
         }
 
-        if(count($errors) > 0) {
+        if (count($errors) > 0) {
             throw new ValidationException($errors);
         }
 

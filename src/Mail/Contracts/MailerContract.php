@@ -17,7 +17,7 @@ interface MailerContract
      * @return bool True si el email se envió correctamente, False en caso contrario
      */
     public function send(string $to, string $subject, string $message, array $options = []): bool;
-    
+
     /**
      * Envía un email usando una plantilla
      *
@@ -29,14 +29,14 @@ interface MailerContract
      * @return bool True si el email se envió correctamente, False en caso contrario
      */
     public function sendTemplate(string $to, string $subject, string $template, array $data = [], array $options = []): bool;
-    
+
     /**
      * Obtiene el driver actual
      *
      * @return \LightWeight\Mail\Contracts\MailDriverContract
      */
     public function getDriver(): MailDriverContract;
-    
+
     /**
      * Establece el driver a utilizar
      *

@@ -6,7 +6,7 @@ use LightWeight\Database\ORM\Model;
 
 /**
  * HasMany relation
- * 
+ *
  * @template TRelatedModel of Model
  * @extends Relation<TRelatedModel>
  */
@@ -27,7 +27,7 @@ class HasMany extends Relation
         protected string $localKey
     ) {
         parent::__construct($query, $parent);
-        
+
         $this->query->where($this->foreignKey, '=', $this->parent->{$this->localKey});
     }
 
@@ -40,20 +40,20 @@ class HasMany extends Relation
     {
         return $this->query->get();
     }
-    
+
     /**
      * Get the foreign key of the relationship.
-     * 
+     *
      * @return string
      */
     public function getForeignKey(): string
     {
         return $this->foreignKey;
     }
-    
+
     /**
      * Get the local key of the relationship.
-     * 
+     *
      * @return string
      */
     public function getLocalKey(): string

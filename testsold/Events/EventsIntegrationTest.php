@@ -21,7 +21,7 @@ class EventsIntegrationTest extends TestCase
         // Mock App class para probar la integración
         $this->app = $this->createMock(Application::class);
         $this->app->events = singleton(EventDispatcherContract::class, EventDispatcher::class);
-        
+
         // Registrar la app en el contenedor para las funciones helper
         \LightWeight\Container\Container::getInstance()->set(Application::class, $this->app);
     }
@@ -51,7 +51,7 @@ class EventsIntegrationTest extends TestCase
 
         // Registrar listener para el evento de bootstrap
         $this->app->events->listen(
-            'application.bootstrapped', 
+            'application.bootstrapped',
             function (EventContract $event) use (&$eventReceived) {
                 $eventReceived = true;
                 $this->assertInstanceOf(ApplicationBootstrapped::class, $event);
@@ -76,7 +76,7 @@ class EventsIntegrationTest extends TestCase
 
         // Registrar listener para el evento de terminación
         $this->app->events->listen(
-            'application.terminating', 
+            'application.terminating',
             function (EventContract $event) use (&$eventReceived, &$responseData) {
                 $eventReceived = true;
                 $responseData = $event->getData()['response'] ?? null;
@@ -94,24 +94,24 @@ class EventsIntegrationTest extends TestCase
     public function testListenerClassIntegration(): void
     {
         // Crear una clase listener
-        $listener = new class implements ListenerContract {
+        $listener = new class () implements ListenerContract {
             public static $wasCalled = false;
-            
+
             public function handle(EventContract $event): void
             {
                 self::$wasCalled = true;
             }
         };
-        
+
         // Limpiar el estado estático
         $listener::$wasCalled = false;
-        
+
         // Registrar el listener usando la app directamente
         $this->app->events->listen('test.with.class', $listener);
-        
+
         // Disparar usando la función helper
         event('test.with.class');
-        
+
         // Verificar
         $this->assertTrue($listener::$wasCalled);
     }
@@ -121,14 +121,14 @@ class EventsIntegrationTest extends TestCase
         // Registrar algunos listeners
         on('event.to.forget', function () {});
         on('event.to.keep', function () {});
-        
+
         // Verificar que están registrados
         $this->assertTrue($this->app->events->hasListeners('event.to.forget'));
         $this->assertTrue($this->app->events->hasListeners('event.to.keep'));
-        
+
         // Olvidar uno específico
         forgetListeners('event.to.forget');
-        
+
         // Verificar que solo se olvidó el correcto
         $this->assertFalse($this->app->events->hasListeners('event.to.forget'));
         $this->assertTrue($this->app->events->hasListeners('event.to.keep'));

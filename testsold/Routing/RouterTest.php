@@ -8,7 +8,6 @@ use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\Http\Response;
 use PHPUnit\Framework\TestCase;
-
 use LightWeight\Server\ServerContract;
 use LightWeight\Http\HttpMethod;
 use LightWeight\Http\Request;

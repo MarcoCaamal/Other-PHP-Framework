@@ -27,7 +27,7 @@ class DependencyInjection
                 }
             } elseif ($param->getType()?->isBuiltin()) {
                 $resolved = $routeParameters[$param->getName()] ?? null;
-            } elseif($param->getType()?->getName() !== null) {
+            } elseif ($param->getType()?->getName() !== null) {
                 // Manejo especial para RequestContract (usar la implementación concreta Request)
                 if ($param->getType()?->getName() === 'LightWeight\\Http\\Contracts\\RequestContract') {
                     $resolved = app('LightWeight\\Http\\Request');

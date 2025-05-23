@@ -19,7 +19,7 @@ return [
     |
     | Here you may configure as many storage "drivers" as you wish. You may
     | even configure multiple drivers of the same type with different names.
-    | 
+    |
     | Supported drivers: "local", "public", "s3", "ftp", "disk" (alias for "local")
     |
     */
@@ -29,7 +29,7 @@ return [
             'path' => env('LOCAL_STORAGE_PATH', storagePath('app/private')),
             'visibility' => 'private',
         ],
-        
+
         'public' => [
             'driver' => 'public',
             'path' => env('PUBLIC_STORAGE_PATH', storagePath('app/public')),
@@ -37,7 +37,7 @@ return [
             'storage_uri' => env('PUBLIC_STORAGE_URI', 'uploads'),
             'visibility' => 'public',
         ],
-        
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -49,7 +49,7 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'visibility' => 'public',
         ],
-        
+
         'ftp' => [
             'driver' => 'ftp',
             'host' => env('FTP_HOST'),
@@ -73,7 +73,7 @@ return [
     |
     */
     'path' => storagePath(),
-    
+
     /*
     |--------------------------------------------------------------------------
     | Public URL and URI for Storage

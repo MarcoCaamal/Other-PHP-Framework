@@ -21,12 +21,12 @@ class ViewCreator
         // Parse view name and namespace if it contains backslashes
         $parts = explode('\\', $viewName);
         $baseName = array_pop($parts);
-        
+
         // If an explicit namespace is provided and our view name doesn't already have one
         if (!empty($namespace) && empty($parts)) {
             $parts = explode('\\', $namespace);
         }
-        
+
         // Ensure resources directory exists
         $resourcesDir = Application::$root . "/resources";
         if (!is_dir($resourcesDir)) {
@@ -35,7 +35,7 @@ class ViewCreator
                 return Command::FAILURE;
             }
         }
-        
+
         // Ensure views base directory exists
         $viewsBaseDir = "$resourcesDir/views";
         if (!is_dir($viewsBaseDir)) {
@@ -44,20 +44,20 @@ class ViewCreator
                 return Command::FAILURE;
             }
         }
-        
+
         // Create path including any namespace parts (for subdirectories)
         $namespaceDir = empty($parts) ? '' : '/'. strtolower(implode('/', $parts));
         $viewsDir = "$viewsBaseDir$namespaceDir/" . strtolower($baseName);
-        
+
         $output->writeln("<comment>Creating views in directory: $viewsDir</comment>");
-        
+
         if (!is_dir($viewsDir)) {
             if (!mkdir($viewsDir, 0755, true)) {
                 $output->writeln("<error>Could not create views directory: $viewsDir</error>");
                 return Command::FAILURE;
             }
         }
-        
+
         // Define the views to create
         $views = [
             'index' => 'view.index.template',
@@ -65,11 +65,11 @@ class ViewCreator
             'show' => 'view.show.template',
             'edit' => 'view.edit.template'
         ];
-        
+
         // Create the views
         foreach ($views as $viewFile => $templateFile) {
             $viewPath = "$viewsDir/$viewFile.php";
-            
+
             // Check if the view already exists
             if (file_exists($viewPath)) {
                 $output->writeln("<comment>The view already exists: $viewPath</comment>");
@@ -77,37 +77,37 @@ class ViewCreator
             }
             // Get view template
             $templatePath = dirname(__DIR__, 3) . "/templates/$templateFile";
-            
+
             if (!file_exists($templatePath)) {
                 $output->writeln("<comment>View template not found: $templateFile</comment>");
                 continue;
             }
-            
+
             $template = file_get_contents($templatePath);
-            
+
             // Replace values in the template
             $routePath = $this->getRoutePath($viewName);
             $template = str_replace("ControllerNameRoute", $routePath, $template);
             $template = str_replace("{{ title }}", $baseName, $template);
             $template = str_replace("<?php echo \$title; ?>", "<?php echo '$baseName'; ?>", $template);
             $template = str_replace("<?php echo \$id; ?>", "<?php echo \$id; ?>", $template);
-            
+
             // Save the view
             if (!file_put_contents($viewPath, $template)) {
                 $output->writeln("<error>Could not create the view: $viewPath</error>");
                 continue;
             }
-            
+
             $relativePath = str_replace(Application::$root, '', $viewPath);
             $output->writeln("<info>View created => $relativePath</info>");
         }
-        
+
         return Command::SUCCESS;
     }
-    
+
     /**
      * Get the route path for a controller
-     * 
+     *
      * @param string $controllerName Controller name
      * @return string
      */

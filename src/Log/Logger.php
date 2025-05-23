@@ -10,7 +10,7 @@ use LightWeight\Log\Contracts\LoggerContract;
 
 /**
  * Logger class for LightWeight framework
- * 
+ *
  * This class is a wrapper around Monolog to provide logging functionality
  * to the LightWeight framework
  */
@@ -51,13 +51,13 @@ class Logger implements LoggerContract
     protected function configureHandlers(array $config): void
     {
         $path = $config['path'] ?? storagePath('logs/lightweight.log');
-        
+
         // Create log directory if it doesn't exist
         $logDir = dirname($path);
         if (!is_dir($logDir)) {
             mkdir($logDir, 0755, true);
         }
-        
+
         $level = $this->getLogLevel($config['level'] ?? 'debug');
         $days = $config['days'] ?? 7;
         $bubble = $config['bubble'] ?? true;

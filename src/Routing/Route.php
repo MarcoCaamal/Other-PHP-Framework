@@ -117,20 +117,20 @@ class Route
         }, $middlewares);
         return $this;
     }
-    
+
     /**
      * Get all middleware groups for this route.
-     * 
+     *
      * @return array<string>
      */
     public function middlewareGroups(): array
     {
         return $this->middlewareGroups;
     }
-    
+
     /**
      * Set middleware groups for this route.
-     * 
+     *
      * @param array<string> $groups
      * @return self
      */
@@ -139,7 +139,7 @@ class Route
         $this->middlewareGroups = $groups;
         return $this;
     }
-    
+
     public function hasMiddlewares(): bool
     {
         return count($this->middlewares) > 0;
@@ -175,7 +175,7 @@ class Route
     }
     public static function load(string $routesDirectory)
     {
-        foreach(glob(pattern: "$routesDirectory/*.php") as $routes) {
+        foreach (glob(pattern: "$routesDirectory/*.php") as $routes) {
             require_once $routes;
         }
     }
@@ -197,9 +197,34 @@ class Route
     public static function put(string $uri, \Closure|array $action): Route
     {
         return app(\LightWeight\Routing\Router::class)->put($uri, $action);
-    }
-    public static function delete(string $uri, \Closure|array $action): Route
+    }    public static function delete(string $uri, \Closure|array $action): Route
     {
         return app(\LightWeight\Routing\Router::class)->delete($uri, $action);
+    }
+
+    /**
+     * Generate a URL for a named route
+     *
+     * @param string $name The name of the route
+     * @param array $parameters Route parameters to replace in the URI
+     * @return string|null The generated URL or null if route not found
+     */
+    public static function url(string $name, array $parameters = []): ?string
+    {
+        return app(\LightWeight\Routing\Router::class)->generateUrl($name, $parameters);
+    }
+
+    /**
+     * Generate an absolute URL for a named route
+     *
+     * @param string $name The name of the route
+     * @param array $parameters Route parameters to replace in the URI
+     * @param string|null $domain Optional domain to use
+     * @return string|null The generated absolute URL or null if route not found
+     */
+    public static function urlAbsolute(string $name, array $parameters = [], ?string $domain = null): ?string
+    {
+        $router = app(\LightWeight\Routing\Router::class);
+        return $router->generateAbsoluteUrl($name, $parameters, $domain);
     }
 }

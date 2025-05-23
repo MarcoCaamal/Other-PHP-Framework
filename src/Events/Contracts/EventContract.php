@@ -13,7 +13,7 @@ interface EventContract
      * @return string
      */
     public function getName(): string;
-    
+
     /**
      * Get event data. This can be any data that needs to be passed to listeners.
      *

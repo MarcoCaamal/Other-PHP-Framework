@@ -12,15 +12,15 @@ class ExceptionHandlerServiceProvider extends ServiceProvider
 {
     /**
      * Proporciona definiciones para el contenedor antes de su compilación
-     * 
+     *
      * @return array
      */
     public function getDefinitions(): array
     {
-        
+
         return [
             ExceptionHandlerContract::class => \DI\factory(function (\LightWeight\Config\Config $config) {
-                $exceptionHandler = $config->get('exceptions.handler',  null);
+                $exceptionHandler = $config->get('exceptions.handler', null);
                 if ($exceptionHandler === null) {
                     throw new \RuntimeException("Exception handler not configured");
                 }
@@ -28,7 +28,7 @@ class ExceptionHandlerServiceProvider extends ServiceProvider
             }),
         ];
     }
-    
+
     /**
      * Register the exception handler service
      *

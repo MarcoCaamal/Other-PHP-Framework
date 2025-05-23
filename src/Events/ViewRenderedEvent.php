@@ -16,7 +16,7 @@ class ViewRenderedEvent extends Event
     {
         return 'view.rendered';
     }
-    
+
     /**
      * Get the view name
      *
@@ -26,7 +26,7 @@ class ViewRenderedEvent extends Event
     {
         return $this->data['view'] ?? '';
     }
-    
+
     /**
      * Get the view parameters
      *
@@ -36,7 +36,7 @@ class ViewRenderedEvent extends Event
     {
         return $this->data['params'] ?? [];
     }
-    
+
     /**
      * Get the layout used (can be string, null, or false)
      *
@@ -46,7 +46,7 @@ class ViewRenderedEvent extends Event
     {
         return $this->data['layout'] ?? null;
     }
-    
+
     /**
      * Get the rendered content
      *

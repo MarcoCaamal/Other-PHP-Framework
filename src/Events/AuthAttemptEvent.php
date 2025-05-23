@@ -16,7 +16,7 @@ class AuthAttemptEvent extends Event
     {
         return 'auth.attempt';
     }
-    
+
     /**
      * Get the credentials used for the login attempt
      *
@@ -26,7 +26,7 @@ class AuthAttemptEvent extends Event
     {
         return $this->data['credentials'] ?? [];
     }
-    
+
     /**
      * Get whether the login attempt was successful
      *
@@ -36,7 +36,7 @@ class AuthAttemptEvent extends Event
     {
         return $this->data['successful'] ?? false;
     }
-    
+
     /**
      * Get whether this was a "remember me" login attempt
      *

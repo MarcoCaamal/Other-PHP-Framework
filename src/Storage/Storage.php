@@ -12,7 +12,7 @@ class Storage
 {
     /**
      * Get a storage driver instance or the default driver
-     * 
+     *
      * @param string|null $driver
      * @return FileStorageDriverContract
      */
@@ -20,7 +20,7 @@ class Storage
     {
         return StorageManager::driver($driver);
     }
-    
+
     /**
      * Put file in the storage directory.
      *
@@ -33,10 +33,10 @@ class Storage
     {
         return static::driver($driver)->put($path, $content);
     }
-    
+
     /**
      * Check if a file exists.
-     * 
+     *
      * @param string $path
      * @param string|null $driver
      * @return bool
@@ -45,10 +45,10 @@ class Storage
     {
         return static::driver($driver)->exists($path);
     }
-    
+
     /**
      * Get file content.
-     * 
+     *
      * @param string $path
      * @param string|null $driver
      * @return mixed
@@ -57,10 +57,10 @@ class Storage
     {
         return static::driver($driver)->get($path);
     }
-    
+
     /**
      * Delete a file.
-     * 
+     *
      * @param string $path
      * @param string|null $driver
      * @return bool
@@ -69,10 +69,10 @@ class Storage
     {
         return static::driver($driver)->delete($path);
     }
-    
+
     /**
      * Lists all files in a directory.
-     * 
+     *
      * @param string|null $directory
      * @param string|null $driver
      * @return array
@@ -81,10 +81,10 @@ class Storage
     {
         return static::driver($driver)->files($directory);
     }
-    
+
     /**
      * Lists all directories in a directory.
-     * 
+     *
      * @param string|null $directory
      * @param string|null $driver
      * @return array
@@ -93,7 +93,7 @@ class Storage
     {
         return static::driver($driver)->directories($directory);
     }
-    
+
     /**
      * Get file size in bytes.
      *
@@ -105,7 +105,7 @@ class Storage
     {
         return static::driver($driver)->size($path);
     }
-    
+
     /**
      * Get the file's last modification time.
      *
@@ -117,7 +117,7 @@ class Storage
     {
         return static::driver($driver)->lastModified($path);
     }
-    
+
     /**
      * Get file mime type.
      *
@@ -143,7 +143,7 @@ class Storage
     {
         return static::driver($driver)->put($path, $content, $visibility);
     }
-    
+
     /**
      * Store file as private.
      *
@@ -156,7 +156,7 @@ class Storage
     {
         return static::putWithVisibility($path, $content, 'private', $driver);
     }
-    
+
     /**
      * Store file as public.
      *
@@ -169,7 +169,7 @@ class Storage
     {
         return static::putWithVisibility($path, $content, 'public', $driver);
     }
-    
+
     /**
      * Get the URL of a file.
      *
@@ -181,7 +181,7 @@ class Storage
     {
         return static::driver($driver)->url($path);
     }
-    
+
     /**
      * Get the absolute path of a file.
      *
@@ -193,7 +193,7 @@ class Storage
     {
         return static::driver($driver)->path($path);
     }
-    
+
     /**
      * Get the visibility of a file.
      *
@@ -205,7 +205,7 @@ class Storage
     {
         return static::driver($driver)->getVisibility($path);
     }
-    
+
     /**
      * Set the visibility of a file.
      *
@@ -218,7 +218,7 @@ class Storage
     {
         return static::driver($driver)->setVisibility($path, $visibility);
     }
-    
+
     /**
      * Make a file public.
      *
@@ -230,7 +230,7 @@ class Storage
     {
         return static::setVisibility($path, 'public', $driver);
     }
-    
+
     /**
      * Make a file private.
      *
@@ -252,10 +252,10 @@ class Storage
      */
     public static function directoryIsEmpty(string $directory, ?string $driver = null): bool
     {
-        return count(static::files($directory, $driver)) === 0 && 
+        return count(static::files($directory, $driver)) === 0 &&
                count(static::directories($directory, $driver)) === 0;
     }
-    
+
     /**
      * Create a directory.
      *
@@ -268,7 +268,7 @@ class Storage
         $fullPath = static::driver($driver)->path($path);
         return is_dir($fullPath) || mkdir($fullPath, 0755, true);
     }
-    
+
     /**
      * Delete a directory.
      *
@@ -280,7 +280,7 @@ class Storage
     public static function deleteDirectory(string $directory, bool $recursive = false, ?string $driver = null): bool
     {
         $success = true;
-        
+
         if ($recursive) {
             // Delete all files in directory
             foreach (static::files($directory, $driver) as $file) {
@@ -288,7 +288,7 @@ class Storage
                     $success = false;
                 }
             }
-            
+
             // Delete all subdirectories
             foreach (static::directories($directory, $driver) as $dir) {
                 if (!static::deleteDirectory($directory . '/' . $dir, true, $driver)) {
@@ -301,83 +301,83 @@ class Storage
                 return false;
             }
         }
-        
+
         // Delete the directory itself
         $fullPath = static::driver($driver)->path($directory);
         return $success && (is_dir($fullPath) ? rmdir($fullPath) : true);
     }
-    
+
     /**
      * Copy a file from one location to another.
-     * 
+     *
      * @param string $from
      * @param string $to
      * @param string|null $fromDriver
-     * @param string|null $toDriver 
+     * @param string|null $toDriver
      * @return bool
      */
     public static function copy(
-        string $from, 
-        string $to, 
-        ?string $fromDriver = null, 
+        string $from,
+        string $to,
+        ?string $fromDriver = null,
         ?string $toDriver = null
     ): bool {
         $content = static::get($from, $fromDriver);
-        
+
         if ($content === null) {
             return false;
         }
-        
+
         $visibility = static::getVisibility($from, $fromDriver);
         static::putWithVisibility($to, $content, $visibility, $toDriver);
-        
+
         return true;
     }
-    
+
     /**
      * Move a file from one location to another.
-     * 
+     *
      * @param string $from
      * @param string $to
      * @param string|null $fromDriver
-     * @param string|null $toDriver 
+     * @param string|null $toDriver
      * @return bool
      */
     public static function move(
-        string $from, 
-        string $to, 
-        ?string $fromDriver = null, 
+        string $from,
+        string $to,
+        ?string $fromDriver = null,
         ?string $toDriver = null
     ): bool {
         // If same driver, try to use rename for better performance
         if ($fromDriver === $toDriver) {
             $fromPath = static::driver($fromDriver)->path($from);
             $toPath = static::driver($toDriver)->path($to);
-            
+
             // Ensure target directory exists
             $toDir = dirname($toPath);
             if (!is_dir($toDir)) {
                 mkdir($toDir, 0755, true);
             }
-            
+
             // Try to rename the file
             if (@rename($fromPath, $toPath)) {
                 return true;
             }
         }
-        
+
         // Fall back to copy and delete
         if (static::copy($from, $to, $fromDriver, $toDriver)) {
             return static::delete($from, $fromDriver);
         }
-        
+
         return false;
     }
 
     /**
      * Create a symbolic link from the target file to the link path.
      * This is particularly useful for making a private file accessible publicly.
-     * 
+     *
      * @param string $target Existing file path
      * @param string $link Path for the symbolic link
      * @param string|null $targetDriver Driver where the target file exists
@@ -385,20 +385,20 @@ class Storage
      * @return bool
      */
     public static function symlink(
-        string $target, 
-        string $link, 
+        string $target,
+        string $link,
         ?string $targetDriver = null,
         ?string $linkDriver = null
     ): bool {
         $targetPath = static::driver($targetDriver)->path($target);
         $linkPath = static::driver($linkDriver)->path($link);
-        
+
         // Ensure the directory for the link exists
         $linkDir = dirname($linkPath);
         if (!is_dir($linkDir)) {
             mkdir($linkDir, 0755, true);
         }
-        
+
         // Remove existing link or file if it exists
         if (file_exists($linkPath) || is_link($linkPath)) {
             if (is_link($linkPath)) {
@@ -407,13 +407,13 @@ class Storage
                 return false; // Don't overwrite a real file
             }
         }
-        
+
         return symlink($targetPath, $linkPath);
     }
-    
+
     /**
      * Check if a path is a symbolic link.
-     * 
+     *
      * @param string $path
      * @param string|null $driver
      * @return bool
@@ -422,10 +422,10 @@ class Storage
     {
         return is_link(static::driver($driver)->path($path));
     }
-    
+
     /**
      * Get the target of a symbolic link.
-     * 
+     *
      * @param string $path
      * @param string|null $driver
      * @return string|false

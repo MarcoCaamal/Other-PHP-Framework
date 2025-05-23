@@ -7,7 +7,7 @@ use LightWeight\Database\QueryBuilder\Builder;
 
 /**
  * Base class for all relation types
- * 
+ *
  * @template TRelatedModel of Model
  */
 abstract class Relation
@@ -21,7 +21,8 @@ abstract class Relation
     public function __construct(
         protected Builder $query,
         protected Model $parent
-    ) {}
+    ) {
+    }
 
     /**
      * Get the results of the relationship.
@@ -32,14 +33,14 @@ abstract class Relation
 
     /**
      * Get the foreign key of the relationship.
-     * 
+     *
      * @return string
      */
     abstract public function getForeignKey(): string;
-    
+
     /**
      * Get the local key of the relationship.
-     * 
+     *
      * @return string
      */
     abstract public function getLocalKey(): string;
@@ -63,7 +64,7 @@ abstract class Relation
     {
         return $this->parent;
     }
-    
+
     /**
      * Forward calls to the query builder.
      *
@@ -75,16 +76,16 @@ abstract class Relation
     {
         // Forward the call to the query builder
         $result = $this->query->$method(...$parameters);
-        
+
         // If the result is a query builder, return $this for chaining
         if ($result instanceof Builder) {
             return $this;
         }
-        
+
         // Otherwise return the result
         return $result;
     }
-    
+
     /**
      * Execute the query as a "select" statement.
      *
@@ -130,7 +131,7 @@ abstract class Relation
     public function where($column, $operator, $value, $boolean = 'AND')
     {
         $this->query->where($column, $operator, $value, $boolean);
-        
+
         return $this;
     }
 
@@ -145,7 +146,7 @@ abstract class Relation
     public function orWhere($column, $operator, $value)
     {
         $this->query->orWhere($column, $operator, $value);
-        
+
         return $this;
     }
 
@@ -164,7 +165,7 @@ abstract class Relation
         } elseif ($default) {
             return $default($this, $value) ?: $this;
         }
-        
+
         return $this;
     }
 
@@ -178,7 +179,7 @@ abstract class Relation
     public function orderBy($column, $direction = 'asc')
     {
         $this->query->orderBy($column, $direction);
-        
+
         return $this;
     }
 
@@ -191,7 +192,7 @@ abstract class Relation
     public function limit($value)
     {
         $this->query->limit($value);
-        
+
         return $this;
     }
 
@@ -204,7 +205,7 @@ abstract class Relation
     {
         return $this->query->getModel();
     }
-    
+
     /**
      * Add a where in condition to the query.
      *

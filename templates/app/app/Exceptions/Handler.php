@@ -23,7 +23,7 @@ class Handler extends BaseExceptionHandler
         \LightWeight\Validation\Exceptions\ValidationException::class,
         // Add application specific exceptions here
     ];
-    
+
     /**
      * Report an exception
      *
@@ -36,18 +36,18 @@ class Handler extends BaseExceptionHandler
         if (!$this->shouldReport($e)) {
             return;
         }
-        
+
         // Use application logging channel if configured
         $channel = config('exceptions.log.channel', 'daily');
-        
+
         // Log the exception with appropriate level based on exception type
         $severity = $this->getSeverityLevel($e);
         error_log("[$severity] " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
         error_log($e->getTraceAsString());
-        
+
         // You can integrate with more advanced logging systems here
     }
-    
+
     /**
      * Get the severity level for the exception
      *
@@ -59,18 +59,18 @@ class Handler extends BaseExceptionHandler
         if ($e instanceof \LightWeight\Database\Exceptions\DatabaseException) {
             return 'ERROR';
         }
-        
+
         if ($e instanceof \LightWeight\Http\HttpNotFoundException) {
             return 'NOTICE';
         }
-        
+
         // Default severity for unknown exceptions
         return 'WARNING';
     }
-    
+
     /**
      * Register custom exception handlers
-     * 
+     *
      * @return void
      */
     public function register(): void
@@ -88,13 +88,13 @@ class Handler extends BaseExceptionHandler
                         'trace' => $e->getTrace()
                     ])->setStatus(500);
                 }
-                
+
                 return Response::view('errors.application', [
                     'message' => $e->getMessage() ?: 'An application error has occurred.'
                 ])->setStatus(500);
             }
         );
-        
+
         // You can register more custom handlers here
     }
 }

@@ -20,7 +20,7 @@ class PublicFileStorage extends DiskFileStorage
     public function __construct(string $storageDirectory, string $storageUri, string $appUrl)
     {
         parent::__construct(
-            $storageDirectory, 
+            $storageDirectory,
             $storageUri,
             $appUrl,
             'public' // Default visibility is always public
@@ -35,7 +35,7 @@ class PublicFileStorage extends DiskFileStorage
         // Public storage always returns a URL regardless of visibility
         return "{$this->appUrl}/{$this->storageUri}/" . ltrim($path, '/');
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -43,12 +43,12 @@ class PublicFileStorage extends DiskFileStorage
     {
         $path = $this->normalizePath($path);
         $this->ensureDirectoryExists(dirname($path));
-        
+
         file_put_contents($path, $content);
-        
+
         // Always set to public regardless of requested visibility
         $this->setVisibility($path, 'public');
-        
+
         return $this->url(str_replace($this->storageDirectory . '/', '', $path));
     }
 }

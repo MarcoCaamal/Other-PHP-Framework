@@ -10,11 +10,11 @@ class PhpNativeSessionStorage implements SessionStorageContract
     public function start()
     {
         $isNew = !isset($_SESSION);
-        
+
         if (!session_start()) {
             throw new \RuntimeException("Failed starting session");
         }
-        
+
         // Dispatch session.started event
         try {
             if (function_exists('event')) {

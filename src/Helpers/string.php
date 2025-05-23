@@ -14,19 +14,19 @@ function snakeCase(string $str): string
 
         $character = $str[$i++];
 
-        if(ctype_upper($character)) {
-            if($last !== '_') {
+        if (ctype_upper($character)) {
+            if ($last !== '_') {
                 $snakeCased[] = '_';
             }
             $snakeCased[] = strtolower($character);
-        } elseif(ctype_lower($character)) {
+        } elseif (ctype_lower($character)) {
             $snakeCased[] = $character;
-        } elseif(in_array($character, $skip)) {
-            if($last !== '_') {
+        } elseif (in_array($character, $skip)) {
+            if ($last !== '_') {
                 $snakeCased[] = '_';
             }
 
-            while($i < strlen($str) && in_array($str[$i], $skip)) {
+            while ($i < strlen($str) && in_array($str[$i], $skip)) {
                 $i++;
             }
         }

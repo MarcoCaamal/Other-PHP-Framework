@@ -49,12 +49,12 @@ class Router
      * @param string $uri
      * @param \Closure $action
      * @return Route
-     */
-    protected function registerRoute(HttpMethod $method, string $uri, \Closure|array $action): Route
+     */    protected function registerRoute(HttpMethod $method, string $uri, \Closure|array $action): Route
     {
         $uriWithPrefix = rtrim(Route::$prefix ?? '', '/') . '/' . ltrim($uri, '/');
         $uriWithPrefix = '/' . trim($uriWithPrefix, '/');
         $route = new Route($uriWithPrefix, $action);
+        $this->verifyIfExistsRouteWithDuplicatedName($route);
         $this->routes[$method->value][] = $route;
         return $route;
     }
@@ -140,11 +140,89 @@ class Router
     public function getMiddlewareGroup(string $group): array
     {
         return $this->middlewareGroups[$group] ?? [];
+    }    /**
+     * Generate a URL for a named route
+     *
+     * @param string $name The name of the route
+     * @param array $parameters Route parameters to replace in the URI
+     * @return string|null The generated URL or null if route not found
+     * @throws \InvalidArgumentException If required parameters are missing
+     */
+    public function generateUrl(string $name, array $parameters = []): ?string
+    {
+        $route = $this->getRouteByName($name);
+
+        if (!$route) {
+            return null;
+        }
+
+        $uri = $route->uri();
+
+        // Extraer todos los parámetros requeridos de la ruta
+        preg_match_all('/\{([a-zA-Z0-9_-]+)\}/', $uri, $matches);
+
+        $requiredParams = $matches[1] ?? [];
+
+        // Verificar que todos los parámetros requeridos estén presentes
+        $missingParams = array_diff($requiredParams, array_keys($parameters));
+
+        if (count($missingParams) > 0) {
+            throw new \InvalidArgumentException(
+                "Missing required parameters for route '{$name}': " .
+                implode(', ', $missingParams)
+            );
+        }
+
+        // Replace route parameters with their values
+        foreach ($parameters as $key => $value) {
+            // Escapar cualquier regex en el valor
+            $value = is_string($value) || is_numeric($value) ? $value : (string)$value;
+            $uri = preg_replace('/\{' . preg_quote($key) . '\}/', $value, $uri);
+        }
+
+        return $uri;
+    }
+
+    /**
+     * Generate an absolute URL for a named route
+     *
+     * @param string $name The name of the route
+     * @param array $parameters Route parameters to replace in the URI
+     * @param string|null $domain Optional domain for the absolute URL
+     * @return string|null The generated absolute URL or null if route not found
+     * @throws \InvalidArgumentException If required parameters are missing
+     */
+    public function generateAbsoluteUrl(string $name, array $parameters = [], ?string $domain = null): ?string
+    {
+        $uri = $this->generateUrl($name, $parameters);
+
+        if (!$uri) {
+            return null;
+        }
+
+        try {
+            // Intentar obtener la configuración del dominio
+            $config = $this->container->get(\LightWeight\Config\Config::class);
+            $domain = $domain ?: $config->get('app.url', 'http://localhost');
+        } catch (\Throwable $th) {
+            // Si no se puede obtener la configuración, usar el dominio proporcionado o localhost
+            $domain = $domain ?: 'http://localhost';
+        }
+
+        // Asegurar que el dominio termina sin slash
+        $domain = rtrim($domain, '/');
+
+        // Asegurar que el URI comienza con slash
+        if (!str_starts_with($uri, '/')) {
+            $uri = '/' . $uri;
+        }
+
+        return $domain . $uri;
     }
 
     /**
      * Check if the router has any defined routes
-     * 
+     *
      * @return bool
      */
     public function isEmpty(): bool
@@ -154,7 +232,7 @@ class Router
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -164,12 +242,12 @@ class Router
         $request->setRoute($route);
         $action = $route->action();        // Recopilar todos los middlewares aplicables
         $middlewareInstances = array_map(
-            function($mw) {
+            function ($mw) {
                 if (is_string($mw)) {
                     return $this->container->make($mw); // Usar el contenedor inyectado para aprovechar la inyección de dependencias
                 }
                 return $mw;
-            }, 
+            },
             $this->globalMiddlewares
         );
 
@@ -178,8 +256,9 @@ class Router
 
         // Si hay middleware groups definidos en la ruta, añadirlos también
         if (method_exists($route, 'middlewareGroups') && !empty($route->middlewareGroups())) {
-            foreach ($route->middlewareGroups() as $groupName) {                $groupMiddlewares = array_map(
-                    function($mw) {
+            foreach ($route->middlewareGroups() as $groupName) {
+                $groupMiddlewares = array_map(
+                    function ($mw) {
                         if (is_string($mw)) {
                             return $this->container->make($mw); // Usar el contenedor inyectado para aprovechar la inyección de dependencias
                         }
@@ -189,7 +268,7 @@ class Router
                 );
                 $middlewareInstances = array_merge($middlewareInstances, $groupMiddlewares);
             }
-        }        if(is_array($action)) {
+        }        if (is_array($action)) {
             // Reemplazar el singleton helper con el container directamente
             if (!$this->container->has($action[0])) {
                 $this->container->set($action[0], \DI\autowire($action[0]));
@@ -199,7 +278,8 @@ class Router
             $middlewareInstances = array_merge($middlewareInstances, $controller->middlewares());
         }
 
-        if (!empty($middlewareInstances)) {            return $this->runMiddlewares(
+        if (!empty($middlewareInstances)) {
+            return $this->runMiddlewares(
                 $request,
                 $middlewareInstances,
                 function () use ($action, $request) {
@@ -220,7 +300,7 @@ class Router
                 }
             );
         }
-          // Sin middlewares, usa call directamente
+        // Sin middlewares, usa call directamente
         if (is_array($action)) {
             return $this->container->call([$action[0], $action[1]], [
                 'request' => $request,
@@ -244,11 +324,30 @@ class Router
             fn ($request) => $this->runMiddlewares($request, array_slice($middlewares, 1), $target)
         );
     }
+    /**
+     * Get a route by its name
+     *
+     * @param string $name The name of the route to find
+     * @return Route|null The route if found, null otherwise
+     */
+    public function getRouteByName(string $name): ?Route
+    {
+        foreach ($this->routes as $methodRoutes) {
+            foreach ($methodRoutes as $route) {
+                if ($route->name() === $name) {
+                    return $route;
+                }
+            }
+        }
+
+        return null;
+    }
+
     protected function verifyIfExistsRouteWithDuplicatedName(Route $newRoute)
     {
-        foreach($this->routes as $method) {
-            foreach($method as $route) {
-                if($route->name() === $newRoute->name() && $newRoute->name() !== null) {
+        foreach ($this->routes as $method) {
+            foreach ($method as $route) {
+                if ($route->name() === $newRoute->name() && $newRoute->name() !== null) {
                     throw new RouteDuplicatedNameException($newRoute->name() ?? '');
                 }
             }

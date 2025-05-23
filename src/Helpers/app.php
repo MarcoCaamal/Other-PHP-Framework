@@ -26,7 +26,7 @@ function app(string $class = Application::class)
 function singleton(string $class, string|callable|object|null $build = null)
 {
     $container = Container::getInstance();
-    if($container->has($class)) {
+    if ($container->has($class)) {
         return $container->get($class);
     }
     match(true) {
@@ -40,7 +40,7 @@ function singleton(string $class, string|callable|object|null $build = null)
 
 /**
  * Obtiene una nueva instancia (transient) del contenedor
- * 
+ *
  * @template T
  * @param class-string<T> $class
  * @return T

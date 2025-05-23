@@ -52,7 +52,7 @@ class Auth
         if ($successful && method_exists($authenticator, 'retrieveByCredentials')) {
             $user = $authenticator->retrieveByCredentials($credentials);
         }
-        
+
         // Evento final con resultado
         if (function_exists('event')) {
             event(new AuthAttemptEvent([

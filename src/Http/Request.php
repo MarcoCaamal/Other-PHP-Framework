@@ -56,7 +56,7 @@ class Request implements RequestContract
      * @var array<string, File>
      */
     protected array $files = [];
-    
+
     /**
      * Request attributes.
      *
@@ -70,56 +70,56 @@ class Request implements RequestContract
      * @var string
      */
     protected string $host = '';
-    
+
     /**
      * URL scheme (http/https)
      *
      * @var string
      */
     protected string $scheme = 'http';
-    
+
     /**
      * Port number
      *
      * @var int|null
      */
     protected ?int $port = null;
-    
+
     /**
      * User agent information
      *
      * @var string|null
      */
     protected ?string $userAgent = null;
-    
+
     /**
      * IP address of the client
      *
      * @var string|null
      */
     protected ?string $ip = null;
-    
+
     /**
      * Referer URL
      *
      * @var string|null
      */
     protected ?string $referer = null;
-    
+
     /**
      * Request content type
      *
      * @var string|null
      */
     protected ?string $contentType = null;
-    
+
     /**
      * Whether request is an AJAX request
      *
      * @var bool
      */
     protected bool $ajax = false;
-    
+
     /**
      * Raw request body content
      *
@@ -135,7 +135,7 @@ class Request implements RequestContract
         // Esta implementación se mantendrá vacía para permitir
         // la inicialización de la Request desde Factory methods
     }
-    
+
 
     /**
      * Get the request URI.
@@ -327,7 +327,7 @@ class Request implements RequestContract
         $validator = new Validator($this->data);
         return $validator->validate($rules, $messages);
     }
-    
+
     /**
      * Get an attribute value or default.
      *
@@ -339,7 +339,7 @@ class Request implements RequestContract
     {
         return $this->attributes[$key] ?? $default;
     }
-    
+
     /**
      * Add an attribute to the request.
      *
@@ -352,7 +352,7 @@ class Request implements RequestContract
         $this->attributes[$key] = $value;
         return $this;
     }
-    
+
     /**
      * Check if an attribute exists.
      *
@@ -363,7 +363,7 @@ class Request implements RequestContract
     {
         return isset($this->attributes[$key]);
     }
-    
+
     /**
      * Get all attributes.
      *
@@ -382,24 +382,24 @@ class Request implements RequestContract
     public function url(): string
     {
         $url = $this->scheme . '://' . $this->host;
-        
+
         // Add port if not standard
-        if ($this->port && !(($this->scheme === 'http' && $this->port === 80) || 
+        if ($this->port && !(($this->scheme === 'http' && $this->port === 80) ||
                            ($this->scheme === 'https' && $this->port === 443))) {
             $url .= ':' . $this->port;
         }
-        
+
         // Add URI
         $url .= '/' . ltrim($this->uri, '/');
-        
+
         // Add query string if exists
         if (!empty($this->query)) {
             $url .= '?' . http_build_query($this->query);
         }
-        
+
         return $url;
     }
-    
+
     /**
      * Get the URL without query string
      *
@@ -408,16 +408,16 @@ class Request implements RequestContract
     public function baseUrl(): string
     {
         $url = $this->scheme . '://' . $this->host;
-        
+
         // Add port if not standard
-        if ($this->port && !(($this->scheme === 'http' && $this->port === 80) || 
+        if ($this->port && !(($this->scheme === 'http' && $this->port === 80) ||
                            ($this->scheme === 'https' && $this->port === 443))) {
             $url .= ':' . $this->port;
         }
-        
+
         return $url;
     }
-    
+
     /**
      * Get the request path (URI without query string)
      *
@@ -427,7 +427,7 @@ class Request implements RequestContract
     {
         return '/' . ltrim($this->uri, '/');
     }
-    
+
     /**
      * Get the URL scheme (http or https)
      *
@@ -437,7 +437,7 @@ class Request implements RequestContract
     {
         return $this->scheme;
     }
-    
+
     /**
      * Check if the request is using HTTPS
      *
@@ -447,7 +447,7 @@ class Request implements RequestContract
     {
         return $this->scheme === 'https';
     }
-    
+
     /**
      * Get the host name
      *
@@ -457,7 +457,7 @@ class Request implements RequestContract
     {
         return $this->host;
     }
-    
+
     /**
      * Get the port number
      *
@@ -467,7 +467,7 @@ class Request implements RequestContract
     {
         return $this->port;
     }
-    
+
     /**
      * Get the client's IP address
      *
@@ -477,7 +477,7 @@ class Request implements RequestContract
     {
         return $this->ip;
     }
-    
+
     /**
      * Get the user agent string
      *
@@ -487,7 +487,7 @@ class Request implements RequestContract
     {
         return $this->userAgent;
     }
-    
+
     /**
      * Check if the request is an AJAX request
      *
@@ -497,7 +497,7 @@ class Request implements RequestContract
     {
         return $this->ajax;
     }
-    
+
     /**
      * Check if the request is expecting a JSON response
      *
@@ -505,10 +505,10 @@ class Request implements RequestContract
      */
     public function expectsJson(): bool
     {
-        return $this->headers('accept') && 
+        return $this->headers('accept') &&
                strpos($this->headers('accept'), 'application/json') !== false;
     }
-    
+
     /**
      * Get the raw request body content
      *
@@ -518,7 +518,7 @@ class Request implements RequestContract
     {
         return $this->content;
     }
-    
+
     /**
      * Get the request content type
      *
@@ -528,7 +528,7 @@ class Request implements RequestContract
     {
         return $this->contentType;
     }
-    
+
     /**
      * Check if the request is a specific content type
      *
@@ -539,7 +539,7 @@ class Request implements RequestContract
     {
         return $this->contentType && strpos($this->contentType, $type) !== false;
     }
-    
+
     /**
      * Get the referer URL
      *
@@ -549,7 +549,7 @@ class Request implements RequestContract
     {
         return $this->referer;
     }
-    
+
     /**
      * Set the scheme for this request
      *
@@ -561,7 +561,7 @@ class Request implements RequestContract
         $this->scheme = $scheme;
         return $this;
     }
-    
+
     /**
      * Set the host for this request
      *
@@ -573,7 +573,7 @@ class Request implements RequestContract
         $this->host = $host;
         return $this;
     }
-    
+
     /**
      * Set the port for this request
      *
@@ -585,7 +585,7 @@ class Request implements RequestContract
         $this->port = $port;
         return $this;
     }
-    
+
     /**
      * Set the client IP address
      *
@@ -597,7 +597,7 @@ class Request implements RequestContract
         $this->ip = $ip;
         return $this;
     }
-    
+
     /**
      * Set the user agent
      *
@@ -609,7 +609,7 @@ class Request implements RequestContract
         $this->userAgent = $userAgent;
         return $this;
     }
-    
+
     /**
      * Set the referer
      *
@@ -621,7 +621,7 @@ class Request implements RequestContract
         $this->referer = $referer;
         return $this;
     }
-    
+
     /**
      * Set whether this is an AJAX request
      *
@@ -633,7 +633,7 @@ class Request implements RequestContract
         $this->ajax = $ajax;
         return $this;
     }
-    
+
     /**
      * Set the raw request content
      *
@@ -645,7 +645,7 @@ class Request implements RequestContract
         $this->content = $content;
         return $this;
     }
-    
+
     /**
      * Set the content type
      *
@@ -657,7 +657,7 @@ class Request implements RequestContract
         $this->contentType = $contentType;
         return $this;
     }
-    
+
     /**
      * Check if the request has a specific input value
      *
@@ -668,7 +668,7 @@ class Request implements RequestContract
     {
         return isset($this->data[$key]) || isset($this->query[$key]);
     }
-    
+
     /**
      * Get a value from the combined input (POST data + query parameters)
      *
@@ -681,19 +681,19 @@ class Request implements RequestContract
         if ($key === null) {
             return array_merge($this->query, $this->data);
         }
-        
+
         // Check in POST data first, then query parameters
         if (isset($this->data[$key])) {
             return $this->data[$key];
         }
-        
+
         if (isset($this->query[$key])) {
             return $this->query[$key];
         }
-        
+
         return $default;
     }
-    
+
     /**
      * Get all inputs except specified ones
      *
@@ -703,14 +703,14 @@ class Request implements RequestContract
     public function except(array $keys): array
     {
         $inputData = $this->input();
-        
+
         foreach ($keys as $key) {
             unset($inputData[$key]);
         }
-        
+
         return $inputData;
     }
-    
+
     /**
      * Get only specified inputs
      *
@@ -721,16 +721,16 @@ class Request implements RequestContract
     {
         $results = [];
         $inputData = $this->input();
-        
+
         foreach ($keys as $key) {
             if (isset($inputData[$key])) {
                 $results[$key] = $inputData[$key];
             }
         }
-        
+
         return $results;
     }
-    
+
     /**
      * Check if the request is for a specific method
      *
@@ -741,7 +741,7 @@ class Request implements RequestContract
     {
         return $this->method === $method;
     }
-    
+
     /**
      * Check if the current request is a GET request
      *
@@ -751,7 +751,7 @@ class Request implements RequestContract
     {
         return $this->isMethod(HttpMethod::GET);
     }
-    
+
     /**
      * Check if the current request is a POST request
      *
@@ -761,7 +761,7 @@ class Request implements RequestContract
     {
         return $this->isMethod(HttpMethod::POST);
     }
-    
+
     /**
      * Check if the current request is a PUT request
      *
@@ -771,7 +771,7 @@ class Request implements RequestContract
     {
         return $this->isMethod(HttpMethod::PUT);
     }
-    
+
     /**
      * Check if the current request is a DELETE request
      *
@@ -781,7 +781,7 @@ class Request implements RequestContract
     {
         return $this->isMethod(HttpMethod::DELETE);
     }
-    
+
     /**
      * Check if the current request is a PATCH request
      *
@@ -791,7 +791,7 @@ class Request implements RequestContract
     {
         return $this->isMethod(HttpMethod::PATCH);
     }
-    
+
     /**
      * Check if the current request is an OPTIONS request
      *

@@ -15,14 +15,14 @@ class GenericEvent implements EventContract
      * @var string
      */
     protected string $name;
-    
+
     /**
      * Event data
      *
      * @var array
      */
     protected array $data;
-    
+
     /**
      * Constructor
      *
@@ -34,7 +34,7 @@ class GenericEvent implements EventContract
         $this->name = $name;
         $this->data = $data;
     }
-    
+
     /**
      * Get the name of the event
      *
@@ -44,7 +44,7 @@ class GenericEvent implements EventContract
     {
         return $this->name;
     }
-    
+
     /**
      * Get event data
      *

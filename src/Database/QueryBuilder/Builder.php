@@ -33,7 +33,6 @@ use LightWeight\Database\QueryBuilder\Exceptions\QueryBuilderException;
  */
 class Builder
 {
-
     /**
      * The relations that should be eager loaded.
      *
@@ -88,33 +87,33 @@ class Builder
     public function get(): array
     {
         $entities = $this->driver->get();
-        if($this->modelClass === null) {
+        if ($this->modelClass === null) {
             return $entities;
         }
         $models = [];
 
-        foreach($entities as $entity) {
+        foreach ($entities as $entity) {
             // Create a new instance of the model
             $model = new $this->modelClass();
-            
+
             // Set raw attributes directly, bypassing any fillable check
             $model->setRawAttributes($entity);
-            
+
             $models[] = $model;
         }
-        
+
         // Load eager relations if any
         if (!empty($this->eagerLoad) && !empty($models)) {
             $this->processEagerLoads($models);
         }
-        
+
         // withCount functionality removed
-        
+
         return $models;
     }
-    
+
     // countEagerRelations method removed
-    
+
     /**
      * Process eager loaded relationships for the models.
      *
@@ -126,11 +125,11 @@ class Builder
         // Primero procesamos las relaciones anidadas para separarlas
         $relations = [];
         $nested = [];
-        
+
         foreach ($this->eagerLoad as $name => $constraints) {
             // Check if the key is numeric (meaning no constraints) and get the actual relation name
             $relation = is_numeric($name) ? $constraints : $name;
-            
+
             // Si contiene un punto, es una relación anidada
             if (is_string($relation) && strpos($relation, '.') !== false) {
                 list($parent, $child) = explode('.', $relation, 2);
@@ -138,7 +137,7 @@ class Builder
                     $nested[$parent] = [];
                 }
                 $nested[$parent][] = $child;
-                
+
                 // Añadimos la relación padre si no existe
                 if (!in_array($parent, $relations)) {
                     $relations[] = $parent;
@@ -149,25 +148,25 @@ class Builder
                 }
             }
         }
-        
+
         // Ahora procesamos cada relación principal
         foreach ($relations as $relation) {
             // Skip if the relation method doesn't exist
             if (empty($models) || !method_exists($this->modelClass, $relation)) {
                 continue;
             }
-            
+
             try {
                 // Get a sample model to access the relation method
                 $sample = reset($models);
-                
+
                 // Get the relationship instance
                 $relationInstance = $sample->$relation();
-                
+
                 // Get all the keys from the models
                 $keys = [];
                 $localKey = $relationInstance->getLocalKey();
-                
+
                 // Collect keys from models
                 foreach ($models as $model) {
                     // Accedemos directamente a la propiedad sin usar isset
@@ -177,24 +176,24 @@ class Builder
                         $keys[] = $value;
                     }
                 }
-                
+
                 // Skip if no keys found
                 if (empty($keys)) {
                     continue;
                 }
-                
+
                 // Creamos un nuevo Builder limpio para evitar restricciones previas
                 $foreignKey = $relationInstance->getForeignKey();
-                
+
                 // Obtenemos una instancia del driver actual
                 $driverClass = get_class($this->driver);
                 $newDriver = new $driverClass($this->driver->getConnection());
-                
+
                 // Creamos un nuevo builder con el driver limpio
                 $newBuilder = new Builder($newDriver);
                 $newBuilder->setModelClass(get_class($relationInstance->getRelated()));
                 $newBuilder->table($relationInstance->getTable());
-                
+
                 // Comprobar si existe un callback para aplicar restricciones adicionales
                 $constraints = null;
                 foreach ($this->eagerLoad as $name => $constraint) {
@@ -203,16 +202,16 @@ class Builder
                         break;
                     }
                 }
-                
+
                 // Aplicar las restricciones adicionales si existen
                 if ($constraints) {
                     $constraints($newBuilder);
                 }
-                
+
                 // Use whereIn to get all related models efficiently
                 $relatedModels = $newBuilder->whereIn($foreignKey, array_unique($keys))->get();
-                
-                
+
+
                 // Group related models by their foreign key
                 $dictionary = [];
                 foreach ($relatedModels as $relatedModel) {
@@ -222,17 +221,17 @@ class Builder
                     } else {
                         $keyValue = $relatedModel->$foreignKey;
                     }
-                    
+
                     // Convertimos a string para asegurar que la comparación sea consistente
                     $keyValueString = (string)$keyValue;
-                    
+
                     if (!isset($dictionary[$keyValueString])) {
                         $dictionary[$keyValueString] = [];
                     }
-                    
+
                     $dictionary[$keyValueString][] = $relatedModel;
                 }
-                
+
                 // Match and set related models to their parents
                 foreach ($models as $model) {
                     // For BelongsTo we need the foreign key value from the parent
@@ -241,14 +240,14 @@ class Builder
                     } else {
                         $keyToMatch = $model->$localKey;
                     }
-                    
+
                     // Convertimos a string para asegurar que la comparación sea consistente
                     // ya que las claves de un array siempre son strings
                     $keyToMatchString = (string)$keyToMatch;
-                    
+
                     if (isset($dictionary[$keyToMatchString])) {
                         // If it's a HasOne or BelongsTo relation, take just the first item
-                        if ($relationInstance instanceof \LightWeight\Database\ORM\Relations\HasOne || 
+                        if ($relationInstance instanceof \LightWeight\Database\ORM\Relations\HasOne ||
                             $relationInstance instanceof \LightWeight\Database\ORM\Relations\BelongsTo) {
                             $model->setRelation($relation, $dictionary[$keyToMatchString][0]);
                         } else {
@@ -256,7 +255,7 @@ class Builder
                         }
                     } else {
                         // If no related models, set appropriate default value
-                        if ($relationInstance instanceof \LightWeight\Database\ORM\Relations\HasOne || 
+                        if ($relationInstance instanceof \LightWeight\Database\ORM\Relations\HasOne ||
                             $relationInstance instanceof \LightWeight\Database\ORM\Relations\BelongsTo) {
                             $model->setRelation($relation, null);
                         } else {
@@ -264,12 +263,12 @@ class Builder
                         }
                     }
                 }
-                
+
                 // Si hay relaciones anidadas para esta relación, las procesamos
                 if (isset($nested[$relation]) && !empty($nested[$relation])) {
                     // Obtenemos los modelos relacionados cargados para procesar sus relaciones anidadas
                     $nestedModels = [];
-                    
+
                     foreach ($models as $model) {
                         if (isset($model->getRelations()[$relation])) {
                             $related = $model->getRelations()[$relation];
@@ -277,28 +276,28 @@ class Builder
                                 foreach ($related as $relatedModel) {
                                     $nestedModels[] = $relatedModel;
                                 }
-                            } else if ($related !== null) {
+                            } elseif ($related !== null) {
                                 $nestedModels[] = $related;
                             }
                         }
                     }
-                    
+
                     // Si hay modelos anidados, cargamos sus relaciones
                     if (!empty($nestedModels)) {
                         // Creamos un nuevo Builder para la clase relacionada
                         $relatedClass = get_class(reset($nestedModels));
-                        
+
                         // Obtenemos una instancia del driver actual
                         $driverClass = get_class($this->driver);
                         $newDriver = new $driverClass($this->driver->getConnection());
-                        
+
                         // Creamos un nuevo builder con el driver limpio
                         $nestedBuilder = new Builder($newDriver);
                         $nestedBuilder->setModelClass($relatedClass);
-                        
+
                         // Configuramos las relaciones a cargar en el builder anidado
                         $nestedBuilder->eagerLoadRelations($nested[$relation]);
-                        
+
                         // Procesamos las relaciones anidadas
                         $nestedBuilder->processEagerLoads($nestedModels);
                     }
@@ -309,7 +308,7 @@ class Builder
             }
         }
     }
-    
+
     /**
      * Get first entity
      * @return ?TModel|array
@@ -317,19 +316,19 @@ class Builder
     public function first(): array|Model|null
     {
         $entity = $this->driver->first();
-        if($this->modelClass === null) {
+        if ($this->modelClass === null) {
             return $entity;
         }
-        if($entity === null) {
+        if ($entity === null) {
             return $entity;
         }
-        
+
         $model = new $this->modelClass();
         $model->setRawAttributes($entity);
-        
+
         return $model;
     }
-    
+
     /**
      * Set the relationships that should be eager loaded.
      *
@@ -353,12 +352,12 @@ class Builder
         $this->eagerCountRelations = $relations;
         return $this;
     }
-    
+
     // Métodos de eager loading ahora unificados en processEagerLoads
-    
+
     /**
      * Get the model instance.
-     * 
+     *
      * @return Model|null
      */
     public function getModel()
@@ -366,10 +365,10 @@ class Builder
         if ($this->modelClass === null) {
             return null;
         }
-        
+
         return new $this->modelClass();
     }
-    
+
     /**
      * Add a subselect expression to the query.
      *
@@ -382,14 +381,14 @@ class Builder
         try {
             // Create a new query builder for the subquery
             $subQuery = new self($this->driver);
-            
+
             // Apply the callback to configure the subquery
             $callback($subQuery);
-            
+
             // Get the SQL for the subquery if available
             if (method_exists($this->driver, 'subQuery')) {
                 $this->driver->subQuery(
-                    function($query) use ($subQuery, $callback) {
+                    function ($query) use ($subQuery, $callback) {
                         $callback($query);
                     },
                     $column
@@ -398,19 +397,19 @@ class Builder
                 // Fallback: Just execute the subquery and add a custom column
                 // This is not ideal but allows some basic functionality
                 $mainQuery = $this;
-                $this->driver->whereCallback(function($query) use ($mainQuery, $column, $callback) {
+                $this->driver->whereCallback(function ($query) use ($mainQuery, $column, $callback) {
                     // Try to implement a simplified version
                     $callback($mainQuery);
                 });
             }
-            
+
             return $this;
         } catch (\Exception $e) {
             // Log or handle the exception as appropriate
             throw new QueryBuilderException("Error adding subselect: " . $e->getMessage());
         }
     }
-    
+
     /**
      * Add a raw select expression to the query.
      *
@@ -428,7 +427,7 @@ class Builder
         }
         return $this;
     }
-    
+
     /**
      * Convert the query to a SQL string.
      *
@@ -449,7 +448,7 @@ class Builder
     {
         return $this->driver->count($column);
     }
-    
+
     /**
      * Add a where column constraint to the query.
      *
@@ -466,7 +465,7 @@ class Builder
         }
         return $this;
     }
-    
+
     /**
      * Reset the query builder state.
      * Clears all conditions, joins, orders, limits, etc.
@@ -478,10 +477,10 @@ class Builder
         if ($this->driver) {
             $this->driver->reset();
         }
-        
+
         $this->eagerLoad = [];
         // eagerCountRelations property removed
-        
+
         return $this;
     }
 }

@@ -19,7 +19,7 @@ class RouterMatched extends Event
     {
         return 'router.matched';
     }
-    
+
     /**
      * Get the matched route
      *
@@ -29,7 +29,7 @@ class RouterMatched extends Event
     {
         return $this->data['route'] ?? null;
     }
-    
+
     /**
      * Get the route URI
      *
@@ -39,7 +39,7 @@ class RouterMatched extends Event
     {
         return $this->data['uri'] ?? '';
     }
-    
+
     /**
      * Get the HTTP method
      *

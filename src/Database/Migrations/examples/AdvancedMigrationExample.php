@@ -19,11 +19,11 @@ return new class () implements MigrationContract {
             $table->enum('role', ['user', 'admin', 'editor'])->default('user');
             $table->integer('login_count')->default(0)->unsigned()->comment('Number of times user has logged in');
             $table->timestamps();
-            
+
             // Create indexes
             $table->index(['name', 'email'], 'name_email_idx');
         });
-        
+
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('title');
@@ -32,11 +32,11 @@ return new class () implements MigrationContract {
             $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
             $table->datetime('published_at')->nullable();
             $table->timestamps();
-            
+
             // Add foreign key
             $table->foreign('user_id')->references('id')->on('users');
         });
-        
+
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
             $table->text('content');
@@ -44,13 +44,13 @@ return new class () implements MigrationContract {
             $table->unsignedInteger('post_id');
             $table->boolean('approved')->default(false);
             $table->timestamps();
-            
+
             // Add foreign keys
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('post_id')->references('id')->on('posts');
         });
     }
-    
+
     public function down()
     {
         // Drop tables in reverse order due to foreign key constraints

@@ -20,11 +20,11 @@ class Schema
     {
         $blueprint = new Blueprint($table);
         $callback($blueprint);
-        
+
         // Execute the blueprint
         DB::statement($blueprint->toSql());
     }
-    
+
     /**
      * Rename a table
      *
@@ -36,7 +36,7 @@ class Schema
     {
         DB::statement("RENAME TABLE `$from` TO `$to`");
     }
-    
+
     /**
      * Drop a table if it exists
      *
@@ -58,7 +58,7 @@ class Schema
     {
         DB::statement("DROP TABLE $table");
     }
-    
+
     /**
      * Alter an existing table
      *
@@ -70,11 +70,11 @@ class Schema
     {
         $blueprint = new Blueprint($table, 'alter');
         $callback($blueprint);
-        
+
         // Execute the blueprint
         if ($blueprint->hasCommands()) {
             DB::statement($blueprint->toSql());
         }
     }
-    
+
 }

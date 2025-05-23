@@ -13,7 +13,7 @@ class UserEventSubscriber implements EventSubscriberContract
 {
     /**
      * Obtiene los eventos manejados por este suscriptor
-     * 
+     *
      * @return array<string, string>
      */
     public static function getSubscribedEvents(): array
@@ -24,10 +24,10 @@ class UserEventSubscriber implements EventSubscriberContract
             'user.logout' => 'onUserLogout'
         ];
     }
-    
+
     /**
      * Registrar los listeners para el suscriptor
-     * 
+     *
      * @param EventDispatcherContract $dispatcher
      * @return void
      */
@@ -36,19 +36,19 @@ class UserEventSubscriber implements EventSubscriberContract
         $dispatcher->listen('user.registered', function (EventContract $event) {
             $this->onUserRegistered($event);
         });
-        
+
         $dispatcher->listen('user.login', function (EventContract $event) {
             $this->onUserLogin($event);
         });
-        
+
         $dispatcher->listen('user.logout', function (EventContract $event) {
             $this->onUserLogout($event);
         });
     }
-    
+
     /**
      * Manejar el evento de registro de usuario
-     * 
+     *
      * @param EventContract $event
      * @return void
      */
@@ -61,10 +61,10 @@ class UserEventSubscriber implements EventSubscriberContract
             // Ejemplo: Actualizar estadísticas
         }
     }
-    
+
     /**
      * Manejar el evento de inicio de sesión
-     * 
+     *
      * @param EventContract $event
      * @return void
      */
@@ -77,10 +77,10 @@ class UserEventSubscriber implements EventSubscriberContract
             // Ejemplo: Detectar inicio de sesión sospechoso
         }
     }
-    
+
     /**
      * Manejar el evento de cierre de sesión
-     * 
+     *
      * @param EventContract $event
      * @return void
      */

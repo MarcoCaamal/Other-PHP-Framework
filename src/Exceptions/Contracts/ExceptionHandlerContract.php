@@ -18,7 +18,7 @@ interface ExceptionHandlerContract
      * @return void
      */
     public function report(Throwable $e): void;
-    
+
     /**
      * Render a response for an exception
      *
@@ -27,7 +27,7 @@ interface ExceptionHandlerContract
      * @return ResponseContract
      */
     public function render(RequestContract $request, Throwable $e): ResponseContract;
-    
+
     /**
      * Determine if the exception should be reported
      *
@@ -35,17 +35,17 @@ interface ExceptionHandlerContract
      * @return bool
      */
     public function shouldReport(Throwable $e): bool;
-    
+
     /**
      * Register custom exception handlers
-     * 
+     *
      * @return void
      */
     public function register(): void;
-    
+
     /**
      * Get a list of exception types that should not be reported
-     * 
+     *
      * @return array<class-string<Throwable>>
      */
     public function getDontReport(): array;

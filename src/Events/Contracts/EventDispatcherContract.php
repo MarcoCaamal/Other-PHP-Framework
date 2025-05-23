@@ -15,7 +15,7 @@ interface EventDispatcherContract
      * @return void
      */
     public function listen(string $eventName, ListenerContract|callable $listener): void;
-    
+
     /**
      * Dispatch an event
      *
@@ -24,7 +24,7 @@ interface EventDispatcherContract
      * @return void
      */
     public function dispatch(EventContract|string $event, array $payload = []): void;
-    
+
     /**
      * Remove all listeners for a specific event
      *
@@ -32,7 +32,7 @@ interface EventDispatcherContract
      * @return void
      */
     public function forget(?string $eventName = null): void;
-    
+
     /**
      * Check if an event has any registered listeners
      *

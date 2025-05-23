@@ -26,23 +26,23 @@ class MigrationCreator
                     return Command::FAILURE;
                 }
             }
-            
+
             if (!is_dir($migrationsDir)) {
                 if (!mkdir($migrationsDir, 0755, true)) {
                     $output->writeln("<error>Could not create migrations directory: $migrationsDir</error>");
                     return Command::FAILURE;
                 }
             }
-            
+
             // Use the Migrator class to create the migration
             $migrationName = "create_{$tableName}_table";
-            
+
             $migrator = app(\LightWeight\Database\Migrations\Migrator::class);
             $fileName = $migrator->make($migrationName);
-            
+
             $output->writeln("<info>Migration created => $fileName</info>");
             return Command::SUCCESS;
-            
+
         } catch (\Exception $e) {
             $output->writeln("<error>Error creating migration: " . $e->getMessage() . "</error>");
             return Command::FAILURE;

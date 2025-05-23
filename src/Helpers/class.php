@@ -9,7 +9,7 @@
 function class_basename($class): string
 {
     $class = is_object($class) ? get_class($class) : $class;
-    
+
     return basename(str_replace('\\', '/', $class));
 }
 
@@ -22,7 +22,7 @@ function class_basename($class): string
 function class_namespace($class): string
 {
     $class = is_object($class) ? get_class($class) : $class;
-    
+
     return trim(implode('\\', array_slice(explode('\\', $class), 0, -1)), '\\');
 }
 
@@ -36,7 +36,7 @@ function class_namespace($class): string
 function class_uses_trait($class, string $trait): bool
 {
     $uses = class_uses_recursive($class);
-    
+
     return in_array($trait, $uses);
 }
 

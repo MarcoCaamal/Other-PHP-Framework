@@ -2,7 +2,7 @@
 
 /**
  * Logging Configuration
- * 
+ *
  * This file defines the configuration for the logging system in the LightWeight framework.
  */
 
@@ -68,7 +68,7 @@ return [
             'level' => 'emergency',
         ],
     ],
-    
+
     /**
      * Event Logging Configuration
      *
@@ -79,7 +79,7 @@ return [
          * Enable event logging.
          */
         'enabled' => env('LOG_EVENTS', false),
-        
+
         /**
          * Events that should not be logged even when event logging is enabled.
          */

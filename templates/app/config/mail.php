@@ -14,7 +14,7 @@ return [
     |
     */
     'default' => env('MAIL_DRIVER', 'phpmailer'),
-    
+
     /*
     |--------------------------------------------------------------------------
     | Configuración del servidor SMTP
@@ -30,13 +30,13 @@ return [
     'username' => env('MAIL_USERNAME', ''),
     'password' => env('MAIL_PASSWORD', ''),
     'auth' => env('MAIL_AUTH', true),
-    
+
     /*
     |--------------------------------------------------------------------------
     | Configuración global del remitente
     |--------------------------------------------------------------------------
     |
-    | Puedes configurar la dirección de correo electrónico y el nombre que se 
+    | Puedes configurar la dirección de correo electrónico y el nombre que se
     | utilizará como remitente predeterminado para todos los correos enviados.
     |
     */
@@ -44,7 +44,7 @@ return [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | Opciones de depuración y registro
@@ -52,7 +52,7 @@ return [
     */
     'debug' => env('MAIL_DEBUG', 0),
     'log_channel' => env('MAIL_LOG_CHANNEL', 'stack'),
-    
+
     /*
     |--------------------------------------------------------------------------
     | Configuración de plantillas

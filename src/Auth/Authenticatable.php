@@ -22,7 +22,7 @@ class Authenticatable extends Model
     {
         app(AuthenticatorContract::class)->login($this, $remember);
     }
-    
+
     /**
      * Log the user out
      *
@@ -32,7 +32,7 @@ class Authenticatable extends Model
     {
         app(AuthenticatorContract::class)->logout($this);
     }
-    
+
     public function isAuthenticated()
     {
         app(AuthenticatorContract::class)->isAuthenticated($this);

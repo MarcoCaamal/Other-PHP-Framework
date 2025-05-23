@@ -16,7 +16,7 @@ interface FileStorageDriverContract
 
     /**
      * Check if a file exists.
-     * 
+     *
      * @param string $path
      * @return bool
      */
@@ -24,7 +24,7 @@ interface FileStorageDriverContract
 
     /**
      * Get file content.
-     * 
+     *
      * @param string $path
      * @return mixed
      */
@@ -32,7 +32,7 @@ interface FileStorageDriverContract
 
     /**
      * Delete a file.
-     * 
+     *
      * @param string $path
      * @return bool
      */
@@ -40,7 +40,7 @@ interface FileStorageDriverContract
 
     /**
      * Lists all files in a directory.
-     * 
+     *
      * @param string|null $directory
      * @return array
      */
@@ -48,12 +48,12 @@ interface FileStorageDriverContract
 
     /**
      * Lists all directories in a directory.
-     * 
+     *
      * @param string|null $directory
      * @return array
      */
     public function directories(?string $directory = null): array;
-    
+
     /**
      * Get file size in bytes.
      *
@@ -61,7 +61,7 @@ interface FileStorageDriverContract
      * @return int|false
      */
     public function size(string $path): int|false;
-    
+
     /**
      * Get the file's last modification time.
      *
@@ -69,7 +69,7 @@ interface FileStorageDriverContract
      * @return int|false
      */
     public function lastModified(string $path): int|false;
-    
+
     /**
      * Get file mime type.
      *
@@ -77,7 +77,7 @@ interface FileStorageDriverContract
      * @return string|false
      */
     public function mimeType(string $path): string|false;
-    
+
     /**
      * Get the visibility of a file.
      *
@@ -85,7 +85,7 @@ interface FileStorageDriverContract
      * @return string
      */
     public function getVisibility(string $path): string;
-    
+
     /**
      * Set the visibility of a file.
      *
@@ -94,7 +94,7 @@ interface FileStorageDriverContract
      * @return bool
      */
     public function setVisibility(string $path, string $visibility): bool;
-    
+
     /**
      * Get the URL of a file.
      *
@@ -102,7 +102,7 @@ interface FileStorageDriverContract
      * @return string|null
      */
     public function url(string $path): ?string;
-    
+
     /**
      * Get the absolute path of a file.
      *
@@ -118,7 +118,7 @@ interface FileStorageDriverContract
      * @return bool
      */
     public function makeDirectory(string $path): bool;
-    
+
     /**
      * Delete a directory.
      *
@@ -127,7 +127,7 @@ interface FileStorageDriverContract
      * @return bool
      */
     public function deleteDirectory(string $directory, bool $recursive = false): bool;
-    
+
     /**
      * Determine if a directory is empty.
      *
@@ -135,7 +135,7 @@ interface FileStorageDriverContract
      * @return bool
      */
     public function directoryIsEmpty(string $directory): bool;
-    
+
     /**
      * Copy a file from one location to another.
      *
@@ -144,7 +144,7 @@ interface FileStorageDriverContract
      * @return bool
      */
     public function copy(string $from, string $to): bool;
-    
+
     /**
      * Move a file from one location to another.
      *

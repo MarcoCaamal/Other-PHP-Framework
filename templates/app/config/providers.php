@@ -17,10 +17,10 @@ return [
         LightWeight\Providers\HasherServiceProvider::class,
         LightWeight\Providers\FileStorageDriverServiceProvider::class,
         LightWeight\Providers\MailServiceProvider::class,
-        
+
         // Servicios de eventos de aplicación
         App\Providers\AppEventServiceProvider::class,
-        
+
         // Servicios de aplicación
         App\Providers\RuleServiceProvider::class,
         App\Providers\RouteServiceProvider::class,

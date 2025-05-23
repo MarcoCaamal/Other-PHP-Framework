@@ -21,9 +21,9 @@ class ModelCreator
         $parts = explode('\\', $modelName);
         $className = array_pop($parts);
         $namespace = implode('\\', $parts);
-        
+
         $modelsDir = Application::$root . "/app/Models";
-        
+
         // Create models directory if it doesn't exist
         if (!is_dir($modelsDir)) {
             if (!mkdir($modelsDir, 0755, true)) {
@@ -31,11 +31,11 @@ class ModelCreator
                 return Command::FAILURE;
             }
         }
-          // Add the namespace path if it exists
+        // Add the namespace path if it exists
         $modelPath = $modelsDir;
         if (!empty($namespace)) {
             $modelPath .= '/' . str_replace('\\', '/', $namespace);
-            
+
             // Create subdirectories if they don't exist
             if (!is_dir($modelPath)) {
                 if (!mkdir($modelPath, 0755, true)) {
@@ -44,52 +44,52 @@ class ModelCreator
                 }
             }
         }
-        
+
         // Full path to the model file
         $modelFilePath = "$modelPath/$className.php";
-        
+
         // Check if the model already exists
         if (file_exists($modelFilePath)) {
             $output->writeln("<comment>The model already exists: $modelFilePath</comment>");
             return Command::SUCCESS;
         }
-          // Get model template
+        // Get model template
         $templatePath = dirname(__DIR__, 3) . "/templates/model.template";
-        
+
         if (!file_exists($templatePath)) {
             $output->writeln("<error>Model template not found</error>");
             return Command::FAILURE;
         }
-        
+
         $template = file_get_contents($templatePath);
-        
+
         // Replace the model name
         $template = str_replace("ModelName", $className, $template);
-        
+
         // Replace namespace if needed
         if (!empty($namespace)) {
             $template = str_replace("namespace App\\Models;", "namespace App\\Models\\$namespace;", $template);
         }
-        
+
         // Replace the table name
         $tableName = $this->getTableName($className);
         $template = str_replace("table_name", $tableName, $template);
-        
+
         // Save the model
         if (!file_put_contents($modelFilePath, $template)) {
             $output->writeln("<error>Could not create the model: $modelFilePath</error>");
             return Command::FAILURE;
         }
-        
+
         $relativePath = str_replace(Application::$root, '', $modelFilePath);
         $output->writeln("<info>Model created => $relativePath</info>");
-        
+
         return Command::SUCCESS;
     }
-    
+
     /**
      * Get the table name for a model
-     * 
+     *
      * @param string $input Model name
      * @return string
      */

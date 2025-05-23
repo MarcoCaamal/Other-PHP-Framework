@@ -12,22 +12,22 @@ class AuthenticatorServiceProvider extends ServiceProvider
 {
     /**
      * Proporciona definiciones para el contenedor antes de su compilación
-     * 
+     *
      * @return array
      */
     public function getDefinitions(): array
     {
         return [
             // Autenticador principal
-            AuthenticatorContract::class => \DI\factory(function(\LightWeight\Config\Config $config) {
+            AuthenticatorContract::class => \DI\factory(function (\LightWeight\Config\Config $config) {
                 return match($config->get('auth.method', 'session')) {
                     'session' => new SessionAuthenticator(),
                     default => throw new \RuntimeException("Authentication method not supported: " . $config->get('auth.method'))
                 };
             }),
-            
+
             // Servicio JWT
-            JWTServiceContract::class => \DI\factory(function(\LightWeight\Config\Config $config) {
+            JWTServiceContract::class => \DI\factory(function (\LightWeight\Config\Config $config) {
                 return new JWTService(
                     $config->get('auth.jwt_options.secret'),
                     $config->get('auth.jwt_options.digest_alg', 'HS256'),
@@ -37,7 +37,7 @@ class AuthenticatorServiceProvider extends ServiceProvider
             }),
         ];
     }
-    
+
     public function registerServices(Container $serviceContainer)
     {
         // Las definiciones ya están configuradas en getDefinitions()

@@ -10,7 +10,7 @@ class SessionStorageServiceProvider extends ServiceProvider
 {
     /**
      * Proporciona definiciones para el contenedor antes de su compilación
-     * 
+     *
      * @return array
      */
     public function getDefinitions(): array

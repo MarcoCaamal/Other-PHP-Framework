@@ -23,12 +23,12 @@ class Unique implements ValidationRuleContract
      */
     public function isValid(string $field, array $data): bool
     {
-        if(!isset($data[$field]) && $data[$field] == "") {
+        if (!isset($data[$field]) && $data[$field] == "") {
             return false;
         }
         $query = "SELECT COUNT(*) as count FROM {$this->table} WHERE {$this->column} = ?";
         $params = [$data[$field]];
-        if($this->exceptColumn != "" && $this->exceptValue != "") {
+        if ($this->exceptColumn != "" && $this->exceptValue != "") {
             $query .= " AND {$this->exceptColumn} != ?";
             $params[] = $this->exceptValue;
         }

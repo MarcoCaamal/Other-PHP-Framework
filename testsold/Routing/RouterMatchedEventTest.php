@@ -28,7 +28,7 @@ class RouterMatchedEventTest extends TestCase
         // Registrar el dispatcher de eventos
         $this->eventDispatcher = new EventDispatcher();
         $container->set(EventDispatcherContract::class, $this->eventDispatcher);
-        
+
         // Configurar la aplicación para que tenga una propiedad 'events'
         $app = new \LightWeight\Application();
         $app->events = $this->eventDispatcher;
@@ -36,7 +36,7 @@ class RouterMatchedEventTest extends TestCase
 
         // Configurar el router
         $this->router = new Router();
-        
+
         // Configurar un listener para el evento
         $this->eventDispatcher->listen('router.matched', function ($event) {
             $this->eventFired = true;
@@ -46,7 +46,7 @@ class RouterMatchedEventTest extends TestCase
                 'route' => $event->getRoute()
             ];
         });
-        
+
         // Crear una solicitud de prueba correctamente
         $this->request = new Request();
         $this->request->setUri('/test')
@@ -59,34 +59,34 @@ class RouterMatchedEventTest extends TestCase
         $this->router->get('/test', function () {
             return 'Test Route';
         });
-        
+
         // Resolver la ruta
         $route = $this->router->resolveRoute($this->request);
-        
+
         // Verificar que el evento se disparó
         $this->assertTrue($this->eventFired, 'El evento router.matched no fue disparado');
-        
+
         // Verificar que los datos del evento son correctos
         $this->assertEquals('/test', $this->eventData['uri']);
         $this->assertEquals('GET', $this->eventData['method']);
         $this->assertSame($route, $this->eventData['route']);
     }
-    
+
     public function testRouterMatchedEventContainsCorrectData(): void
     {
         // Crear una ruta con parámetros
         $this->router->get('/users/{id}', function ($id) {
             return "User $id";
         });
-        
+
         // Crear una solicitud para esa ruta correctamente
         $userRequest = new Request();
         $userRequest->setUri('/users/123')
                     ->setMethod(HttpMethod::GET);
-        
+
         // Resolver la ruta
         $route = $this->router->resolveRoute($userRequest);
-        
+
         // Verificar que el evento se disparó con los datos correctos
         $this->assertTrue($this->eventFired);
         $this->assertEquals('/users/123', $this->eventData['uri']);

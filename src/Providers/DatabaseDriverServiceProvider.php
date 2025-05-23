@@ -12,22 +12,22 @@ class DatabaseDriverServiceProvider extends ServiceProvider
 {
     /**
      * Proporciona definiciones para el contenedor antes de su compilación
-     * 
+     *
      * @return array
      */
     public function getDefinitions(): array
     {
         return [
             // Registrar el driver de base de datos
-            DatabaseDriverContract::class => \DI\factory(function() {
+            DatabaseDriverContract::class => \DI\factory(function () {
                 return match(config('database.connection', 'mysql')) {
                     'mysql' => new PdoDriver(),
                     default => throw new \LightWeight\Database\Exceptions\DatabaseException("Unsupported database connection type")
                 };
             }),
-            
+
             // Registrar el query builder con el driver correspondiente
-            QueryBuilderContract::class => \DI\factory(function(DatabaseDriverContract $driver) {
+            QueryBuilderContract::class => \DI\factory(function (DatabaseDriverContract $driver) {
                 return match(config('database.connection', 'mysql')) {
                     'mysql' => new MySQLQueryBuilder($driver),
                     default => throw new \LightWeight\Database\Exceptions\DatabaseException("Unsupported database connection type")
@@ -35,7 +35,7 @@ class DatabaseDriverServiceProvider extends ServiceProvider
             })
         ];
     }
-    
+
     /**
      * @inheritDoc
      */

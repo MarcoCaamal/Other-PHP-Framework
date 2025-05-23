@@ -24,7 +24,7 @@ class LogDriver implements MailDriverContract
         'text_body' => '',
         'attachments' => [],
     ];
-    
+
     /**
      * Constructor
      */
@@ -32,7 +32,7 @@ class LogDriver implements MailDriverContract
     {
         // No se requiere configuración especial
     }
-    
+
     /**
      * Establece el remitente del email
      *
@@ -46,7 +46,7 @@ class LogDriver implements MailDriverContract
         $this->emailData['from_name'] = $name ?? '';
         return $this;
     }
-    
+
     /**
      * Establece el destinatario del email
      *
@@ -62,7 +62,7 @@ class LogDriver implements MailDriverContract
         ];
         return $this;
     }
-    
+
     /**
      * Añade un destinatario en copia (CC)
      *
@@ -78,7 +78,7 @@ class LogDriver implements MailDriverContract
         ];
         return $this;
     }
-    
+
     /**
      * Añade un destinatario en copia oculta (BCC)
      *
@@ -94,7 +94,7 @@ class LogDriver implements MailDriverContract
         ];
         return $this;
     }
-    
+
     /**
      * Establece el asunto del email
      *
@@ -106,7 +106,7 @@ class LogDriver implements MailDriverContract
         $this->emailData['subject'] = $subject;
         return $this;
     }
-    
+
     /**
      * Establece el cuerpo HTML del email
      *
@@ -118,7 +118,7 @@ class LogDriver implements MailDriverContract
         $this->emailData['html_body'] = $body;
         return $this;
     }
-    
+
     /**
      * Establece el cuerpo de texto plano del email
      *
@@ -130,7 +130,7 @@ class LogDriver implements MailDriverContract
         $this->emailData['text_body'] = $body;
         return $this;
     }
-    
+
     /**
      * Añade un archivo adjunto al email
      *
@@ -146,7 +146,7 @@ class LogDriver implements MailDriverContract
         ];
         return $this;
     }
-    
+
     /**
      * Añade un archivo adjunto desde una cadena de datos
      *
@@ -164,7 +164,7 @@ class LogDriver implements MailDriverContract
         ];
         return $this;
     }
-    
+
     /**
      * Envía el email (en este caso, lo registra en el log)
      *
@@ -173,16 +173,16 @@ class LogDriver implements MailDriverContract
     public function send(): bool
     {
         $logMessage = $this->formatLogMessage();
-        
+
         if (function_exists('log_info')) {
             log_info($logMessage);
         } else {
             error_log($logMessage);
         }
-        
+
         return true;
     }
-    
+
     /**
      * Formatea el mensaje para el log
      *
@@ -192,71 +192,71 @@ class LogDriver implements MailDriverContract
     {
         $message = "Email enviado (simulado):\n";
         $message .= "De: {$this->emailData['from']}";
-        
+
         if (!empty($this->emailData['from_name'])) {
             $message .= " ({$this->emailData['from_name']})";
         }
-        
+
         $message .= "\n";
-        
+
         if (!empty($this->emailData['to'])) {
             $message .= "Para: {$this->emailData['to']['address']}";
-            
+
             if (!empty($this->emailData['to']['name'])) {
                 $message .= " ({$this->emailData['to']['name']})";
             }
-            
+
             $message .= "\n";
         }
-        
+
         if (!empty($this->emailData['cc'])) {
             $message .= "CC: ";
             $ccAddresses = [];
-            
+
             foreach ($this->emailData['cc'] as $cc) {
                 $ccAddress = $cc['address'];
-                
+
                 if (!empty($cc['name'])) {
                     $ccAddress .= " ({$cc['name']})";
                 }
-                
+
                 $ccAddresses[] = $ccAddress;
             }
-            
+
             $message .= implode(', ', $ccAddresses) . "\n";
         }
-        
+
         if (!empty($this->emailData['bcc'])) {
             $message .= "BCC: ";
             $bccAddresses = [];
-            
+
             foreach ($this->emailData['bcc'] as $bcc) {
                 $bccAddress = $bcc['address'];
-                
+
                 if (!empty($bcc['name'])) {
                     $bccAddress .= " ({$bcc['name']})";
                 }
-                
+
                 $bccAddresses[] = $bccAddress;
             }
-            
+
             $message .= implode(', ', $bccAddresses) . "\n";
         }
-        
+
         $message .= "Asunto: {$this->emailData['subject']}\n";
-        
+
         if (!empty($this->emailData['text_body'])) {
             $message .= "Cuerpo (texto): " . substr($this->emailData['text_body'], 0, 300) . "...\n";
         }
-        
+
         if (!empty($this->emailData['html_body'])) {
             $htmlExcerpt = strip_tags(substr($this->emailData['html_body'], 0, 300));
             $message .= "Cuerpo (HTML): " . $htmlExcerpt . "...\n";
         }
-        
+
         if (!empty($this->emailData['attachments'])) {
             $message .= "Adjuntos: " . count($this->emailData['attachments']) . "\n";
-            
+
             foreach ($this->emailData['attachments'] as $attachment) {
                 if (isset($attachment['path'])) {
                     $message .= "- {$attachment['name']} ({$attachment['path']})\n";
@@ -265,10 +265,10 @@ class LogDriver implements MailDriverContract
                 }
             }
         }
-        
+
         return $message;
     }
-    
+
     /**
      * Reinicia el objeto de email para un nuevo envío
      *
@@ -287,7 +287,7 @@ class LogDriver implements MailDriverContract
             'text_body' => '',
             'attachments' => [],
         ];
-        
+
         return $this;
     }
 }

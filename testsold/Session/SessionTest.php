@@ -12,37 +12,43 @@ use PHPUnit\Framework\TestCase;
 class MockSessionStorage implements SessionStorageContract
 {
     public array $storage = [];
-    
-    public function start() {}
-    
-    public function save() {}
-    
+
+    public function start()
+    {
+    }
+
+    public function save()
+    {
+    }
+
     public function id(): string
     {
         return "id";
     }
-    
+
     public function get(string $key, $default = null)
     {
         return $this->storage[$key] ?? $default;
     }
-    
+
     public function set(string $key, mixed $value)
     {
         $this->storage[$key] = $value;
     }
-    
+
     public function has(string $key): bool
     {
         return isset($this->storage[$key]);
     }
-    
+
     public function remove(string $key)
     {
         unset($this->storage[$key]);
     }
-    
-    public function destroy() {}
+
+    public function destroy()
+    {
+    }
 }
 
 class SessionTest extends TestCase
@@ -54,7 +60,7 @@ class SessionTest extends TestCase
     public function testAgeFlashData()
     {
         $mock = $this->createMockSessionStorage();
-        if(!$mock instanceof SessionStorageContract) {
+        if (!$mock instanceof SessionStorageContract) {
             $this->fail('The object mock isn\'t instace of SessionContract Class');
         }
         $s1 = new Session($mock);

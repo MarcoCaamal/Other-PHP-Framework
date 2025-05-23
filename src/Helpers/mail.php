@@ -44,10 +44,10 @@ function mailTemplate(string $to, string $subject, string $template, array $data
 function mailDriver(?string $driver = null)
 {
     $mailer = app(\LightWeight\Mail\Contracts\MailerContract::class);
-    
+
     if ($driver !== null) {
         return $mailer->setDriver(driver: $driver);
     }
-    
+
     return $mailer->getDriver();
 }

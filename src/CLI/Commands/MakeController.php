@@ -18,7 +18,7 @@ class MakeController extends Command
 {
     protected static $defaultName = "make:controller";
     protected static $defaultDescription = "Create a new controller";
-    
+
     // Define available controller types
     protected array $controllerTypes = [
         'basic' => 'controller.template',
@@ -26,18 +26,18 @@ class MakeController extends Command
         'resource' => 'controller.resource.template',
         'web' => 'controller.web.template',
     ];
-    
+
     // Utility instances
     protected ControllerCreator $controllerCreator;
     protected ModelCreator $modelCreator;
     protected ViewCreator $viewCreator;
     protected RouteCreator $routeCreator;
     protected MigrationCreator $migrationCreator;
-    
+
     public function __construct()
     {
         parent::__construct();
-        
+
         // Initialize utilities
         $this->controllerCreator = new ControllerCreator();
         $this->modelCreator = new ModelCreator();
@@ -45,7 +45,7 @@ class MakeController extends Command
         $this->routeCreator = new RouteCreator();
         $this->migrationCreator = new MigrationCreator();
     }
-    
+
     protected function configure()
     {
         $this
@@ -57,7 +57,7 @@ class MakeController extends Command
             ->addOption("routes", "r", InputOption::VALUE_OPTIONAL, "Add routes to a file (provide filename or leave empty for default)", null)
             ->addOption("all", "a", InputOption::VALUE_NONE, "Create all associated resources");
     }
-    
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $name = $input->getArgument("name");
@@ -68,29 +68,29 @@ class MakeController extends Command
         $createViews = $input->getOption("views");
         $createRoutes = $input->getOption("routes");
         $createAll = $input->getOption("all");
-        
+
         // If "all" option was specified, activate all options based on controller type
         if ($createAll) {
             $createModel = true;
             $createMigration = true;
-            
+
             // Only create views and routes for non-basic controllers
             if ($type !== 'basic') {
                 $createViews = ($type === 'web'); // Only create views for web controllers
                 $createRoutes = $type; // Use controller type as the route file name
             }
         }
-        
+
         // Create the controller using the controller creator utility
-        list($status, $controllerName, $namespace, $baseControllerName) = 
+        list($status, $controllerName, $namespace, $baseControllerName) =
             $this->controllerCreator->createController($output, $name, $type);
-        
+
         if ($status === Command::FAILURE) {
             return Command::FAILURE;
         }
-          // Create associated resources
+        // Create associated resources
         $results = [];
-        
+
         // Create model if specified
         if ($createModel) {
             // If model name is explicitly provided, use it
@@ -100,18 +100,18 @@ class MakeController extends Command
                 // Otherwise use controller name and namespace
                 $fullModelName = empty($namespace) ? $baseControllerName : $namespace . '\\' . $baseControllerName;
             }
-            
+
             $modelResult = $this->modelCreator->createModel($output, $fullModelName);
             $results[] = $modelResult;
         }
-        
+
         // Create migration if specified
         if ($createMigration) {
             $tableName = tableName($baseControllerName);
             $migrationResult = $this->migrationCreator->createMigration($output, $tableName);
             $results[] = $migrationResult;
         }
-          // Create views if specified and it's a web controller
+        // Create views if specified and it's a web controller
         if ($createViews && $type === 'web') {
             $viewName = empty($namespace) ? $baseControllerName : $baseControllerName;
             $viewsResult = $this->viewCreator->createViews($output, $viewName, $namespace);
@@ -119,26 +119,26 @@ class MakeController extends Command
         } elseif ($createViews && $type !== 'web') {
             $output->writeln("<comment>Views are only created for 'web' type controllers</comment>");
         }
-        
+
         // Create or update routes if specified and not a basic controller
         if ($createRoutes && $type !== 'basic') {
             $routesResult = $this->routeCreator->createRoutes(
-                $output, 
-                $baseControllerName, 
-                $namespace, 
-                $createRoutes, 
+                $output,
+                $baseControllerName,
+                $namespace,
+                $createRoutes,
                 $type
             );
             $results[] = $routesResult;
-        } else if ($createRoutes && $type === 'basic') {
+        } elseif ($createRoutes && $type === 'basic') {
             $output->writeln("<comment>Routes are not created for 'basic' type controllers as they have no methods</comment>");
         }
-        
+
         // Check if any operation failed
         if (in_array(Command::FAILURE, $results)) {
             return Command::FAILURE;
         }
-        
+
         return Command::SUCCESS;
     }
 }

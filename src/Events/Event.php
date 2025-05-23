@@ -15,7 +15,7 @@ abstract class Event implements EventContract
      * @var array
      */
     protected array $data = [];
-    
+
     /**
      * Event constructor.
      *
@@ -25,7 +25,7 @@ abstract class Event implements EventContract
     {
         $this->data = $data;
     }
-    
+
     /**
      * Get the name of the event
      * By default, uses the class name, but can be overridden
@@ -36,7 +36,7 @@ abstract class Event implements EventContract
     {
         return static::class;
     }
-    
+
     /**
      * Get event data
      *

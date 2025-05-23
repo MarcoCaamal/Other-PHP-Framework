@@ -12,10 +12,10 @@ class DB
     {
         return app(DatabaseDriverContract::class)->statement($query, $bind);
     }
-    
+
     /**
      * Create a new query builder instance
-     * 
+     *
      * @param string $table Table name
      * @return Builder
      */
@@ -24,10 +24,10 @@ class DB
         $builder = app(QueryBuilderContract::class);
         return (new Builder($builder))->table($table);
     }
-    
+
     /**
      * Execute a raw query against the database
-     * 
+     *
      * @param string $query
      * @param array $bindings
      * @return array
@@ -36,10 +36,10 @@ class DB
     {
         return self::statement($query, $bindings);
     }
-    
+
     /**
      * Execute a select query against the database
-     * 
+     *
      * @param string $query
      * @param array $bindings
      * @return array
@@ -48,7 +48,7 @@ class DB
     {
         return self::statement($query, $bindings);
     }
-    
+
     /**
      * Begin a transaction
      */
@@ -58,10 +58,10 @@ class DB
         if (method_exists(app(DatabaseDriverContract::class), 'beginTransaction')) {
             return app(DatabaseDriverContract::class)->beginTransaction();
         }
-        
+
         return false;
     }
-    
+
     /**
      * Commit a transaction
      */
@@ -70,10 +70,10 @@ class DB
         if (method_exists(app(DatabaseDriverContract::class), 'commit')) {
             return app(DatabaseDriverContract::class)->commit();
         }
-        
+
         return false;
     }
-    
+
     /**
      * Rollback a transaction
      */
@@ -82,7 +82,7 @@ class DB
         if (method_exists(app(DatabaseDriverContract::class), 'rollback')) {
             return app(DatabaseDriverContract::class)->rollback();
         }
-        
+
         return false;
     }
 }

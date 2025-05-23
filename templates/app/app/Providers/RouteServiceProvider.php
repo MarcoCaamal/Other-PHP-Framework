@@ -20,7 +20,7 @@ class RouteServiceProvider extends \LightWeight\Providers\ServiceProvider
             // \App\Middleware\CorsMiddleware::class,
             // \App\Middleware\RequestLogMiddleware::class,
         ]);
-        
+
         // Configurar grupos de middleware
         $router->setMiddlewareGroups([
             'web' => [
@@ -35,7 +35,7 @@ class RouteServiceProvider extends \LightWeight\Providers\ServiceProvider
                 // \App\Middleware\AuthMiddleware::class,
             ]
         ]);
-        
+
         Route::load(Application::$root . '/routes');
     }
 }

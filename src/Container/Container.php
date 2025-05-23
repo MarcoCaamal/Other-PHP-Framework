@@ -80,42 +80,42 @@ class Container implements ContainerInterface
      */
     public function get(string $id)
     {
-        if($this->container === null) {
+        if ($this->container === null) {
             throw new ContainerNotBuildException();
         }
         return $this->container->get($id);
     }
     public function set(string $id, mixed $value)
     {
-        if($this->container === null) {
+        if ($this->container === null) {
             throw new ContainerNotBuildException();
         }
         $this->container->set($id, $value);
     }
     public function has(string $id): bool
     {
-        if($this->container === null) {
+        if ($this->container === null) {
             throw new ContainerNotBuildException();
         }
         return $this->container->has($id);
     }
     public function call(array|string|callable $id, array $parameters = []): mixed
     {
-        if($this->container === null) {
+        if ($this->container === null) {
             throw new ContainerNotBuildException();
         }
         return $this->container->call($id, $parameters);
     }
     public function make(string $id, array $parameters = []): mixed
     {
-        if($this->container === null) {
+        if ($this->container === null) {
             throw new ContainerNotBuildException();
         }
         return $this->container->make($id, $parameters);
     }
     public function getContainer(): DIContainer
     {
-        if($this->container === null) {
+        if ($this->container === null) {
             throw new ContainerNotBuildException();
         }
         return $this->container;

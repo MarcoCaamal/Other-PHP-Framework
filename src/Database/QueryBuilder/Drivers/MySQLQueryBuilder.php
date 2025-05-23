@@ -45,7 +45,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $this->unions = [];
         $this->aggregate = [];
     }
-    
+
     /**
      * Reset the query builder state.
      * Clears all conditions, joins, orders, limits, etc.
@@ -150,7 +150,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
                     // Remove leading boolean operators from the nested query
                     $nestedClauses = ltrim($nestedClauses, 'AND ');
                     $nestedClauses = ltrim($nestedClauses, 'OR ');
-                    
+
                     $whereClauses[] = "{$boolean} ({$nestedClauses})";
                     break;
                 case 'between':
@@ -207,7 +207,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         // Convertir los bindings de array asociativo a array indexado
         $bindingValues = array_values($this->bindings);
-        
+
         $result = $this->db->execute($sql, $bindingValues);
         $this->resetInternal();
 
@@ -230,10 +230,10 @@ class MySQLQueryBuilder implements QueryBuilderContract
     public function get(): array
     {
         $sql = $this->compileSelect();
-        
+
         // Convertir los bindings de array asociativo a array indexado
         $bindingValues = array_values($this->bindings);
-        
+
         $result = $this->db->statement($sql, $bindingValues);
         $this->resetInternal();
         return $result;
@@ -245,13 +245,13 @@ class MySQLQueryBuilder implements QueryBuilderContract
     public function insert(array $data): bool
     {
         $this->queryType = 'insert';
-        
+
         // Usar interrogaciones (?) en lugar de marcadores con nombre
         $columns = implode(', ', array_keys($data));
         $placeholders = implode(', ', array_fill(0, count($data), '?'));
 
         $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})";
-        
+
         $result = $this->db->execute($sql, array_values($data));
         $this->resetInternal();
 
@@ -380,10 +380,10 @@ class MySQLQueryBuilder implements QueryBuilderContract
     public function update(array $data): bool
     {
         $this->queryType = 'update';
-        
+
         $sets = [];
         $updateValues = [];
-        
+
         foreach ($data as $column => $value) {
             $sets[] = "{$column} = ?";
             $updateValues[] = $value;
@@ -394,10 +394,10 @@ class MySQLQueryBuilder implements QueryBuilderContract
         if (!empty($this->wheres)) {
             $sql .= ' WHERE ' . $this->compileWheres();
         }
-        
+
         // Combinar los valores del SET con los valores de WHERE
         $allValues = array_merge($updateValues, array_values($this->bindings));
-        
+
         $result = $this->db->execute($sql, $allValues);
         $this->resetInternal();
 
@@ -452,13 +452,13 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         // Ejecutar el callback para agregar condiciones al grupo
         $callback($this);
-        
+
         // Guardar las condiciones del grupo
         $groupWheres = $this->wheres;
-        
+
         // Restaurar las condiciones originales
         $this->wheres = $currentWheres;
-        
+
         // Agregar el grupo de condiciones
         if (!empty($groupWheres)) {
             $this->wheres[] = [
@@ -569,11 +569,11 @@ class MySQLQueryBuilder implements QueryBuilderContract
             'boolean' => $boolean,
             'bindings' => $bindings
         ];
-        
+
         if (!empty($bindings)) {
             $this->bindings = array_merge($this->bindings, $bindings);
         }
-        
+
         return $this;
     }
     /**
@@ -597,7 +597,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         // Convertir los bindings de array asociativo a array indexado
         $bindingValues = array_values($this->bindings);
-        
+
         $result = $this->db->statement($sql, $bindingValues);
 
         return $result[0]['avg_result'] !== null ? (float)$result[0]['avg_result'] : 0;
@@ -618,7 +618,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         // Convertir los bindings de array asociativo a array indexado
         $bindingValues = array_values($this->bindings);
-        
+
         // Ejecutamos la consulta
         $result = $this->db->statement($sql, $bindingValues);
 
@@ -639,7 +639,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         // Construimos la sentencia SQL con placeholder de interrogación
         $sql = "UPDATE {$this->table} SET {$column} = {$column} - ?";
-        
+
         // Valores para los placeholders
         $values = [$value];
 
@@ -650,7 +650,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         // Combinar los valores
         $allValues = array_merge($values, array_values($this->bindings));
-        
+
         // Ejecutamos la consulta
         $affectedRows = $this->db->execute($sql, $allValues);
 
@@ -732,7 +732,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         // Construimos la sentencia SQL con placeholder de interrogación
         $sql = "UPDATE {$this->table} SET {$column} = {$column} + ?";
-        
+
         // Valores para los placeholders
         $values = [$value];
 
@@ -743,7 +743,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         // Combinar los valores
         $allValues = array_merge($values, array_values($this->bindings));
-        
+
         // Ejecutamos la consulta
         $affectedRows = $this->db->execute($sql, $allValues);
 
@@ -777,7 +777,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
         foreach ($data as $row) {
             $rowPlaceholders = array_fill(0, count($row), '?');
             $placeholders[] = '(' . implode(', ', $rowPlaceholders) . ')';
-            
+
             // Agregar valores al array de valores
             foreach ($row as $value) {
                 $values[] = $value;
@@ -785,7 +785,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
         }
 
         $sql = "INSERT INTO {$this->table} ({$columnsStr}) VALUES " . implode(', ', $placeholders);
-        
+
         $affectedRows = $this->db->execute($sql, $values);
         $this->reset();
 
@@ -804,11 +804,11 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         // Valores a pasar a la consulta
         $values = [];
-        
+
         // Preparar valores y placeholders para INSERT
         $insertPlaceholders = array_fill(0, count($data), '?');
         $valuesStr = implode(', ', $insertPlaceholders);
-        
+
         // Agregar valores de INSERT al array de valores
         foreach ($data as $value) {
             $values[] = $value;
@@ -826,7 +826,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $sql = "INSERT INTO {$this->table} ({$columnsStr}) 
                 VALUES ({$valuesStr})
                 ON DUPLICATE KEY UPDATE {$updatesStr}";
-        
+
         $result = $this->db->execute($sql, $values);
         $this->reset();
 
@@ -846,7 +846,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         // Convertir los bindings de array asociativo a array indexado
         $bindingValues = array_values($this->bindings);
-        
+
         $result = $this->db->statement($sql, $bindingValues);
 
         return $result[0]['max_result'] !== null ? (float)$result[0]['max_result'] : 0;
@@ -865,7 +865,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         // Convertir los bindings de array asociativo a array indexado
         $bindingValues = array_values($this->bindings);
-        
+
         $result = $this->db->statement($sql, $bindingValues);
 
         return $result[0]['min_result'] !== null ? (float)$result[0]['min_result'] : 0;
@@ -935,7 +935,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
 
         // Convertir los bindings de array asociativo a array indexado
         $bindingValues = array_values($this->bindings);
-        
+
         $result = $this->db->statement($sql, $bindingValues);
 
         return $result[0]['sum_result'] !== null ? (float)$result[0]['sum_result'] : 0;
@@ -956,7 +956,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
         $columns = $this->db->statement("SHOW FULL COLUMNS FROM {$this->table}");
         $columnsMetadata = [];
 
-        foreach($columns as $column) {
+        foreach ($columns as $column) {
             $columnMetadata = new Column($column);
             $columnsMetadata[] = $columnMetadata;
         }
@@ -977,15 +977,15 @@ class MySQLQueryBuilder implements QueryBuilderContract
         if (preg_match('/^[a-zA-Z0-9_]+$/', $identifier)) {
             return $identifier;
         }
-        
+
         // If it contains a dot, we need to quote the parts separately
         if (strpos($identifier, '.') !== false) {
-            $parts = array_map(function($part) {
+            $parts = array_map(function ($part) {
                 return '`' . str_replace('`', '``', $part) . '`';
             }, explode('.', $identifier));
             return implode('.', $parts);
         }
-        
+
         // Simple case - just quote the identifier
         return '`' . str_replace('`', '``', $identifier) . '`';
     }
@@ -1011,7 +1011,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
         if (empty($this->wheres)) {
             return '';
         }
-        
+
         return $this->compileWheres();
     }
 
@@ -1021,26 +1021,26 @@ class MySQLQueryBuilder implements QueryBuilderContract
     public function whereCallback(\Closure $callback, string $boolean = 'AND'): static
     {
         // Esta implementación es similar a whereGroup
-        
+
         // Guardar el estado actual de los wheres
         $currentWheres = $this->wheres;
         $currentBindings = $this->bindings;
-        
+
         // Reiniciar wheres para el callback
         $this->wheres = [];
         $this->bindings = [];
-        
+
         // Ejecutar el callback para agregar condiciones
         $callback($this);
-        
+
         // Guardar las condiciones del grupo
         $groupWheres = $this->wheres;
         $groupBindings = $this->bindings;
-        
+
         // Restaurar las condiciones originales
         $this->wheres = $currentWheres;
         $this->bindings = $currentBindings;
-        
+
         // Agregar el grupo de condiciones
         if (!empty($groupWheres)) {
             $this->wheres[] = [
@@ -1048,7 +1048,7 @@ class MySQLQueryBuilder implements QueryBuilderContract
                 'wheres' => $groupWheres,
                 'boolean' => $boolean
             ];
-            
+
             // Añadir los bindings del grupo
             $this->bindings = array_merge($this->bindings, $groupBindings);
         }

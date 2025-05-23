@@ -14,10 +14,10 @@ class Email implements ValidationRuleContract
      */
     public function isValid(string $field, array $data): bool
     {
-        if(!array_key_exists($field, $data)) {
+        if (!array_key_exists($field, $data)) {
             return false;
         }
-        if(empty($data[$field])) {
+        if (empty($data[$field])) {
             return false;
         }
         $email = strtolower(trim($data[$field]));

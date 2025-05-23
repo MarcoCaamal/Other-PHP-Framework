@@ -18,7 +18,7 @@ class EventDispatcher implements EventDispatcherContract
      * @var array
      */
     protected array $listeners = [];
-    
+
     /**
      * Register an event listener
      *
@@ -30,7 +30,7 @@ class EventDispatcher implements EventDispatcherContract
     {
         $this->listeners[$eventName][] = $listener;
     }
-    
+
     /**
      * Dispatch an event to all registered listeners
      *
@@ -46,20 +46,20 @@ class EventDispatcher implements EventDispatcherContract
         } else {
             $eventObj = $event;
         }
-        
+
         $eventName = $eventObj->getName();
-        
+
         // Call specific event listeners
         if ($this->hasListeners($eventName)) {
             $this->callListeners($eventName, $eventObj);
         }
-        
+
         // Call wildcard listeners
         if ($this->hasListeners('*')) {
             $this->callListeners('*', $eventObj, $eventName);
         }
     }
-    
+
     /**
      * Call listeners for a specific event
      *
@@ -83,14 +83,14 @@ class EventDispatcher implements EventDispatcherContract
             } elseif (is_string($listener) && class_exists($listener)) {
                 // Instantiate listener class using dependency injection container
                 $instance = Container::make($listener);
-                
+
                 if ($instance instanceof ListenerContract) {
                     $instance->handle($eventObj);
                 }
             }
         }
     }
-    
+
     /**
      * Remove all listeners for a specific event
      *
@@ -105,7 +105,7 @@ class EventDispatcher implements EventDispatcherContract
             unset($this->listeners[$eventName]);
         }
     }
-    
+
     /**
      * Check if an event has any registered listeners
      *

@@ -25,7 +25,7 @@ class File
         $this->type = $type;
         $this->originalName = $originalName;
     }
-    
+
     /**
      * Get the original name of the file.
      *
@@ -35,7 +35,7 @@ class File
     {
         return $this->originalName;
     }
-    
+
     /**
      * Get the content of the file.
      *
@@ -45,7 +45,7 @@ class File
     {
         return $this->content;
     }
-    
+
     /**
      * Get the mime type of the file.
      *
@@ -55,7 +55,7 @@ class File
     {
         return $this->type;
     }
-    
+
     /**
      * Check if the current file is an image.
      *
@@ -65,7 +65,7 @@ class File
     {
         return str_starts_with($this->type, "image");
     }
-    
+
     /**
      * Check if the file is a PDF.
      *
@@ -75,7 +75,7 @@ class File
     {
         return $this->type === "application/pdf";
     }
-    
+
     /**
      * Get the file extension based on MIME type.
      *
@@ -106,7 +106,7 @@ class File
             default => null,
         };
     }
-    
+
     /**
      * Get the file size in bytes.
      *
@@ -117,10 +117,10 @@ class File
         if (is_string($this->content)) {
             return strlen($this->content);
         }
-        
+
         return 0; // For other content types, would need specific handling
     }
-    
+
     /**
      * Store the file with original name.
      *
@@ -132,9 +132,9 @@ class File
         $fileName = pathinfo($this->originalName, PATHINFO_FILENAME);
         $extension = $this->extension() ?: pathinfo($this->originalName, PATHINFO_EXTENSION);
         $fileName = $this->sanitizeFileName($fileName) . '.' . $extension;
-        
+
         $path = is_null($directory) ? $fileName : "$directory/$fileName";
-        
+
         // Check if file exists and add counter if needed
         $counter = 1;
         $basePath = $path;
@@ -143,14 +143,14 @@ class File
             $directory = $fileNameParts['dirname'] !== '.' ? $fileNameParts['dirname'] : '';
             $filename = $fileNameParts['filename'];
             $extension = isset($fileNameParts['extension']) ? '.' . $fileNameParts['extension'] : '';
-            
+
             $path = ($directory ? "$directory/" : '') . $filename . "-$counter" . $extension;
             $counter++;
         }
-        
+
         return Storage::put($path, $this->content);
     }
-    
+
     /**
      * Store the file with a unique name.
      *
@@ -161,35 +161,34 @@ class File
      * @return string URL or path.
      */
     public function store(
-        ?string $directory = null, 
+        ?string $directory = null,
         bool $useTimestamp = false,
         ?string $visibility = null,
         ?string $driver = null
-    ): string
-    {
+    ): string {
         $extension = $this->extension();
-        
+
         if (!$extension) {
             $extension = pathinfo($this->originalName, PATHINFO_EXTENSION);
         }
-        
+
         $extension = $extension ? ".$extension" : '';
-        
+
         if ($useTimestamp) {
             $filename = time() . '_' . uniqid();
         } else {
             $filename = uniqid();
         }
-        
+
         $path = is_null($directory) ? $filename . $extension : "$directory/$filename$extension";
-        
+
         if ($visibility !== null) {
             return Storage::putWithVisibility($path, $this->content, $visibility, $driver);
         }
-        
+
         return Storage::put($path, $this->content, $driver);
     }
-    
+
     /**
      * Store the file with original name and specified visibility.
      *
@@ -206,27 +205,27 @@ class File
         $fileName = pathinfo($this->originalName, PATHINFO_FILENAME);
         $extension = $this->extension() ?: pathinfo($this->originalName, PATHINFO_EXTENSION);
         $fileName = $this->sanitizeFileName($fileName) . '.' . $extension;
-        
+
         $path = is_null($directory) ? $fileName : "$directory/$fileName";
-        
+
         // Check if file exists and add counter if needed
         $counter = 1;
         $basePath = $path;
-        
+
         // We need to check if the file exists in the specific driver
         while (Storage::exists($path, $driver)) {
             $fileNameParts = pathinfo($basePath);
             $directory = $fileNameParts['dirname'] !== '.' ? $fileNameParts['dirname'] : '';
             $filename = $fileNameParts['filename'];
             $extension = isset($fileNameParts['extension']) ? '.' . $fileNameParts['extension'] : '';
-            
+
             $path = ($directory ? "$directory/" : '') . $filename . "-$counter" . $extension;
             $counter++;
         }
-        
+
         return Storage::putWithVisibility($path, $this->content, $visibility, $driver);
     }
-    
+
     /**
      * Store the file as public (always accessible via URL).
      *
@@ -239,7 +238,7 @@ class File
     {
         return $this->store($directory, $useTimestamp, 'public', $driver);
     }
-    
+
     /**
      * Store the file as private (not accessible via URL).
      *
@@ -252,7 +251,7 @@ class File
     {
         return $this->store($directory, $useTimestamp, 'private', $driver);
     }
-    
+
     /**
      * Store the file with original name as public.
      *
@@ -264,7 +263,7 @@ class File
     {
         return $this->storeWithOriginalNameAndVisibility($directory, 'public', $driver);
     }
-    
+
     /**
      * Store the file with original name as private.
      *
@@ -276,7 +275,7 @@ class File
     {
         return $this->storeWithOriginalNameAndVisibility($directory, 'private', $driver);
     }
-    
+
     /**
      * Sanitize a filename to remove invalid characters.
      *
@@ -289,26 +288,26 @@ class File
         if (strpos($filename, '../path/traversal.php') !== false) {
             return 'pathtraversal.php';
         }
-        
+
         // Eliminar sólo los patrones de navegación de directorio
         $filename = str_replace(['../', './'], '', $filename);
-        
+
         // Eliminar cualquier caracter que no sea alfanumérico, guión, punto o espacio
         $filename = preg_replace('/[^\w\-\. ]/', '', $filename);
-        
+
         // Reemplazar espacios con guiones
         $filename = str_replace(' ', '-', $filename);
-        
+
         // Eliminar guiones múltiples
         $filename = preg_replace('/-+/', '-', $filename);
-        
+
         // Eliminar guiones antes de extensiones
         $filename = preg_replace('/-\./', '.', $filename);
-        
+
         // Eliminar guiones al principio y al final
         return trim($filename, '-');
     }
-    
+
     /**
      * Create a File instance from an uploaded file.
      *
@@ -320,17 +319,17 @@ class File
         if (!isset($fileData['tmp_name']) || !isset($fileData['name']) || !isset($fileData['type'])) {
             return null;
         }
-        
+
         if (!is_uploaded_file($fileData['tmp_name'])) {
             return null;
         }
-        
+
         $content = file_get_contents($fileData['tmp_name']);
-        
+
         if ($content === false) {
             return null;
         }
-        
+
         return new static(
             $content,
             $fileData['type'],

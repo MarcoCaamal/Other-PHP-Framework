@@ -5,7 +5,7 @@ use LightWeight\Routing\Route;
 // Ejemplo de uso de grupos de middleware para API
 Route::prefix('/api', function () {
     // Todas estas rutas usarán el grupo de middleware 'api'
-    
+
     Route::get('/users', function () {
         return json([
             'users' => [
@@ -14,7 +14,7 @@ Route::prefix('/api', function () {
             ]
         ]);
     })->setMiddlewareGroups(['api']);
-    
+
     Route::get('/products', function () {
         return json([
             'products' => [
@@ -23,7 +23,7 @@ Route::prefix('/api', function () {
             ]
         ]);
     })->setMiddlewareGroups(['api']);
-    
+
     // Rutas que requieren autenticación
     Route::get('/profile', function () {
         return json([

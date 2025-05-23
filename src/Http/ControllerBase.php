@@ -154,7 +154,7 @@ class ControllerBase
     {
         return $this->json(['error' => $message], $status);
     }
-    
+
     /**
      * Apply middleware to the controller actions.
      *
@@ -166,7 +166,7 @@ class ControllerBase
     public function middleware($middleware, array $only = [], array $except = []): self
     {
         $middlewares = is_array($middleware) ? $middleware : [$middleware];
-        
+
         foreach ($middlewares as $mw) {
             $this->middlewares[] = [
                 'middleware' => $mw,
@@ -174,10 +174,10 @@ class ControllerBase
                 'except' => $except
             ];
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Validate the request data against the provided rules.
      *
@@ -190,7 +190,7 @@ class ControllerBase
     {
         return $this->request->validate($rules, $messages);
     }
-    
+
     /**
      * Validate the request data against the provided rules, but don't throw exceptions.
      *
@@ -206,7 +206,7 @@ class ControllerBase
             return false;
         }
     }
-    
+
     /**
      * Log a message with specified level.
      *
@@ -220,7 +220,7 @@ class ControllerBase
         if (!$this->logger) {
             return;
         }
-        
+
         $this->logger->log($level, $message, $context);
     }
 
@@ -238,10 +238,10 @@ class ControllerBase
         } elseif (is_string($data)) {
             $data = ['message' => $data];
         }
-        
+
         return $this->json($data, $status);
     }
-    
+
     /**
      * Return a created response with optional data.
      *
@@ -252,7 +252,7 @@ class ControllerBase
     {
         return $this->success($data, 201);
     }
-    
+
     /**
      * Return a no content response.
      *
@@ -265,7 +265,7 @@ class ControllerBase
 
     /**
      * Return a forbidden response.
-     * 
+     *
      * @param string $message The error message
      * @return \LightWeight\Http\Response
      */
@@ -273,10 +273,10 @@ class ControllerBase
     {
         return $this->json(['error' => $message], 403);
     }
-    
+
     /**
      * Return an unauthorized response.
-     * 
+     *
      * @param string $message The error message
      * @return \LightWeight\Http\Response
      */
@@ -294,7 +294,7 @@ class ControllerBase
     {
         return $this->view;
     }
-    
+
     /**
      * Get data from the request.
      *
@@ -305,14 +305,14 @@ class ControllerBase
     protected function input(?string $key = null, $default = null)
     {
         $data = $this->request->data($key);
-        
+
         if ($key !== null && $data === null) {
             return $default;
         }
-        
+
         return $data;
     }
-    
+
     /**
      * Get query string parameter from the request.
      *
@@ -323,11 +323,11 @@ class ControllerBase
     protected function query(?string $key = null, $default = null)
     {
         $data = $this->request->query($key);
-        
+
         if ($key !== null && $data === null) {
             return $default;
         }
-        
+
         return $data;
     }
 
@@ -339,10 +339,10 @@ class ControllerBase
     protected function isAuthenticated(): bool
     {
         return app(\LightWeight\Application::class)
-            ->has(\LightWeight\Auth\Contracts\Authenticators\AuthenticatorContract::class) 
+            ->has(\LightWeight\Auth\Contracts\Authenticators\AuthenticatorContract::class)
             && app(\LightWeight\Auth\Contracts\Authenticators\AuthenticatorContract::class)->resolve() !== null;
     }
-    
+
     /**
      * Get the currently authenticated user.
      *
@@ -352,7 +352,7 @@ class ControllerBase
     {
         return app(\LightWeight\Auth\Contracts\Authenticators\AuthenticatorContract::class)->resolve();
     }
-    
+
     /**
      * Authorize a specific action based on a condition.
      *
@@ -365,7 +365,7 @@ class ControllerBase
         if ($condition) {
             return true;
         }
-        
+
         return $this->forbidden($message);
     }
 
@@ -378,7 +378,7 @@ class ControllerBase
     {
         return config('app.url', '');
     }
-    
+
     /**
      * Get all route parameters.
      *
@@ -388,7 +388,7 @@ class ControllerBase
     {
         return $this->request->routeParameters();
     }
-    
+
     /**
      * Get a specific route parameter.
      *

@@ -16,7 +16,7 @@ class AuthLoginEvent extends Event
     {
         return 'auth.login';
     }
-    
+
     /**
      * Get the authenticated user
      *
@@ -26,7 +26,7 @@ class AuthLoginEvent extends Event
     {
         return $this->data['user'] ?? null;
     }
-    
+
     /**
      * Get whether this is a "remember me" login
      *

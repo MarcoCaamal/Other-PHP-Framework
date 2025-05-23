@@ -66,15 +66,15 @@
             <?= $message ?? 'An unexpected error occurred while processing your request.' ?>
         </div>
         
-        <?php if(config('exceptions.debug', false) === true): ?>
+        <?php if (config('exceptions.debug', false) === true): ?>
         <div class="error-details">
             <strong>Error <?= $code ?? '500' ?></strong><br>
             <br>
-            <?php if(isset($file) && isset($line)): ?>
+            <?php if (isset($file) && isset($line)): ?>
             <strong>Location:</strong> <?= $file ?>:<?= $line ?><br>
             <?php endif; ?>
             
-            <?php if(isset($trace)): ?>
+            <?php if (isset($trace)): ?>
             <strong>Stack Trace:</strong><br>
             <pre><?= print_r($trace, true) ?></pre>
             <?php endif; ?>

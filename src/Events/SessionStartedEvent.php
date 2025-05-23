@@ -16,7 +16,7 @@ class SessionStartedEvent extends Event
     {
         return 'session.started';
     }
-    
+
     /**
      * Get the session ID
      *
@@ -26,7 +26,7 @@ class SessionStartedEvent extends Event
     {
         return $this->data['session_id'] ?? '';
     }
-    
+
     /**
      * Get whether this is a new session
      *
@@ -36,7 +36,7 @@ class SessionStartedEvent extends Event
     {
         return $this->data['is_new'] ?? false;
     }
-    
+
     /**
      * Get the session data
      *

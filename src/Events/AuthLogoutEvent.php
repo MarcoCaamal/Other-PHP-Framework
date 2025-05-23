@@ -16,7 +16,7 @@ class AuthLogoutEvent extends Event
     {
         return 'auth.logout';
     }
-    
+
     /**
      * Get the authenticated user that is logging out
      *

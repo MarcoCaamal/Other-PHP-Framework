@@ -15,7 +15,7 @@ class PhpMailerDriver implements MailDriverContract
      * Instancia de PHPMailer
      */
     protected PHPMailer $mailer;
-    
+
     /**
      * Constructor
      */
@@ -24,7 +24,7 @@ class PhpMailerDriver implements MailDriverContract
         $this->mailer = new PHPMailer(true); // true habilita excepciones
         $this->configure();
     }
-    
+
     /**
      * Configura PHPMailer según las opciones de configuración
      */
@@ -36,30 +36,30 @@ class PhpMailerDriver implements MailDriverContract
         $this->mailer->SMTPAuth = (bool)config('mail.auth', true);
         $this->mailer->Username = config('mail.username', '');
         $this->mailer->Password = config('mail.password', '');
-        
+
         // Configuración de cifrado
         $encryption = config('mail.encryption', 'ENCRYPTION_STARTTLS');
         if ($encryption && defined('PHPMailer\\PHPMailer\\PHPMailer::' . $encryption)) {
             $this->mailer->SMTPSecure = constant('PHPMailer\\PHPMailer\\PHPMailer::' . $encryption);
         }
-        
+
         $this->mailer->Port = (int)config('mail.port', 587);
-        
+
         // Configuración de depuración
         $this->mailer->SMTPDebug = (int)config('mail.debug', 0);
-        
+
         // Configuración del remitente por defecto
         $fromAddress = config('mail.from.address', 'from@example.com');
         $fromName = config('mail.from.name', 'Example');
-        
+
         if ($fromAddress) {
             $this->setFrom($fromAddress, $fromName);
         }
-        
+
         // Configuración de codificación
         $this->mailer->CharSet = config('mail.charset', 'UTF-8');
     }
-    
+
     /**
      * Establece el remitente del email
      *
@@ -77,10 +77,10 @@ class PhpMailerDriver implements MailDriverContract
                 log_error("Error al establecer remitente: {$e->getMessage()}");
             }
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Establece el destinatario del email
      *
@@ -99,10 +99,10 @@ class PhpMailerDriver implements MailDriverContract
                 log_error("Error al establecer destinatario: {$e->getMessage()}");
             }
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Añade un destinatario en copia (CC)
      *
@@ -120,10 +120,10 @@ class PhpMailerDriver implements MailDriverContract
                 log_error("Error al añadir CC: {$e->getMessage()}");
             }
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Añade un destinatario en copia oculta (BCC)
      *
@@ -141,10 +141,10 @@ class PhpMailerDriver implements MailDriverContract
                 log_error("Error al añadir BCC: {$e->getMessage()}");
             }
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Establece el asunto del email
      *
@@ -156,7 +156,7 @@ class PhpMailerDriver implements MailDriverContract
         $this->mailer->Subject = $subject;
         return $this;
     }
-    
+
     /**
      * Establece el cuerpo HTML del email
      *
@@ -167,15 +167,15 @@ class PhpMailerDriver implements MailDriverContract
     {
         $this->mailer->isHTML(true);
         $this->mailer->Body = $body;
-        
+
         // Generar automáticamente una versión de texto plano si no se ha establecido
         if (empty($this->mailer->AltBody)) {
             $this->mailer->AltBody = strip_tags($body);
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Establece el cuerpo de texto plano del email
      *
@@ -187,7 +187,7 @@ class PhpMailerDriver implements MailDriverContract
         $this->mailer->AltBody = $body;
         return $this;
     }
-    
+
     /**
      * Añade un archivo adjunto al email
      *
@@ -205,10 +205,10 @@ class PhpMailerDriver implements MailDriverContract
                 log_error("Error al añadir adjunto: {$e->getMessage()}");
             }
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Añade un archivo adjunto desde una cadena de datos
      *
@@ -227,10 +227,10 @@ class PhpMailerDriver implements MailDriverContract
                 log_error("Error al añadir adjunto desde string: {$e->getMessage()}");
             }
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Envía el email
      *
@@ -248,7 +248,7 @@ class PhpMailerDriver implements MailDriverContract
             return false;
         }
     }
-    
+
     /**
      * Reinicia el objeto de email para un nuevo envío
      *
@@ -264,7 +264,7 @@ class PhpMailerDriver implements MailDriverContract
         $this->mailer->Subject = '';
         $this->mailer->Body = '';
         $this->mailer->AltBody = '';
-        
+
         return $this;
     }
 }

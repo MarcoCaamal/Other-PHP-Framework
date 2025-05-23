@@ -48,10 +48,10 @@ abstract class Model implements JsonSerializable
      * @var \LightWeight\Database\QueryBuilder\Metadata\Column[]|null
      */
     protected static ?array $columns = [];
-    
+
     /**
      * Get the database driver from the container (transient, new instance)
-     * 
+     *
      * @return DatabaseDriverContract
      * @throws DatabaseException If the database driver is not available
      */
@@ -63,10 +63,10 @@ abstract class Model implements JsonSerializable
             throw new DatabaseException("Database driver not available: {$e->getMessage()}", 0, $e);
         }
     }
-    
+
     /**
      * Get the query builder from the container (transient, new instance)
-     * 
+     *
      * @return QueryBuilderContract
      * @throws DatabaseException If the query builder is not available
      */
@@ -78,7 +78,7 @@ abstract class Model implements JsonSerializable
             throw new DatabaseException("Query builder not available: {$e->getMessage()}", 0, $e);
         }
     }
-    
+
     /**
      * @deprecated Use getDatabaseDriver() instead
      */
@@ -87,7 +87,7 @@ abstract class Model implements JsonSerializable
         // Esta función se mantiene solo para compatibilidad con código existente
         // y ahora no hace nada ya que obtenemos el driver del contenedor
     }
-    
+
     /**
      * @deprecated Use getQueryBuilder() instead
      */
@@ -98,21 +98,21 @@ abstract class Model implements JsonSerializable
     }
     public function __construct()
     {
-        if(is_null($this->table)) {
+        if (is_null($this->table)) {
             $subclass = new \ReflectionClass(static::class);
             $this->table = snakeCase("{$subclass->getShortName()}s");
         }
-        
+
         try {
             $queryBuilder = static::getQueryBuilder();
-            
-            if(static::$columns === null) {
+
+            if (static::$columns === null) {
                 $query = new Builder($queryBuilder, static::class);
                 static::$columns = $query->getMetadataOfTableColumns();
             }
-            
+
             // Initialize attributes with defaults from table schema
-            foreach(static::$columns as $column) {
+            foreach (static::$columns as $column) {
                 // Only set defaults if the attribute doesn't already exist
                 if (!isset($this->attributes[$column->name])) {
                     $this->attributes[$column->name] = $column->default;
@@ -132,23 +132,23 @@ abstract class Model implements JsonSerializable
         if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
         }
-        
+
         // Check if the relation exists and has been loaded
         if (isset($this->relations[$name])) {
             return $this->relations[$name];
         }
-        
+
         // Check if the relation method exists
         if (method_exists($this, $name)) {
             // Load the relation
             $relation = $this->$name();
-            
+
             if ($relation instanceof Relation) {
                 // Cache the relationship result
                 return $this->relations[$name] = $relation->getResults();
             }
         }
-        
+
         return null;
     }
     public function __sleep()
@@ -165,16 +165,18 @@ abstract class Model implements JsonSerializable
         if (method_exists($query, $method)) {
             return $query->$method(...$args);
         }
-        
+
         throw new \BadMethodCallException(sprintf(
-            'Call to undefined method %s::%s()', static::class, $method
+            'Call to undefined method %s::%s()',
+            static::class,
+            $method
         ));
     }
     public static function __callStatic($method, $args)
     {
         try {
             $queryBuilder = static::getQueryBuilder();
-            
+
             if (!method_exists($queryBuilder, $method)) {
                 throw new QueryBuilderException("Method $method is not defined.");
             }
@@ -196,7 +198,7 @@ abstract class Model implements JsonSerializable
     {
         return $this->primaryKey;
     }
-    
+
     /**
      * Get the value of the model's primary key.
      *
@@ -213,7 +215,7 @@ abstract class Model implements JsonSerializable
         foreach ($this->hidden as $hide) {
             unset($newData[$hide]);
         }
-        
+
         return $newData;
     }
     public function fill(array $attributes): static
@@ -236,13 +238,13 @@ abstract class Model implements JsonSerializable
             fn ($value, $key) => !in_array($key, $this->hidden),
             ARRAY_FILTER_USE_BOTH
         );
-        
+
         return $array;
     }
-    
+
     /**
      * Set multiple attributes directly (for internal use)
-     * 
+     *
      * @param array $attributes Attributes to set
      * @return $this
      */
@@ -251,20 +253,20 @@ abstract class Model implements JsonSerializable
         $this->attributes = $attributes;
         return $this;
     }
-    
+
     /**
      * Get all attributes of the model (for debugging)
-     * 
+     *
      * @return array
      */
     public function getAttributes(): array
     {
         return $this->attributes;
     }
-    
+
     /**
      * Get column metadata (for debugging)
-     * 
+     *
      * @return array
      */
     public static function getColumns(): array
@@ -274,13 +276,13 @@ abstract class Model implements JsonSerializable
     public function save(): static
     {
         // Dispatch model.creating event
-        if(function_exists('event')) {
+        if (function_exists('event')) {
             event(new ModelCreatingEvent(['model' => $this]));
         }
-        
+
         // Make a copy of the attributes before we modify them
         $attributesToSave = $this->attributes;
-        
+
         // Process boolean values to ensure they are properly stored in MySQL
         foreach ($attributesToSave as $key => $value) {
             // Convert boolean values to integers for MySQL
@@ -289,62 +291,62 @@ abstract class Model implements JsonSerializable
             } elseif ($value === '') {
                 // Check if this column is a boolean field in the schema
                 $isBoolean = false;
-                foreach(static::$columns as $column) {
+                foreach (static::$columns as $column) {
                     if ($column->name === $key && ($column->type->name === 'tinyint' || $column->type->name === 'boolean')) {
                         $isBoolean = true;
                         break;
                     }
                 }
-                
+
                 // If it's a boolean field, convert empty string to 0
                 if ($isBoolean) {
                     $attributesToSave[$key] = 0;
                 }
             }
         }
-        
+
         // Only add timestamps if they don't exist already
         if ($this->insertTimestamps && !isset($attributesToSave["created_at"])) {
             $attributesToSave["created_at"] = date("Y-m-d H:i:s");
         }
-        
+
         try {
             $queryBuilder = static::getQueryBuilder();
             $builder = new Builder($queryBuilder);
             $builder->table($this->table);
-            
+
             // Use the copied attributes for the insert
             if ($builder->insert($attributesToSave)) {
                 $this->{$this->primaryKey} = $builder->lastInsertId();
             }
-            
+
             // Dispatch model.created event
-            if(function_exists('event')) {
+            if (function_exists('event')) {
                 event(new ModelCreatedEvent(['model' => $this]));
             }
-            
+
             return $this;
         } catch (\Exception $e) {
             throw new DatabaseException("Error saving model: {$e->getMessage()}", 0, $e);
         }
     }
-    
+
     public function update(): static
     {
         // Dispatch model.updating event
-        if(function_exists('event')) {
+        if (function_exists('event')) {
             event(new ModelUpdatingEvent(['model' => $this]));
         }
-        
+
         if ($this->insertTimestamps) {
             $this->attributes["updated_at"] = date("Y-m-d H:i:s");
         }
-        
+
         $primaryKey = $this->attributes[$this->primaryKey] ?? null;
         if ($primaryKey === null) {
             throw new \RuntimeException("Cannot update a model without a primary key value");
         }
-        
+
         // Process boolean values for MySQL
         $attributesToUpdate = $this->attributes;
         foreach ($attributesToUpdate as $key => $value) {
@@ -354,62 +356,62 @@ abstract class Model implements JsonSerializable
             } elseif ($value === '') {
                 // Check if this column is a boolean field in the schema
                 $isBoolean = false;
-                foreach(static::$columns as $column) {
+                foreach (static::$columns as $column) {
                     if ($column->name === $key && ($column->type->name === 'tinyint' || $column->type->name === 'boolean')) {
                         $isBoolean = true;
                         break;
                     }
                 }
-                
+
                 // If it's a boolean field, convert empty string to 0
                 if ($isBoolean) {
                     $attributesToUpdate[$key] = 0;
                 }
             }
         }
-        
+
         try {
             $queryBuilder = static::getQueryBuilder();
             $builder = new Builder($queryBuilder);
             $builder->table($this->table)
                     ->where($this->primaryKey, '=', $primaryKey)
                     ->update($attributesToUpdate);
-            
+
             // Dispatch model.updated event
-            if(function_exists('event')) {
+            if (function_exists('event')) {
                 event(new ModelUpdatedEvent(['model' => $this]));
             }
-            
+
             return $this;
         } catch (\Exception $e) {
             throw new DatabaseException("Error updating model: {$e->getMessage()}", 0, $e);
         }
     }
-    
+
     public function delete(): static
     {
         // Dispatch model.deleting event
-        if(function_exists('event')) {
+        if (function_exists('event')) {
             event(new ModelDeletingEvent(['model' => $this]));
         }
-        
+
         $primaryKey = $this->attributes[$this->primaryKey] ?? null;
         if ($primaryKey === null) {
             throw new \RuntimeException("Cannot delete a model without a primary key value");
         }
-        
+
         try {
             $queryBuilder = static::getQueryBuilder();
             $builder = new Builder($queryBuilder);
             $builder->table($this->table)
                     ->where($this->primaryKey, '=', $primaryKey)
                     ->delete();
-            
+
             // Dispatch model.deleted event
-            if(function_exists('event')) {
+            if (function_exists('event')) {
                 event(new ModelDeletedEvent(['model' => $this]));
             }
-            
+
             return $this;
         } catch (\Exception $e) {
             throw new DatabaseException("Error deleting model: {$e->getMessage()}", 0, $e);
@@ -419,10 +421,10 @@ abstract class Model implements JsonSerializable
     {
         $instance = new static();
         $instance->fill($attributes);
-        
+
         // Al usar save(), los eventos model.creating y model.created se dispararán automáticamente
         $instance->save();
-        
+
         return $instance;
     }
     /**
@@ -463,7 +465,7 @@ abstract class Model implements JsonSerializable
     }
     /**
      * Create a new instance of the Builder for this model
-     * 
+     *
      * @return Builder<static>
      */
     public static function query(): Builder
@@ -477,10 +479,10 @@ abstract class Model implements JsonSerializable
             throw new QueryBuilderException("Error creating query: {$e->getMessage()}", 0, $e);
         }
     }
-    
+
     /**
      * Create a new query for the Model
-     * 
+     *
      * @return Builder<static>
      */
     protected function newQuery(): Builder
@@ -506,8 +508,8 @@ abstract class Model implements JsonSerializable
     public function hasOne(string $related, ?string $foreignKey = null, ?string $localKey = null): HasOne
     {
         // Create a new instance of the related model
-        $instance = new $related;
-        
+        $instance = new $related();
+
         // Determine the foreign key
         if (is_null($foreignKey)) {
             // Get the "snake case" version of the calling model's class name + _id
@@ -517,15 +519,15 @@ abstract class Model implements JsonSerializable
             $className = preg_replace('/Model$/', '', $className);
             $foreignKey = snakeCase($className) . '_id';
         }
-        
+
         // Determine the local key (default is primary key of this model)
         if (is_null($localKey)) {
             $localKey = $this->getPrimaryKeyName();
         }
-        
+
         // Create a query builder for the related model
         $query = $instance->query();
-        
+
         // Return a new HasOne relation
         return new HasOne($query, $this, $foreignKey, $localKey);
     }
@@ -542,8 +544,8 @@ abstract class Model implements JsonSerializable
     public function hasMany(string $related, ?string $foreignKey = null, ?string $localKey = null): HasMany
     {
         // Create a new instance of the related model
-        $instance = new $related;
-        
+        $instance = new $related();
+
         // Determine the foreign key
         if (is_null($foreignKey)) {
             // Get the "snake case" version of the calling model's class name + _id
@@ -553,15 +555,15 @@ abstract class Model implements JsonSerializable
             $className = preg_replace('/Model$/', '', $className);
             $foreignKey = snakeCase($className) . '_id';
         }
-        
+
         // Determine the local key (default is primary key of this model)
         if (is_null($localKey)) {
             $localKey = $this->getPrimaryKeyName();
         }
-        
+
         // Create a query builder for the related model
         $query = $instance->query();
-        
+
         // Return a new HasMany relation
         return new HasMany($query, $this, $foreignKey, $localKey);
     }
@@ -578,8 +580,8 @@ abstract class Model implements JsonSerializable
     public function belongsTo(string $related, ?string $foreignKey = null, ?string $ownerKey = null): BelongsTo
     {
         // Create a new instance of the related model
-        $instance = new $related;
-        
+        $instance = new $related();
+
         // Determine the foreign key
         if (is_null($foreignKey)) {
             // Get the "snake case" version of the related model's class name + _id
@@ -589,22 +591,22 @@ abstract class Model implements JsonSerializable
             $className = preg_replace('/Model$/', '', $className);
             $foreignKey = snakeCase($className) . '_id';
         }
-        
+
         // Determine the owner key (default is primary key of the related model)
         if (is_null($ownerKey)) {
             $ownerKey = $instance->getPrimaryKeyName();
         }
-        
+
         // Create a query builder for the related model
         $query = $instance->query();
-        
+
         // Return a new BelongsTo relation
         return new BelongsTo($query, $this, $foreignKey, $ownerKey);
     }
 
     /**
      * Get relationship method from the dynamic method
-     * 
+     *
      * @param string $method Method name
      * @return mixed The relationship if it exists, null otherwise
      */
@@ -618,35 +620,35 @@ abstract class Model implements JsonSerializable
         // Check if a relationship method exists
         if (method_exists($this, $method)) {
             $relation = $this->$method();
-            
+
             if ($relation instanceof Relation) {
                 // Get and cache the relationship value
                 return $this->relations[$method] = $relation->getResults();
             }
         }
-        
+
         return null;
     }
-    
+
     /**
      * Load a relationship by name
-     * 
+     *
      * @param string $name Name of the relationship method
      * @return $this
      */
-    public function load(string $name): static 
+    public function load(string $name): static
     {
         if (method_exists($this, $name)) {
             $relation = $this->$name();
-            
+
             if ($relation instanceof Relation) {
                 $this->relations[$name] = $relation->getResults();
             }
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Set relationships that should be eager loaded.
      *
@@ -655,17 +657,17 @@ abstract class Model implements JsonSerializable
      */
     public static function with($relations): Builder
     {
-        $instance = new static;
+        $instance = new static();
         $query = $instance->newQuery();
-        
+
         $relations = is_array($relations) ? $relations : func_get_args();
         $query->eagerLoadRelations($relations);
-        
+
         return $query;
     }
-    
+
     // withCount method removed
-    
+
     /**
      * Save a new model and associate it with this parent model.
      *
@@ -677,24 +679,24 @@ abstract class Model implements JsonSerializable
     {
         // Get the relation instance
         $relationInstance = $this->$relation();
-        
+
         if ($relationInstance instanceof BelongsTo) {
             // Set the foreign key on this model to the related model's key
             $this->{$relationInstance->getForeignKey()} = $model->getKey();
             $this->save();
-            
+
             // Store the relation
             $this->relations[$relation] = $model;
-            
+
             return $this;
         }
-        
+
         throw new \RuntimeException("The relation {$relation} is not a BelongsTo relation");
     }
 
     /**
      * Save a related model for a HasOne or HasMany relationship.
-     * 
+     *
      * @param string $relation Relation name
      * @param Model $model Model to save
      * @return Model The saved model
@@ -703,15 +705,15 @@ abstract class Model implements JsonSerializable
     {
         // Get the relation instance
         $relationInstance = $this->$relation();
-        
+
         if ($relationInstance instanceof HasOne || $relationInstance instanceof HasMany) {
             // Set the foreign key on the related model
             $foreignKey = $relationInstance->getForeignKey();
             $localKey = $relationInstance->getLocalKey();
-            
+
             $model->{$foreignKey} = $this->{$localKey};
             $model->save();
-            
+
             // Store the relation in the relations array
             if ($relationInstance instanceof HasOne) {
                 $this->relations[$relation] = $model;
@@ -721,13 +723,13 @@ abstract class Model implements JsonSerializable
                 }
                 $this->relations[$relation][] = $model;
             }
-            
+
             return $model;
         }
-        
+
         throw new \RuntimeException("The relation {$relation} is not a HasOne or HasMany relation");
     }
-    
+
     /**
      * Get all the loaded relations for the model.
      *
@@ -737,7 +739,7 @@ abstract class Model implements JsonSerializable
     {
         return $this->relations;
     }
-    
+
     /**
      * Set a relationship on the model.
      *

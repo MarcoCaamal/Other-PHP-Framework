@@ -21,16 +21,16 @@ class BootstrapExceptionHandler implements BootstrapExceptionHandlerContract
     public function logException(Throwable $exception): void
     {
         // Check if App::$root is defined and accessible
-        $logPath = class_exists('LightWeight\Application') && isset(Application::$root) 
-            ? Application::$root . '/storage/logs/bootstrap-errors.log' 
+        $logPath = class_exists('LightWeight\Application') && isset(Application::$root)
+            ? Application::$root . '/storage/logs/bootstrap-errors.log'
             : __DIR__ . '/../../storage/logs/bootstrap-errors.log';
-        
+
         // Make sure the log directory exists
         $logDir = dirname($logPath);
         if (!is_dir($logDir)) {
             mkdir($logDir, 0755, true);
         }
-        
+
         // Format the exception message
         $message = sprintf(
             "[%s] %s: %s in %s on line %d\n%s\n\n",
@@ -41,11 +41,11 @@ class BootstrapExceptionHandler implements BootstrapExceptionHandlerContract
             $exception->getLine(),
             $exception->getTraceAsString()
         );
-        
+
         // Write to log file
         file_put_contents($logPath, $message, FILE_APPEND);
     }
-    
+
     /**
      * Handle a bootstrap exception
      *
@@ -56,18 +56,18 @@ class BootstrapExceptionHandler implements BootstrapExceptionHandlerContract
     {
         // Log the exception
         $this->logException($exception);
-        
+
         // Display an appropriate error message
         if (php_sapi_name() === 'cli') {
             $this->renderCliError($exception);
         } else {
             $this->renderHttpError($exception);
         }
-        
+
         // End execution with an error code
         exit(1);
     }
-    
+
     /**
      * Render an error message for CLI environment
      *
@@ -83,10 +83,10 @@ class BootstrapExceptionHandler implements BootstrapExceptionHandlerContract
             $exception->getFile(),
             $exception->getLine()
         );
-        
+
         fwrite(STDERR, $message);
     }
-    
+
     /**
      * Render an error message for HTTP environment
      *
@@ -96,7 +96,7 @@ class BootstrapExceptionHandler implements BootstrapExceptionHandlerContract
     protected function renderHttpError(Throwable $exception): void
     {
         http_response_code(500);
-        
+
         // Check if APP_DEBUG is set to true (as a string or boolean)
         $isDebug = env('APP_DEBUG', false);
 
@@ -106,7 +106,7 @@ class BootstrapExceptionHandler implements BootstrapExceptionHandlerContract
             echo $this->getProductionErrorPage();
         }
     }
-    
+
     /**
      * Get a debug error page with detailed exception information
      *
@@ -120,7 +120,7 @@ class BootstrapExceptionHandler implements BootstrapExceptionHandlerContract
         $file = htmlspecialchars($exception->getFile());
         $line = $exception->getLine();
         $trace = nl2br(htmlspecialchars($exception->getTraceAsString()));
-        
+
         $html = '<!DOCTYPE html>';
         $html .= '<html>';
         $html .= '<head>';
@@ -156,10 +156,10 @@ class BootstrapExceptionHandler implements BootstrapExceptionHandlerContract
         $html .= '    <p>This detailed error is shown because <code>APP_DEBUG</code> is enabled. Set it to <code>false</code> in production.</p>';
         $html .= '</body>';
         $html .= '</html>';
-        
+
         return $html;
     }
-    
+
     /**
      * Get a production error page with minimal information
      *
@@ -187,7 +187,7 @@ class BootstrapExceptionHandler implements BootstrapExceptionHandlerContract
         $html .= '    </div>';
         $html .= '</body>';
         $html .= '</html>';
-        
+
         return $html;
     }
 }

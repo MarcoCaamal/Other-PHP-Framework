@@ -10,7 +10,7 @@ class HasherServiceProvider extends ServiceProvider
 {
     /**
      * Proporciona definiciones para el contenedor antes de su compilación
-     * 
+     *
      * @return array
      */
     public function getDefinitions(): array
@@ -24,7 +24,7 @@ class HasherServiceProvider extends ServiceProvider
             })
         ];
     }
-    
+
     public function registerServices(Container $serviceContainer)
     {
         // Las definiciones ya están configuradas en getDefinitions()

@@ -199,7 +199,7 @@ class Response implements ResponseContract
             ->setContentType('text/html')
             ->setContent($content);
     }
-    
+
     /**
      * Create a new HTML response.
      *

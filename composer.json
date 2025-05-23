@@ -6,8 +6,7 @@
     "autoload": {
         "psr-4": {
             "LightWeight\\": "src"
-        },
-        "files": [
+        },        "files": [
             "src/Helpers/app.php",
             "src/Helpers/string.php",
             "src/Helpers/http.php",
@@ -16,7 +15,8 @@
             "src/Helpers/class.php",
             "src/Helpers/events.php",
             "src/Helpers/mail.php",
-            "src/Helpers/logger.php"
+            "src/Helpers/logger.php",
+            "src/Helpers/route.php"
         ]
     },
     "scripts": {

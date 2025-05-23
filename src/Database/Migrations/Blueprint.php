@@ -15,43 +15,43 @@ class Blueprint
      * @var string
      */
     protected string $table;
-    
+
     /**
      * The commands that should be run for the table
      *
      * @var array
      */
     protected array $commands = [];
-    
+
     /**
      * The columns that should be added to the table
      *
      * @var array
      */
     protected array $columns = [];
-    
+
     /**
      * The storage engine that should be used for the table
      *
      * @var string
      */
     protected string $engine = 'innodb';
-    
+
     /**
      * The default character set that should be used for the table
      */
     protected ?string $charset = null;
-    
+
     /**
      * The collation that should be used for the table
      */
     protected ?string $collation = null;
-    
+
     /**
      * The type of blueprint (create or alter)
      */
     protected string $type;
-    
+
     /**
      * Create a new blueprint instance
      *
@@ -64,7 +64,7 @@ class Blueprint
         $this->table = $table;
         $this->type = $type;
     }
-    
+
     /**
      * Add a new column to the blueprint
      *
@@ -94,7 +94,7 @@ class Blueprint
 
         return $this;
     }
-    
+
     /**
      * Check if the blueprint has any commands
      *
@@ -104,7 +104,7 @@ class Blueprint
     {
         return !empty($this->commands) || !empty($this->columns);
     }
-    
+
     /**
      * Create an auto-incrementing integer ID column
      *
@@ -114,14 +114,14 @@ class Blueprint
     public function id(string $column = 'id'): self
     {
         $this->addColumn('int', $column);
-        
+
         $index = count($this->columns) - 1;
         $this->columns[$index]['autoIncrement'] = true;
         $this->columns[$index]['primary'] = true;
-        
+
         return $this;
     }
-    
+
     /**
      * Create a string column
      *
@@ -133,7 +133,7 @@ class Blueprint
     {
         return $this->addColumn('varchar', $column, ['length' => $length]);
     }
-    
+
     /**
      * Create an integer column
      *
@@ -144,7 +144,7 @@ class Blueprint
     {
         return $this->addColumn('int', $column);
     }
-    
+
     /**
      * Create a boolean column
      *
@@ -155,7 +155,7 @@ class Blueprint
     {
         return $this->addColumn('tinyint', $column, ['length' => 1]);
     }
-    
+
     /**
      * Create a text column
      *
@@ -166,7 +166,7 @@ class Blueprint
     {
         return $this->addColumn('text', $column);
     }
-    
+
     /**
      * Create a decimal column
      *
@@ -182,7 +182,7 @@ class Blueprint
             'scale' => $scale
         ]);
     }
-    
+
     /**
      * Create a timestamp column
      *
@@ -193,7 +193,7 @@ class Blueprint
     {
         return $this->addColumn('timestamp', $column);
     }
-    
+
     /**
      * Create a datetime column
      *
@@ -204,7 +204,7 @@ class Blueprint
     {
         return $this->addColumn('datetime', $column);
     }
-    
+
     /**
      * Create a date column
      *
@@ -215,7 +215,7 @@ class Blueprint
     {
         return $this->addColumn('date', $column);
     }
-    
+
     /**
      * Create a time column
      *
@@ -226,7 +226,7 @@ class Blueprint
     {
         return $this->addColumn('time', $column);
     }
-    
+
     /**
      * Create an enum column
      *
@@ -238,7 +238,7 @@ class Blueprint
     {
         return $this->addColumn('enum', $column, ['values' => $values]);
     }
-    
+
     /**
      * Set the default value for the last column
      *
@@ -250,13 +250,13 @@ class Blueprint
         if (empty($this->columns)) {
             return $this;
         }
-        
+
         $index = count($this->columns) - 1;
         $this->columns[$index]['default'] = $value;
-        
+
         return $this;
     }
-    
+
     /**
      * Make the last column nullable
      *
@@ -268,7 +268,7 @@ class Blueprint
         if (empty($this->columns)) {
             return $this;
         }
-        
+
         $index = count($this->columns) - 1;
         $this->columns[$index]['nullable'] = $value;
 
@@ -279,7 +279,7 @@ class Blueprint
 
         return $this;
     }
-    
+
     /**
      * Make the last column unique
      *
@@ -290,13 +290,13 @@ class Blueprint
         if (empty($this->columns)) {
             return $this;
         }
-        
+
         $index = count($this->columns) - 1;
         $this->columns[$index]['unique'] = true;
-        
+
         return $this;
     }
-    
+
     /**
      * Make the last column unsigned (for integer columns)
      *
@@ -307,13 +307,13 @@ class Blueprint
         if (empty($this->columns)) {
             return $this;
         }
-        
+
         $index = count($this->columns) - 1;
         $this->columns[$index]['parameters']['unsigned'] = true;
-        
+
         return $this;
     }
-    
+
     /**
      * Set the column to auto-increment
      *
@@ -324,19 +324,19 @@ class Blueprint
         if (empty($this->columns)) {
             return $this;
         }
-        
+
         $index = count($this->columns) - 1;
         $this->columns[$index]['autoIncrement'] = true;
-        
+
         // An auto-increment column must be a key, so make it a primary key if not already
         // set as a key through other means
         if (!isset($this->columns[$index]['parameters']['primary']) || $this->columns[$index]['parameters']['primary'] !== true) {
             $this->columns[$index]['parameters']['primary'] = true;
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Add a comment to the column
      *
@@ -348,13 +348,13 @@ class Blueprint
         if (empty($this->columns)) {
             return $this;
         }
-        
+
         $index = count($this->columns) - 1;
         $this->columns[$index]['parameters']['comment'] = $comment;
-        
+
         return $this;
     }
-    
+
     /**
      * Set the charset for the column
      *
@@ -366,13 +366,13 @@ class Blueprint
         if (empty($this->columns)) {
             return $this;
         }
-        
+
         $index = count($this->columns) - 1;
         $this->columns[$index]['parameters']['charset'] = $charset;
-        
+
         return $this;
     }
-    
+
     /**
      * Set the collation for the column
      *
@@ -384,13 +384,13 @@ class Blueprint
         if (empty($this->columns)) {
             return $this;
         }
-        
+
         $index = count($this->columns) - 1;
         $this->columns[$index]['parameters']['collation'] = $collation;
-        
+
         return $this;
     }
-    
+
     /**
      * Add timestamps (created_at, updated_at) columns
      *
@@ -400,10 +400,10 @@ class Blueprint
     {
         $this->datetime('created_at');
         $this->datetime('updated_at')->nullable();
-        
+
         return $this;
     }
-    
+
     /**
      * Add a foreign key constraint
      *
@@ -413,10 +413,10 @@ class Blueprint
     public function foreign($columns): ForeignKeyDefinition
     {
         $columns = is_array($columns) ? $columns : [$columns];
-        
+
         return new ForeignKeyDefinition($this, $columns);
     }
-    
+
     /**
      * Add a foreign key command to the blueprint
      *
@@ -428,13 +428,12 @@ class Blueprint
      * @return $this
      */
     public function addForeignKeyCommand(
-        array $columns, 
-        string $table, 
+        array $columns,
+        string $table,
         array $foreignColumns,
         ?string $onDelete = null,
         ?string $onUpdate = null
-    ): self
-    {
+    ): self {
         $this->commands[] = [
             'type' => 'foreign',
             'columns' => $columns,
@@ -443,10 +442,10 @@ class Blueprint
             'onDelete' => $onDelete,
             'onUpdate' => $onUpdate,
         ];
-        
+
         return $this;
     }
-    
+
     /**
      * Add a dropColumn command
      *
@@ -456,17 +455,17 @@ class Blueprint
     public function dropColumn($columns): self
     {
         $columns = is_array($columns) ? $columns : [$columns];
-        
+
         foreach ($columns as $column) {
             $this->commands[] = [
                 'type' => 'drop_column',
                 'column' => $column
             ];
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Add a renameColumn command
      *
@@ -485,7 +484,7 @@ class Blueprint
             $scale = $options['scale'] ?? 2;
             $columnType = "DECIMAL($precision,$scale)";
         }
-        
+
         $this->commands[] = [
             'type' => 'rename_column',
             'from' => $from,
@@ -493,7 +492,7 @@ class Blueprint
             'column_type' => $columnType,
             'options' => $options
         ];
-        
+
         return $this;
     }
 
@@ -508,16 +507,16 @@ class Blueprint
     {
         $columns = is_array($columns) ? $columns : [$columns];
         $name = $name ?: $this->createIndexName('index', $columns);
-        
+
         $this->commands[] = [
             'type' => 'index',
             'columns' => $columns,
             'name' => $name
         ];
-        
+
         return $this;
     }
-    
+
     /**
      * Add a primary key to the table
      *
@@ -529,16 +528,16 @@ class Blueprint
     {
         $columns = is_array($columns) ? $columns : [$columns];
         $name = $name ?: $this->createIndexName('primary', $columns);
-        
+
         $this->commands[] = [
             'type' => 'primary',
             'columns' => $columns,
             'name' => $name
         ];
-        
+
         return $this;
     }
-    
+
     /**
      * Add a unique index to the table
      *
@@ -550,16 +549,16 @@ class Blueprint
     {
         $columns = is_array($columns) ? $columns : [$columns];
         $name = $name ?: $this->createIndexName('unique', $columns);
-        
+
         $this->commands[] = [
             'type' => 'unique',
             'columns' => $columns,
             'name' => $name
         ];
-        
+
         return $this;
     }
-    
+
     /**
      * Create a default index name for the table
      *
@@ -571,7 +570,7 @@ class Blueprint
     {
         return strtolower($this->table . '_' . implode('_', $columns) . '_' . $type);
     }
-    
+
     /**
      * Drop an index from the table
      *
@@ -583,15 +582,15 @@ class Blueprint
     {
         $columns = is_array($columns) ? $columns : [$columns];
         $name = $name ?: $this->createIndexName('index', $columns);
-        
+
         $this->commands[] = [
             'type' => 'drop_index',
             'name' => $name
         ];
-        
+
         return $this;
     }
-    
+
     /**
      * Drop a primary key from the table
      *
@@ -600,15 +599,15 @@ class Blueprint
     public function dropPrimary(?string $name = null): self
     {
         $name = $name ?: "{$this->table}_pkey";
-        
+
         $this->commands[] = [
             'type' => 'drop_primary',
             'name' => $name
         ];
-        
+
         return $this;
     }
-    
+
     /**
      * Drop a unique index from the table
      *
@@ -620,15 +619,15 @@ class Blueprint
     {
         $columns = is_array($columns) ? $columns : [$columns];
         $name = $name ?: $this->createIndexName('unique', $columns);
-        
+
         $this->commands[] = [
             'type' => 'drop_unique',
             'name' => $name
         ];
-        
+
         return $this;
     }
-    
+
     /**
      * Rename an index
      *
@@ -643,10 +642,10 @@ class Blueprint
             'from' => $from,
             'to' => $to
         ];
-        
+
         return $this;
     }
-    
+
     /**
      * Modify a column (change its type, constraints, etc.)
      *
@@ -669,10 +668,10 @@ class Blueprint
             'parameters' => $parameters,
             'options' => $options
         ];
-        
+
         return $this;
     }
-    
+
     /**
      * Change column to allow NULL values
      *
@@ -683,7 +682,7 @@ class Blueprint
     {
         return $this->change($column, 'current', ['nullable' => true]);
     }
-    
+
     /**
      * Change column to NOT NULL
      *
@@ -694,7 +693,7 @@ class Blueprint
     {
         return $this->change($column, 'current', ['nullable' => false]);
     }
-    
+
     /**
      * Generate the SQL for this blueprint
      *
@@ -705,10 +704,10 @@ class Blueprint
         if ($this->type === 'create') {
             return $this->compileCreate();
         }
-        
+
         return $this->compileAlter();
     }
-    
+
     /**
      * Compile the create table SQL
      *
@@ -717,11 +716,11 @@ class Blueprint
     protected function compileCreate(): string
     {
         $columnDefinitions = [];
-        
+
         foreach ($this->columns as $column) {
             $columnDefinitions[] = $this->compileColumn($column);
         }
-        
+
         // Add any constraints and indexes
         foreach ($this->commands as $command) {
             if ($command['type'] === 'foreign') {
@@ -734,28 +733,28 @@ class Blueprint
                 $columnDefinitions[] = $this->compileIndex($command);
             }
         }
-        
-        $sql = "CREATE TABLE {$this->table} (\n    " . 
-               implode(",\n    ", $columnDefinitions) . 
+
+        $sql = "CREATE TABLE {$this->table} (\n    " .
+               implode(",\n    ", $columnDefinitions) .
                "\n)";
-        
+
         // Add engine
         if ($this->engine) {
             $sql .= " ENGINE={$this->engine}";
         }
-        
+
         // Add charset and collation
         if ($this->charset) {
             $sql .= " DEFAULT CHARACTER SET {$this->charset}";
-            
+
             if ($this->collation) {
                 $sql .= " COLLATE {$this->collation}";
             }
         }
-        
+
         return $sql;
     }
-    
+
     /**
      * Compile the alter table SQL
      *
@@ -764,12 +763,12 @@ class Blueprint
     protected function compileAlter(): string
     {
         $commands = [];
-        
+
         // Add columns
         foreach ($this->columns as $column) {
             $commands[] = "ADD COLUMN " . $this->compileColumn($column);
         }
-        
+
         // Add any constraints or other commands
         foreach ($this->commands as $command) {
             if ($command['type'] === 'foreign') {
@@ -777,13 +776,13 @@ class Blueprint
             } elseif ($command['type'] === 'drop_column') {
                 $commands[] = "DROP COLUMN `{$command['column']}`";
             } elseif ($command['type'] === 'primary') {
-                $columns = implode(', ', array_map(fn($col) => "`$col`", $command['columns']));
+                $columns = implode(', ', array_map(fn ($col) => "`$col`", $command['columns']));
                 $commands[] = "ADD PRIMARY KEY ($columns)";
             } elseif ($command['type'] === 'unique') {
-                $columns = implode(', ', array_map(fn($col) => "`$col`", $command['columns']));
+                $columns = implode(', ', array_map(fn ($col) => "`$col`", $command['columns']));
                 $commands[] = "ADD UNIQUE KEY `{$command['name']}` ($columns)";
             } elseif ($command['type'] === 'index') {
-                $columns = implode(', ', array_map(fn($col) => "`$col`", $command['columns']));
+                $columns = implode(', ', array_map(fn ($col) => "`$col`", $command['columns']));
                 $commands[] = "ADD INDEX `{$command['name']}` ($columns)";
             } elseif ($command['type'] === 'drop_index') {
                 $commands[] = "DROP INDEX `{$command['name']}`";
@@ -794,7 +793,7 @@ class Blueprint
             } elseif ($command['type'] === 'rename_column') {
                 $columnType = $command['column_type'] ?? 'VARCHAR(255)';
                 $columnType = strtoupper($columnType);
-                
+
                 // Procesar opciones adicionales para el tipo (como para DECIMAL)
                 if (!empty($command['options'])) {
                     if ($columnType === 'DECIMAL' && isset($command['options']['precision'], $command['options']['scale'])) {
@@ -803,13 +802,13 @@ class Blueprint
                         $columnType .= "($precision,$scale)";
                     }
                 }
-                
+
                 $commands[] = "CHANGE COLUMN `{$command['from']}` `{$command['to']}` $columnType";
             } elseif ($command['type'] === 'rename_index') {
                 $commands[] = "RENAME INDEX `{$command['from']}` TO `{$command['to']}`";
             } elseif ($command['type'] === 'change_column') {
                 $type = strtoupper($command['new_type']);
-                
+
                 // Manejar parámetros adicionales para el tipo de columna
                 if (!empty($command['parameters'])) {
                     switch ($type) {
@@ -824,25 +823,25 @@ class Blueprint
                             break;
                         case 'ENUM':
                             $values = array_map(
-                                fn($val) => "'$val'", 
+                                fn ($val) => "'$val'",
                                 $command['parameters']['values'] ?? []
                             );
                             $type .= "(" . implode(', ', $values) . ")";
                             break;
                     }
                 }
-                
+
                 $commands[] = "MODIFY COLUMN `{$command['column']}` $type";
             }
         }
-        
+
         if (empty($commands)) {
             return "";
         }
-        
+
         return "ALTER TABLE {$this->table}\n    " . implode(",\n    ", $commands);
     }
-    
+
     /**
      * Compile a column definition
      *
@@ -852,44 +851,44 @@ class Blueprint
     protected function compileColumn(array $column): string
     {
         $sql = "`{$column['name']}` " . $this->compileType($column);
-        
+
         // Add nullable
         if (!$column['nullable']) {
             $sql .= " NOT NULL";
         } else {
             $sql .= " NULL";
         }
-        
+
         // Add default value
         if ($column['default'] !== null) {
             $sql .= " DEFAULT " . $this->quoteDefaultValue($column['default']);
-        } else if ($column['nullable']) {
+        } elseif ($column['nullable']) {
             $sql .= " DEFAULT NULL";
         }
-        
+
         // Add auto increment
         if ($column['autoIncrement'] ?? false) {
             $sql .= " AUTO_INCREMENT";
         }
-        
+
         // Add primary key
         if ($column['primary'] ?? false) {
             $sql .= " PRIMARY KEY";
         }
-        
+
         // Add unique constraint
         if ($column['unique']) {
             $sql .= " UNIQUE";
         }
-        
+
         // Add comment if specified
         if (isset($column['parameters']['comment'])) {
             $sql .= " COMMENT '" . str_replace("'", "''", $column['parameters']['comment']) . "'";
         }
-        
+
         return $sql;
     }
-    
+
     /**
      * Compile a column type definition
      *
@@ -900,46 +899,46 @@ class Blueprint
     {
         $parameters = $column['parameters'] ?? [];
         $type = '';
-        
+
         switch ($column['type']) {
             case 'varchar':
                 $length = $parameters['length'] ?? 255;
                 $type = "VARCHAR($length)";
                 break;
-            
+
             case 'int':
                 $type = "INT";
                 break;
-            
+
             case 'tinyint':
                 $length = $parameters['length'] ?? 1;
                 $type = "TINYINT($length)";
                 break;
-            
+
             case 'decimal':
                 $precision = $parameters['precision'] ?? 8;
                 $scale = $parameters['scale'] ?? 2;
                 $type = "DECIMAL($precision,$scale)";
                 break;
-            
+
             case 'enum':
-                $values = array_map(fn($val) => "'$val'", $parameters['values'] ?? []);
+                $values = array_map(fn ($val) => "'$val'", $parameters['values'] ?? []);
                 $type = "ENUM(" . implode(', ', $values) . ")";
                 break;
-                
+
             default:
                 $type = strtoupper($column['type']);
                 break;
         }
-        
+
         // Add unsigned modifier if specified
         if (isset($parameters['unsigned']) && $parameters['unsigned'] === true) {
             $type .= ' UNSIGNED';
         }
-        
+
         return $type;
     }
-    
+
     /**
      * Quote a default value for use in a SQL statement
      *
@@ -951,18 +950,18 @@ class Blueprint
         if ($value === null) {
             return 'NULL';
         }
-        
+
         if (is_bool($value)) {
             return $value ? '1' : '0';
         }
-        
+
         if (is_numeric($value)) {
             return (string) $value;
         }
-        
+
         return "'" . str_replace("'", "''", $value) . "'";
     }
-    
+
     /**
      * Compile a foreign key constraint
      *
@@ -971,35 +970,35 @@ class Blueprint
      */
     protected function compileForeignKey(array $command): string
     {
-        $columns = implode(', ', array_map(fn($col) => "`$col`", $command['columns']));
-        $foreignColumns = implode(', ', array_map(fn($col) => "`$col`", $command['foreignColumns']));
-        
+        $columns = implode(', ', array_map(fn ($col) => "`$col`", $command['columns']));
+        $foreignColumns = implode(', ', array_map(fn ($col) => "`$col`", $command['foreignColumns']));
+
         $constraintName = $this->createForeignKeyName(
-            $this->table, 
-            $command['table'], 
+            $this->table,
+            $command['table'],
             $command['columns'],
             64,
             $command['onDelete'] ?? null,
             $command['onUpdate'] ?? null
         );
-        
+
         $sql = "CONSTRAINT `$constraintName` " .
                "FOREIGN KEY ($columns) " .
                "REFERENCES {$command['table']}($foreignColumns)";
-        
+
         // Añadir cláusula ON DELETE si está especificada
         if (!empty($command['onDelete'])) {
             $sql .= " ON DELETE {$command['onDelete']}";
         }
-        
+
         // Añadir cláusula ON UPDATE si está especificada
         if (!empty($command['onUpdate'])) {
             $sql .= " ON UPDATE {$command['onUpdate']}";
         }
-        
+
         return $sql;
     }
-    
+
     /**
      * Crea un nombre para la clave foránea que cumpla con el límite de 64 caracteres de MySQL
      *
@@ -1012,21 +1011,20 @@ class Blueprint
      * @return string
      */
     protected function createForeignKeyName(
-        string $table, 
-        string $foreignTable, 
-        array $columns, 
+        string $table,
+        string $foreignTable,
+        array $columns,
         int $maxLength = 64,
         ?string $onDelete = null,
         ?string $onUpdate = null
-    ): string
-    {
+    ): string {
         // Prefijo estándar para claves foráneas
         $prefix = 'fk_';
-        
+
         // Acortamos nombres de tablas si son muy largos
         $tableShort = $this->shortenIdentifier($table, 8);
         $foreignTableShort = $this->shortenIdentifier($foreignTable, 8);
-        
+
         // Acortamos nombres de columnas si hay varias o son muy largas
         $columnsStr = '';
         if (count($columns) > 2) {
@@ -1034,10 +1032,10 @@ class Blueprint
             $columnsStr = $this->shortenIdentifier($columns[0], 8) . '_' . substr(md5(implode('_', $columns)), 0, 4);
         } else {
             // Acortamos cada columna individualmente y las unimos
-            $shortColumns = array_map(fn($col) => $this->shortenIdentifier($col, 8), $columns);
+            $shortColumns = array_map(fn ($col) => $this->shortenIdentifier($col, 8), $columns);
             $columnsStr = implode('_', $shortColumns);
         }
-        
+
         // Incorporamos información de acciones en un sufijo corto
         $actionSuffix = '';
         if (!empty($onDelete)) {
@@ -1051,7 +1049,7 @@ class Blueprint
             $actionKey = strtoupper($onDelete);
             $actionSuffix .= isset($actionMap[$actionKey]) ? '_d' . $actionMap[$actionKey] : '_d' . substr(strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $onDelete)), 0, 2);
         }
-        
+
         if (!empty($onUpdate)) {
             $actionMap = [
                 'CASCADE' => 'cd',
@@ -1063,37 +1061,37 @@ class Blueprint
             $actionKey = strtoupper($onUpdate);
             $actionSuffix .= isset($actionMap[$actionKey]) ? '_u' . $actionMap[$actionKey] : '_u' . substr(strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $onUpdate)), 0, 2);
         }
-        
+
         // Añadir un identificador único basado en todas las partes
         $uniquePart = '';
         if (empty($actionSuffix)) {
             // Si no hay acciones, usamos un hash basado en las tablas y columnas
             $uniquePart = '_' . substr(md5($table . $foreignTable . implode('_', $columns)), 0, 4);
         }
-        
+
         // Combinamos las partes con un formato predecible
         $name = "{$prefix}{$tableShort}_{$foreignTableShort}_{$columnsStr}{$actionSuffix}{$uniquePart}";
-        
+
         // Nos aseguramos de que el nombre final no exceda la longitud máxima
         if (strlen($name) > $maxLength) {
             // Truncar conservando el prefijo y añadiendo un hash
             $hashLength = 8; // Longitud del hash para evitar colisiones
             $prefixLength = strlen($prefix);
             $availableLength = $maxLength - $prefixLength - $hashLength - 1; // -1 por el guión
-            
+
             $shortenedName = substr($name, $prefixLength, $availableLength);
             $hash = substr(md5($name), 0, $hashLength);
-            
+
             $name = $prefix . $shortenedName . '_' . $hash;
             $name = substr($name, 0, $maxLength);
         }
-        
+
         return $name;
     }
-    
+
     /**
      * Acorta un identificador manteniendo su legibilidad
-     * 
+     *
      * @param string $identifier Identificador a acortar
      * @param int $maxLength Longitud máxima deseada
      * @return string
@@ -1103,32 +1101,34 @@ class Blueprint
         if (strlen($identifier) <= $maxLength) {
             return $identifier;
         }
-        
+
         // Estrategia mejorada para acortar identificadores
-        
+
         // 1. Eliminar palabras comunes que no aportan mucho valor semántico
         $commonWords = ['the', 'and', 'for', 'with', 'from', 'that', 'this', 'table', 'column', 'field'];
         $parts = explode('_', $identifier);
-        $parts = array_filter($parts, function($part) use ($commonWords) {
+        $parts = array_filter($parts, function ($part) use ($commonWords) {
             return !in_array(strtolower($part), $commonWords);
         });
         $identifier = implode('_', $parts);
-        
+
         // Si aún es demasiado largo después de eliminar palabras comunes
         if (strlen($identifier) <= $maxLength) {
             return $identifier;
         }
-        
+
         // 2. Abreviación mediante eliminación de vocales (excepto la primera letra de cada palabra)
         $parts = explode('_', $identifier);
         $result = [];
-        
+
         foreach ($parts as $part) {
-            if (empty($part)) continue;
-            
+            if (empty($part)) {
+                continue;
+            }
+
             // Mantener la primera letra intacta
             $abbreviated = $part[0];
-            
+
             // Eliminar vocales del resto de la palabra
             $vowels = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
             for ($i = 1; $i < strlen($part); $i++) {
@@ -1136,12 +1136,12 @@ class Blueprint
                     $abbreviated .= $part[$i];
                 }
             }
-            
+
             $result[] = $abbreviated;
         }
-        
+
         $identifier = implode('_', $result);
-        
+
         // 3. Si aún es demasiado largo, truncar el resultado
         if (strlen($identifier) > $maxLength) {
             // Para nombres muy largos, podemos usar una técnica de hash para la parte final
@@ -1153,10 +1153,10 @@ class Blueprint
                 $identifier = substr($identifier, 0, $maxLength);
             }
         }
-        
+
         return $identifier;
     }
-    
+
     /**
      * Compile a primary key constraint
      *
@@ -1165,10 +1165,10 @@ class Blueprint
      */
     protected function compilePrimaryKey(array $command): string
     {
-        $columns = implode(', ', array_map(fn($col) => "`$col`", $command['columns']));
+        $columns = implode(', ', array_map(fn ($col) => "`$col`", $command['columns']));
         return "PRIMARY KEY ($columns)";
     }
-    
+
     /**
      * Compile a unique index constraint
      *
@@ -1177,10 +1177,10 @@ class Blueprint
      */
     protected function compileUniqueIndex(array $command): string
     {
-        $columns = implode(', ', array_map(fn($col) => "`$col`", $command['columns']));
+        $columns = implode(', ', array_map(fn ($col) => "`$col`", $command['columns']));
         return "UNIQUE KEY `{$command['name']}` ($columns)";
     }
-    
+
     /**
      * Compile a standard index
      *
@@ -1189,10 +1189,10 @@ class Blueprint
      */
     protected function compileIndex(array $command): string
     {
-        $columns = implode(', ', array_map(fn($col) => "`$col`", $command['columns']));
+        $columns = implode(', ', array_map(fn ($col) => "`$col`", $command['columns']));
         return "INDEX `{$command['name']}` ($columns)";
     }
-    
+
     /**
      * Set the storage engine for the table
      *
@@ -1204,7 +1204,7 @@ class Blueprint
         $this->engine = $engine;
         return $this;
     }
-    
+
     /**
      * Set the character set for the table
      *
@@ -1216,7 +1216,7 @@ class Blueprint
         $this->charset = $charset;
         return $this;
     }
-    
+
     /**
      * Set the collation for the table
      *
@@ -1228,7 +1228,7 @@ class Blueprint
         $this->collation = $collation;
         return $this;
     }
-    
+
     /**
      * Helper function to see what's in the command
      */

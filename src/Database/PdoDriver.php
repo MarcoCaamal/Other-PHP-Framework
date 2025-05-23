@@ -26,7 +26,7 @@ class PdoDriver implements DatabaseDriverContract
         $this->pdo = new PDO($dsn, $username, $password);
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
-    
+
     /**
      * @inheritDoc
      */
@@ -34,7 +34,7 @@ class PdoDriver implements DatabaseDriverContract
     {
         return $this->pdo->lastInsertId();
     }
-    
+
     /**
      * @inheritDoc
      */
@@ -44,7 +44,7 @@ class PdoDriver implements DatabaseDriverContract
         $statement->execute($bind);
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
     /**
      * @inheritDoc
      */
@@ -53,30 +53,30 @@ class PdoDriver implements DatabaseDriverContract
         $statement = $this->pdo->prepare($query);
         return $statement->execute($bind);
     }
-    
+
     /**
      * Begin a transaction
-     * 
+     *
      * @return bool
      */
     public function beginTransaction(): bool
     {
         return $this->pdo->beginTransaction();
     }
-    
+
     /**
      * Commit a transaction
-     * 
+     *
      * @return bool
      */
     public function commit(): bool
     {
         return $this->pdo->commit();
     }
-    
+
     /**
      * Rollback a transaction
-     * 
+     *
      * @return bool
      */
     public function rollback(): bool

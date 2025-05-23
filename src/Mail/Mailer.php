@@ -16,7 +16,7 @@ class Mailer implements MailerContract
      * Driver actual para el envío de correos
      */
     protected MailDriverContract $driver;
-    
+
     /**
      * Mapa de drivers disponibles
      *
@@ -26,12 +26,12 @@ class Mailer implements MailerContract
         'phpmailer' => \LightWeight\Mail\Drivers\PhpMailerDriver::class,
         'log' => \LightWeight\Mail\Drivers\LogDriver::class,
     ];
-    
+
     /**
      * Motor de vistas para renderizar plantillas
      */
     protected ?ViewContract $viewEngine = null;
-    
+
     /**
      * Constructor
      *
@@ -43,7 +43,7 @@ class Mailer implements MailerContract
         $this->setDriver($defaultDriver);
         $this->viewEngine = $viewEngine;
     }
-    
+
     /**
      * Envía un email simple
      *
@@ -57,18 +57,18 @@ class Mailer implements MailerContract
     {
         // Reiniciar el driver para un nuevo email
         $this->driver->reset();
-        
+
         // Establecer el remitente si se especifica en las opciones
         if (isset($options['from'])) {
             $fromName = $options['from_name'] ?? null;
             $this->driver->setFrom($options['from'], $fromName);
         }
-        
+
         // Configurar el email
         $this->driver->setTo($to)
                      ->setSubject($subject)
                      ->setHtmlBody($message);
-        
+
         // Añadir CC si se especifica
         if (isset($options['cc'])) {
             if (is_array($options['cc'])) {
@@ -79,7 +79,7 @@ class Mailer implements MailerContract
                 $this->driver->addCC($options['cc']);
             }
         }
-        
+
         // Añadir BCC si se especifica
         if (isset($options['bcc'])) {
             if (is_array($options['bcc'])) {
@@ -90,7 +90,7 @@ class Mailer implements MailerContract
                 $this->driver->addBCC($options['bcc']);
             }
         }
-        
+
         // Añadir adjuntos si se especifican
         if (isset($options['attachments'])) {
             if (is_array($options['attachments'])) {
@@ -105,16 +105,16 @@ class Mailer implements MailerContract
                 $this->driver->addAttachment($options['attachments']);
             }
         }
-        
+
         // Establecer cuerpo de texto plano si se especifica
         if (isset($options['text'])) {
             $this->driver->setTextBody($options['text']);
         }
-        
+
         // Enviar el email
         return $this->driver->send();
     }
-    
+
     /**
      * Envía un email usando una plantilla
      *
@@ -129,11 +129,11 @@ class Mailer implements MailerContract
     {
         // Renderizar la plantilla
         $message = $this->renderTemplate($template, $data);
-        
+
         // Enviar el email usando el mensaje renderizado
         return $this->send($to, $subject, $message, $options);
     }
-    
+
     /**
      * Obtiene el driver actual
      *
@@ -143,7 +143,7 @@ class Mailer implements MailerContract
     {
         return $this->driver;
     }
-    
+
     /**
      * Establece el driver a utilizar
      *
@@ -156,13 +156,13 @@ class Mailer implements MailerContract
         if (!isset($this->drivers[$driver])) {
             throw new MailerException("El driver de correo '{$driver}' no está registrado.");
         }
-        
+
         $driverClass = $this->drivers[$driver];
         $this->driver = new $driverClass();
-        
+
         return $this;
     }
-    
+
     /**
      * Registra un nuevo driver
      *
@@ -175,7 +175,7 @@ class Mailer implements MailerContract
         $this->drivers[$name] = $class;
         return $this;
     }
-    
+
     /**
      * Renderiza una plantilla con los datos proporcionados
      *
@@ -194,42 +194,42 @@ class Mailer implements MailerContract
                 if (!str_starts_with($viewName, 'emails.')) {
                     $viewName = 'emails.' . $viewName;
                 }
-                
+
                 // Renderizamos sin layout para emails (false como tercer parámetro)
                 return $this->viewEngine->render($viewName, $data, false);
             } catch (\Exception $e) {
                 throw new MailerException("Error al renderizar la plantilla de email '{$template}': " . $e->getMessage());
             }
         }
-        
+
         // Si no tenemos motor de vistas, intentamos obtener recursos mediante helpers (prioridad 2)
         if (function_exists('resourcesDirectory')) {
             $templatePath = resourcesDirectory() . '/views/emails/' . str_replace('.', '/', $template) . '.php';
-            
+
             if (!file_exists($templatePath)) {
                 throw new MailerException("La plantilla de email '{$template}' no existe en: {$templatePath}");
             }
-            
+
             // Extraer variables para la vista
             extract($data);
-            
+
             // Capturar salida
             ob_start();
             include $templatePath;
             return ob_get_clean();
         }
-        
+
         // Método de respaldo si nada de lo anterior está disponible (prioridad 3)
         $basePath = dirname(__DIR__, 2);
         $templatePath = rtrim($basePath, '/') . '/resources/views/emails/' . str_replace('.', '/', $template) . '.php';
-        
+
         if (!file_exists($templatePath)) {
             throw new MailerException("La plantilla de email '{$template}' no existe en: {$templatePath}");
         }
-        
+
         // Extraer variables para la vista
         extract($data);
-        
+
         // Capturar salida
         ob_start();
         include $templatePath;

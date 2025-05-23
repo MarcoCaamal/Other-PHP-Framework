@@ -12,7 +12,7 @@ class FileStorageDriverServiceProvider extends ServiceProvider
 {
     /**
      * Proporciona definiciones para el contenedor antes de su compilación
-     * 
+     *
      * @return array
      */
     public function getDefinitions(): array
@@ -21,13 +21,13 @@ class FileStorageDriverServiceProvider extends ServiceProvider
             FileStorageDriverContract::class => \DI\factory(function () {
                 $default = config("storage.default", "local");
                 $driverConfig = config("storage.drivers.$default", null);
-                
+
                 if (!$driverConfig) {
                     throw new ConfigurationException("Storage driver configuration for '$default' not found");
                 }
-                
+
                 $driver = $driverConfig['driver'] ?? $default;
-                  // Create the appropriate driver based on configuration
+                // Create the appropriate driver based on configuration
                 return match ($driver) {
                     "disk", "local" => new LocalFileStorage(
                         $driverConfig['path'] ?? config('storage.path', rootDirectory() . '/storage/app')
@@ -45,7 +45,7 @@ class FileStorageDriverServiceProvider extends ServiceProvider
             })
         ];
     }
-    
+
     /**
      * @inheritDoc
      */
@@ -53,7 +53,7 @@ class FileStorageDriverServiceProvider extends ServiceProvider
     {
         // Todas las definiciones ya están configuradas en getDefinitions()
     }
-    
+
     /**
      * Register local driver
      *
@@ -64,13 +64,13 @@ class FileStorageDriverServiceProvider extends ServiceProvider
     protected function registerLocalDriver(\DI\Container $serviceContainer, array $config): void
     {
         $serviceContainer->set(
-            FileStorageDriverContract::class, 
+            FileStorageDriverContract::class,
             \DI\create(LocalFileStorage::class)->constructor(
                 $config['path'] ?? config('storage.path', rootDirectory() . '/storage/app')
             )
         );
     }
-    
+
     /**
      * Register public driver
      *
@@ -81,7 +81,7 @@ class FileStorageDriverServiceProvider extends ServiceProvider
     protected function registerPublicDriver(\DI\Container $serviceContainer, array $config): void
     {
         $serviceContainer->set(
-            FileStorageDriverContract::class, 
+            FileStorageDriverContract::class,
             \DI\create(PublicFileStorage::class)->constructor(
                 $config['path'] ?? config('storage.path', rootDirectory() . '/storage/public'),
                 $config['storage_uri'] ?? config('storage.storage_uri', 'storage/public'),
@@ -89,7 +89,7 @@ class FileStorageDriverServiceProvider extends ServiceProvider
             )
         );
     }
-    
+
     /**
      * Register S3 driver
      *
@@ -102,7 +102,7 @@ class FileStorageDriverServiceProvider extends ServiceProvider
         // This is a placeholder for future S3 driver implementation
         throw new ConfigurationException("S3 driver not yet implemented");
     }
-    
+
     /**
      * Register FTP driver
      *
