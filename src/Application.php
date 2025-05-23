@@ -154,6 +154,7 @@ class Application
             // Crear la aplicación con el contenedor ya construido
             $app = new Application($container);
             $app->container = $container; // Asegurar que el contenedor esté asignado a la aplicación
+            $container->set(Application::class, $app);
             $app
                 ->loadConfig()
                 ->runServiceProviders('boot')  // Ahora solo ejecuta registerServices()
@@ -250,11 +251,11 @@ class Application
      */
     public function setHttpHandlers(): self
     {
-        $this->router = app(Router::class);
-        $this->server = app(ServerContract::class);
-        $this->request = app(RequestContract::class);
-        $this->session = app(Session::class);
-        
+        $this->router = $this->container->get(Router::class);
+        $this->server = $this->container->get(ServerContract::class);
+        $this->request = $this->container->get(RequestContract::class);
+        $this->session = $this->container->get(Session::class);
+
         // No need to create a global response instance
         // Each controller/route will create its own response
         

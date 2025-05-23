@@ -24,7 +24,7 @@ class SessionStorageServiceProvider extends ServiceProvider
             })
         ];
     }
-    
+
     public function registerServices(Container $serviceContainer)
     {
         // La configuración ya está definida en getDefinitions()
