@@ -5,8 +5,7 @@
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
-            "LightWeight\\": "src",
-            "App\\": "app"
+            "LightWeight\\": "src"
         },
         "files": [
             "src/Helpers/app.php",

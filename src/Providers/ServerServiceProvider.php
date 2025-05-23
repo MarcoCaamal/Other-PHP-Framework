@@ -2,6 +2,7 @@
 
 namespace LightWeight\Providers;
 
+use LightWeight\Application;
 use LightWeight\Container\Container;
 use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Routing\Router;
@@ -36,5 +37,6 @@ class ServerServiceProvider extends ServiceProvider
     public function registerServices(Container $serviceContainer)
     {
         // Las definiciones ya están configuradas en getDefinitions()
+        \LightWeight\Routing\Route::load(Application::$root . '/routes');
     }
 }

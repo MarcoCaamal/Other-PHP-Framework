@@ -7,7 +7,7 @@ use LightWeight\Events\Contracts\EventDispatcherContract;
 /**
  * Proveedor de servicios para el sistema de eventos específico de la aplicación
  */
-class AppEventServiceProvider implements \LightWeight\Providers\Contracts\ServiceProviderContract
+class AppEventServiceProvider extends \LightWeight\Providers\ServiceProvider
 {
     /**
      * Lista de listeners a registrar para cada evento

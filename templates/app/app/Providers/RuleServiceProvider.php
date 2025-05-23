@@ -2,11 +2,10 @@
 
 namespace App\Providers;
 
-use DI\Container;
-use LightWeight\Providers\Contracts\ServiceProviderContract;
+use LightWeight\Container\Container;
 use LightWeight\Validation\Rule;
 
-class RuleServiceProvider implements ServiceProviderContract
+class RuleServiceProvider extends \LightWeight\Providers\ServiceProvider
 {
     public function registerServices(Container $serviceContainer)
     {

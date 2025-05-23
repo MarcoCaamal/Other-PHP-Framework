@@ -2,13 +2,12 @@
 
 namespace App\Providers;
 
-use DI\Container;
+use LightWeight\Container\Container;
 use LightWeight\Application;
-use LightWeight\Providers\Contracts\ServiceProviderContract;
 use LightWeight\Routing\Route;
 use LightWeight\Routing\Router;
 
-class RouteServiceProvider implements ServiceProviderContract
+class RouteServiceProvider extends \LightWeight\Providers\ServiceProvider
 {
     /**
      * @inheritDoc

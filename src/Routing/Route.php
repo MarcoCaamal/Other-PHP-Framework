@@ -175,7 +175,7 @@ class Route
     }
     public static function load(string $routesDirectory)
     {
-        foreach(glob("$routesDirectory/*.php") as $routes) {
+        foreach(glob(pattern: "$routesDirectory/*.php") as $routes) {
             require_once $routes;
         }
     }

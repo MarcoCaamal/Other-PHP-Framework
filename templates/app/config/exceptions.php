@@ -6,7 +6,7 @@ return [
      * 
      * This class will handle exceptions thrown during the application execution
      */
-    'exception_handler' => \App\Exceptions\Handler::class,
+    'handler' => \App\Exceptions\Handler::class,
     
     /**
      * Whether to display detailed error information
