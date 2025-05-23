@@ -27,7 +27,9 @@ class ServerServiceProvider extends ServiceProvider
             RequestContract::class => \DI\factory(function (ServerContract $server) {
                 return $server->getRequest();
             }),
-            Router::class => \DI\create(Router::class)
+            Router::class => \DI\factory(function (Container $container) {
+                return new Router($container);
+            })
         ];
     }
 

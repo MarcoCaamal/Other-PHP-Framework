@@ -3,13 +3,10 @@
 namespace LightWeight\Routing;
 
 use LightWeight\Container\Container;
-use LightWeight\Container\DependencyInjection;
 use LightWeight\Http\Contracts\RequestContract;
 use LightWeight\Http\Contracts\ResponseContract;
 use LightWeight\Http\HttpMethod;
-use LightWeight\Http\Request;
 use LightWeight\Http\HttpNotFoundException;
-use LightWeight\Http\Response;
 use LightWeight\Routing\Exceptions\RouteDuplicatedNameException;
 use LightWeight\Routing\Route;
 
@@ -39,8 +36,7 @@ class Router
 
     /**
      * Create a new router
-     */
-    public function __construct()
+     */    public function __construct(protected Container $container)
     {
         foreach (HttpMethod::cases() as $method) {
             $this->routes[$method->value] = [];
@@ -72,12 +68,12 @@ class Router
     public function resolveRoute(RequestContract $request): Route
     {
         foreach ($this->routes[$request->method()->value] as $route) {
-            if ($route->matches($request->uri())) {
-                // Disparar el evento router.matched cuando se encuentra una ruta
+            if ($route->matches($request->uri())) {                // Disparar el evento router.matched cuando se encuentra una ruta
                 try {
-                    $app = app();
-                    if (isset($app->events)) {
-                        $app->events->dispatch(new \LightWeight\Events\System\RouterMatched([
+                    // Intentar obtener el despachador de eventos directamente del contenedor
+                    if ($this->container->has(\LightWeight\Events\Contracts\EventDispatcherContract::class)) {
+                        $eventDispatcher = $this->container->get(\LightWeight\Events\Contracts\EventDispatcherContract::class);
+                        $eventDispatcher->dispatch(new \LightWeight\Events\System\RouterMatched([
                             'route' => $route,
                             'uri' => $request->uri(),
                             'method' => $request->method()->value
@@ -166,13 +162,11 @@ class Router
     {
         $route = $this->resolveRoute($request);
         $request->setRoute($route);
-        $action = $route->action();
-
-        // Recopilar todos los middlewares aplicables
+        $action = $route->action();        // Recopilar todos los middlewares aplicables
         $middlewareInstances = array_map(
             function($mw) {
                 if (is_string($mw)) {
-                    return Container::make($mw); // Usar Container::make para aprovechar la inyección de dependencias
+                    return $this->container->make($mw); // Usar el contenedor inyectado para aprovechar la inyección de dependencias
                 }
                 return $mw;
             }, 
@@ -184,11 +178,10 @@ class Router
 
         // Si hay middleware groups definidos en la ruta, añadirlos también
         if (method_exists($route, 'middlewareGroups') && !empty($route->middlewareGroups())) {
-            foreach ($route->middlewareGroups() as $groupName) {
-                $groupMiddlewares = array_map(
+            foreach ($route->middlewareGroups() as $groupName) {                $groupMiddlewares = array_map(
                     function($mw) {
                         if (is_string($mw)) {
-                            return Container::make($mw); // Usar Container::make para aprovechar la inyección de dependencias
+                            return $this->container->make($mw); // Usar el contenedor inyectado para aprovechar la inyección de dependencias
                         }
                         return $mw;
                     },
@@ -196,29 +189,30 @@ class Router
                 );
                 $middlewareInstances = array_merge($middlewareInstances, $groupMiddlewares);
             }
-        }
-
-        if(is_array($action)) {
-            $controller = singleton($action[0], \DI\autowire($action[0]));
+        }        if(is_array($action)) {
+            // Reemplazar el singleton helper con el container directamente
+            if (!$this->container->has($action[0])) {
+                $this->container->set($action[0], \DI\autowire($action[0]));
+            }
+            $controller = $this->container->get($action[0]);
             $action[0] = $controller;
             $middlewareInstances = array_merge($middlewareInstances, $controller->middlewares());
         }
 
-        if (!empty($middlewareInstances)) {
-            return $this->runMiddlewares(
+        if (!empty($middlewareInstances)) {            return $this->runMiddlewares(
                 $request,
                 $middlewareInstances,
                 function () use ($action, $request) {
                     // Usa PHP-DI call() directamente para invocar el controlador o función de cierre
                     if (is_array($action)) {
                         // Es un método de controlador [ControllerClass, 'method']
-                        return Container::call([$action[0], $action[1]], [
+                        return $this->container->call([$action[0], $action[1]], [
                             'request' => $request,
                             ...$request->routeParameters()
                         ]);
                     } else {
                         // Es una función de cierre
-                        return Container::call($action, [
+                        return $this->container->call($action, [
                             'request' => $request,
                             ...$request->routeParameters()
                         ]);
@@ -226,15 +220,14 @@ class Router
                 }
             );
         }
-        
-        // Sin middlewares, usa call directamente
+          // Sin middlewares, usa call directamente
         if (is_array($action)) {
-            return Container::call([$action[0], $action[1]], [
+            return $this->container->call([$action[0], $action[1]], [
                 'request' => $request,
                 ...$request->routeParameters()
             ]);
         } else {
-            return Container::getContainer()->call($action, [
+            return $this->container->call($action, [
                 'request' => $request,
                 ...$request->routeParameters()
             ]);
