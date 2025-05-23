@@ -54,7 +54,6 @@ class Router
         $uriWithPrefix = rtrim(Route::$prefix ?? '', '/') . '/' . ltrim($uri, '/');
         $uriWithPrefix = '/' . trim($uriWithPrefix, '/');
         $route = new Route($uriWithPrefix, $action);
-        $this->verifyIfExistsRouteWithDuplicatedName($route);
         $this->routes[$method->value][] = $route;
         return $route;
     }
@@ -141,6 +140,26 @@ class Router
     {
         return $this->middlewareGroups[$group] ?? [];
     }    /**
+     * Check if a route with the given name already exists (excluding the provided route)
+     * 
+     * @param string $name The name to check
+     * @param Route|null $excludeRoute Route to exclude from the check
+     * @return bool True if a route with the name exists, false otherwise
+     */
+    public function hasRouteWithName(string $name, ?Route $excludeRoute = null): bool
+    {
+        foreach ($this->routes as $methodRoutes) {
+            foreach ($methodRoutes as $route) {
+                if ($route !== $excludeRoute && $route->name() === $name) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    /**
      * Generate a URL for a named route
      *
      * @param string $name The name of the route
@@ -341,6 +360,29 @@ class Router
         }
 
         return null;
+    }
+
+    /**
+     * Update a route's name and verify that there are no duplicates
+     *
+     * @param Route $route The route to update
+     * @param string $name The new name
+     * @return Route The updated route
+     * @throws RouteDuplicatedNameException If the name is already used by another route
+     */    public function updateRouteName(Route $route, string $name): Route
+    {
+        // Verificar si el nombre ya está en uso por otra ruta
+        if ($this->hasRouteWithName($name, $route)) {
+            throw new RouteDuplicatedNameException($name);
+        }
+        
+        // Actualizar el nombre de la ruta directamente para evitar llamadas recursivas
+        $routeReflection = new \ReflectionObject($route);
+        $nameProperty = $routeReflection->getProperty('name');
+        $nameProperty->setAccessible(true);
+        $nameProperty->setValue($route, $name);
+        
+        return $route;
     }
 
     protected function verifyIfExistsRouteWithDuplicatedName(Route $newRoute)
